@@ -926,7 +926,7 @@ function answer(v,el){
   if(ok&&secs<tim().sec){
     me++;player.goals=(player.goals||0)+1;
     var was=st.level>=GOLD,gold=false;
-    if(!usedHint){st.level=Math.min(GOLD,st.level+1);if(!st.best||secs<st.best)st.best=secs;gold=!was&&st.level>=GOLD;if(gold)goldNow++;}
+    if(!usedHint){st.level=GOLD;if(!st.best||secs<st.best)st.best=secs;gold=!was&&st.level>=GOLD;if(gold)goldNow++;}
     burst();if(gold)sGold();else sGoal();
     bg='#d4efdf';col='#0b6a38';head='⚽ قـــول! سجّلتَ هدفًا';
     line=ar(c.a)+' × '+ar(c.b)+' = '+ar(p)+' في '+ar(secs.toFixed(1))+' ثانية'+(gold?'<br>🧤 وصارت تسديدة مضمونة':'');
