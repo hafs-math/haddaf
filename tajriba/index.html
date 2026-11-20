@@ -359,7 +359,7 @@ function topBar(){
   return '<header class="top-bar"><div class="trow">'
    +'<div style="width:44px">'+shirt(44,kit(),player.num,'')+'</div>'
    +'<div style="flex:1"><div class="tname">'+player.name+' — '+player.team+'</div>'
-   +'<div class="tsmall">رقم '+ar(player.num)+' — قميص '+kit().n+' — '+lvl().e+' '+lvl().n+'</div></div>'
+   +'<div class="tsmall">رقم '+player.num+' — قميص '+kit().n+' — '+lvl().e+' '+lvl().n+'</div></div>'
    +'<div class="credit" id="cred">'+sch()+'<br>'+aut()+(player.teacher?'<br><span style="color:#f6b93b">وضع المعلم مفعّل</span>':'')+'</div></div>'
    +'<div class="stats"><div>⭐ '+allStars()+'/'+(TABLES.length*3)+'</div><div>🏆 '+wins()+'/'+TABLES.length+'</div><div>🧤 '+allGold()+'/90</div></div>'
    +(BACK?'<button class="backb" id="bkb">⟶ السابق</button>':'')+'</header>';
@@ -489,7 +489,7 @@ function wiz(step,editing){
     var have3=player.kitSaved&&!editing;
     h+=wizHead(3,'👕 صمّم فنيلتك','اختر رقمك، ولونك الأساسي، والنقش ولونه.');
     h+='<div class="card" style="text-align:center"><div id="pv">'+shirt(120,kit(),player.num,player.name)+'</div></div>';
-    if(have3){ h+=savedCard('الفنيلة','رقم '+ar(player.num)+' — '+kit().n+' — '+patn().n); mode='next'; }
+    if(have3){ h+=savedCard('الفنيلة','رقم '+player.num+' — '+kit().n+' — '+patn().n); mode='next'; }
     else {
       h+='<div class="card"><h3>🔢 الرقم (من 1 إلى 99)</h3>'
        +'<div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:10px">'
@@ -527,7 +527,7 @@ function wiz(step,editing){
     h+=wizHead(6,'⚽ هل أنت مستعد؟','')
      +'<div class="card" style="text-align:center">'+shirt(140,kit(),player.num,player.name)
      +'<h3 style="font-size:1.3rem;margin-top:8px">'+player.name+' — '+player.team+'</h3>'
-     +'<p style="font-size:.9rem;color:#57606f;font-weight:700;line-height:1.9">رقم '+ar(player.num)+' — '+kit().n+'<br>المستوى: '+lvl().e+' '+lvl().n+'</p></div>'; mode='go';
+     +'<p style="font-size:.9rem;color:#57606f;font-weight:700;line-height:1.9">رقم '+player.num+' — '+kit().n+'<br>المستوى: '+lvl().e+' '+lvl().n+'</p></div>'; mode='go';
   }
 
   if(mode==='save') h+='<button class="btn main" id="wsave">💾 حفظ</button>';
@@ -794,7 +794,7 @@ function showReport(){
   var h='<div class="screen active" id="rep">'
    +'<div class="card" style="text-align:center"><div style="font-size:2.4rem">📄</div>'
    +'<h3>تقرير إنجاز اللاعب</h3>'
-   +'<p style="font-size:.86rem;color:#57606f;line-height:1.9">'+player.name+' — '+player.team+'<br>رقم القميص '+ar(player.num)+' — المستوى '+lvl().n+'<br>'+sch()+'<br>'+aut()+'<br>'+new Date().toLocaleDateString('ar-EG')+'</p></div>'
+   +'<p style="font-size:.86rem;color:#57606f;line-height:1.9">'+player.name+' — '+player.team+'<br>رقم القميص '+player.num+' — المستوى '+lvl().n+'<br>'+sch()+'<br>'+aut()+'<br>'+new Date().toLocaleDateString('ar-EG')+'</p></div>'
    +'<div class="card"><table style="width:100%;font-size:.85rem;border-collapse:collapse">'
    +'<tr style="background:#f1f2f6;font-weight:700"><td style="padding:7px">الجدول</td><td style="padding:7px">الإتقان</td><td style="padding:7px">الدوري</td><td style="padding:7px">الكأس</td></tr>';
   TABLES.forEach(function(n){
@@ -855,7 +855,7 @@ function showCupChampion(){
    +'<div class="card" style="border-right:6px solid #9aa7b1"><h3>🎖️ كلمة الكأس</h3>'
    +'<p style="font-size:.95rem;line-height:2.1;color:#2f3542;font-weight:700">'
    +'نشكر فريق <span style="color:#5d6d7e">'+player.team+'</span> واللاعب <span style="color:#5d6d7e">'+player.name+'</span> '
-   +'صاحب القميص رقم '+ar(player.num)+' على رفع كأس ركلات الترجيح.<br><br>'
+   +'صاحب القميص رقم '+player.num+' على رفع كأس ركلات الترجيح.<br><br>'
    +'وقف أمام الحرّاس واحدًا بعد الآخر فلم يتراجع، وسدّد بثقة وهدوء حتى هزمهم جميعًا.<br><br>'
    +'أحسنت يا قنّاص الركلات.</p>'
    +'<p style="font-size:.78rem;color:#57606f;margin-top:12px;text-align:center;line-height:1.9">'+sch()+'<br>'+aut()+'</p></div>'
@@ -1085,7 +1085,7 @@ function showChampion(){
    +'<h3>🎖️ كلمة البطولة</h3>'
    +'<p style="font-size:.95rem;line-height:2.1;color:#2f3542;font-weight:700">'
    +'نشكر فريق <span style="color:#b9770e">'+player.team+'</span> واللاعب <span style="color:#b9770e">'+player.name+'</span> '
-   +'صاحب القميص رقم '+ar(player.num)+' على فوزه ببطولة هدّاف الضرب.<br><br>'
+   +'صاحب القميص رقم '+player.num+' على فوزه ببطولة هدّاف الضرب.<br><br>'
    +'لقد كان قويًا سريعًا لا يهاب الحرّاس، تخطّى الحرّاس واحدًا بعد الآخر، وسجّل '+ar(g)+' هدفًا، '
    +'وأتقن جدول الضرب من ٢ إلى ٩.<br><br>'
    +'أحسنت يا بطل، وإلى بطولات أكبر بإذن الله.</p>'
