@@ -14,6 +14,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="هدّاف الضرب">
 <meta name="description" content="لعبة تعليمية لإتقان جدول الضرب من ٢ إلى ٩">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
  --ocean-dark:#0a3d62; --ocean-mid:#0c6397; --ocean-light:#38ada9;
@@ -29,6 +32,16 @@ body{background:linear-gradient(180deg,var(--ocean-dark) 0%,var(--ocean-mid) 50%
 .tname{font-weight:700;font-size:.95rem;line-height:1.5}
 .tsmall{font-size:.72rem;opacity:.85;line-height:1.6}
 .credit{text-align:left;font-size:.66rem;opacity:.8;line-height:1.6;max-width:150px}
+.kufi{font-family:'Reem Kufi','Noto Kufi Arabic','Tajawal','Segoe UI',Tahoma,sans-serif;color:#fff}
+.idscr{position:fixed;inset:0;background:linear-gradient(170deg,#062f52 0%,#0a3d62 45%,#0b4f7d 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px 20px;z-index:4000;overflow-y:auto}
+.idbox{width:100%;max-width:420px;border:2px solid rgba(246,185,59,.55);border-radius:20px;padding:26px 18px;background:rgba(255,255,255,.05)}
+.idl1{font-size:1.18rem;font-weight:700;line-height:2.1;letter-spacing:.5px}
+.idl2{font-size:1.42rem;font-weight:700;line-height:2.1;letter-spacing:.5px}
+.idrule{height:2px;background:linear-gradient(90deg,rgba(246,185,59,0),rgba(246,185,59,.9),rgba(246,185,59,0));margin:16px auto;width:85%}
+.idl3{font-size:1.04rem;font-weight:600;line-height:2.1}
+.idl4{font-size:1rem;font-weight:600;line-height:2.1;opacity:.95}
+.idfade{animation:idIn .7s ease both}
+@keyframes idIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .backb{width:100%;margin-top:8px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:11px;padding:7px;font-family:inherit;font-weight:700;font-size:.8rem;cursor:pointer}
 .stats{display:flex;justify-content:space-around;background:rgba(0,0,0,.25);padding:6px 8px;border-radius:12px;font-size:.85rem;font-weight:700;margin-top:8px}
 
@@ -113,6 +126,10 @@ function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()
 
 var DEF_SCHOOL='مدرسة الإمام حفص الابتدائية — الطائف';
 var DEF_AUTHOR='إعداد المعلم محمد العرابي';
+var ID_IDARA='إدارة التعليم بمحافظة الطائف';
+var ID_SCHOOL='مدرسة الإمام حفص الابتدائية';
+var ID_MANAGER='محمد ناصر السالمي';
+var ID_TEACHER='إعداد المعلم محمد مساعد العرابي';
 function sch(){return (player.school!==undefined&&player.school!==null)?player.school:DEF_SCHOOL;}
 function aut(){return (player.author!==undefined&&player.author!==null)?player.author:DEF_AUTHOR;}
 var TABLES=[2,3,4,5,6,7,8,9];
@@ -382,7 +399,29 @@ function showStart(){
    +'<div id="stx" style="font-size:.8rem;font-weight:700;padding:8px;border-radius:10px;margin-bottom:8px;background:'+(STORE_OK?'#d4efdf':'#fadbd8')+';color:'+(STORE_OK?'#0b6a38':'#8a2318')+'">'
    +(STORE_OK?'✅ الحفظ يعمل على هذا الجهاز':'⚠️ الحفظ معطّل في هذا العرض')+(player.name?'<br>آخر لاعب محفوظ: '+player.name:'<br>لا يوجد لاعب محفوظ بعد')+'</div>'
    +'<p style="font-size:.74rem;color:#57606f;line-height:1.8">'+sch()+'<br>'+aut()+'</p></div></div>';
-  document.getElementById('go').onclick=function(){ac();sGoal();if(player.name&&player.team)showPick();else wiz(1);};
+  document.getElementById('go').onclick=function(){ac();sGoal();showIdentity();};
+}
+
+/* صفحة التعريف بالمدرسة */
+function showIdentity(){
+  document.getElementById('app').innerHTML=''
+   +'<div class="idscr">'
+   +'<div class="idbox idfade">'
+   +'<div class="kufi idl1">'+ID_IDARA+'</div>'
+   +'<div class="kufi idl2">'+ID_SCHOOL+'</div>'
+   +'<div class="idrule"></div>'
+   +'<div class="kufi idl3">مدير المدرسة : '+ID_MANAGER+'</div>'
+   +'<div class="kufi idl4">'+ID_TEACHER+'</div>'
+   +'</div>'
+   +'<div style="width:100%;max-width:420px;margin-top:22px">'
+   +'<button class="btn main" id="idgo">تابع ⚽</button>'
+   +'<button class="backb" id="idback">⟶ السابق</button>'
+   +'</div></div>';
+  document.getElementById('idgo').onclick=function(){
+    ac();sGoal();
+    if(player.name&&player.team)showPick();else wiz(1);
+  };
+  document.getElementById('idback').onclick=function(){ac();showStart();};
 }
 
 /* التجهيز خطوة خطوة */
