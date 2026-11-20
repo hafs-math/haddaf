@@ -493,9 +493,9 @@ function wiz(step,editing){
     else {
       h+='<div class="card"><h3>🔢 الرقم (من 1 إلى 99)</h3>'
        +'<div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:10px">'
-       +'<button class="num" id="nmin" style="min-width:52px">−</button>'
+       +'<button class="num" id="nplus" style="min-width:52px">+</button>'
        +'<input id="nfld" type="number" min="1" max="99" value="'+player.num+'" inputmode="numeric" style="width:96px;text-align:center;font-size:1.5rem;font-weight:700;padding:8px;border-radius:12px;border:2px solid #ced6e0;direction:ltr">'
-       +'<button class="num" id="nplus" style="min-width:52px">+</button></div>'
+       +'<button class="num" id="nmin" style="min-width:52px">−</button></div>'
        +'<div class="nums">';
       NUMS.forEach(function(n){h+='<button class="num'+(n===player.num?' on':'')+'" data-n="'+n+'">'+n+'</button>';});
       h+='</div><h3>🎨 اللون الأساسي</h3><div class="cols">';
