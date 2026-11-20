@@ -16,7 +16,7 @@
 <meta name="description" content="لعبة تعليمية لإتقان جدول الضرب من ٢ إلى ٩">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
  --ocean-dark:#0a3d62; --ocean-mid:#0c6397; --ocean-light:#38ada9;
@@ -32,7 +32,7 @@ body{background:linear-gradient(180deg,var(--ocean-dark) 0%,var(--ocean-mid) 50%
 .tname{font-weight:700;font-size:.95rem;line-height:1.5}
 .tsmall{font-size:.72rem;opacity:.85;line-height:1.6}
 .credit{text-align:left;font-size:.66rem;opacity:.8;line-height:1.6;max-width:150px}
-.kufi{font-family:'Reem Kufi','Noto Kufi Arabic','Tajawal','Segoe UI',Tahoma,sans-serif;color:#fff}
+.kufi{font-family:'Noto Naskh Arabic','Amiri','Traditional Arabic','Tajawal','Segoe UI',Tahoma,serif;color:#fff}
 .idscr{position:fixed;inset:0;background:linear-gradient(170deg,#062f52 0%,#0a3d62 45%,#0b4f7d 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px 20px;z-index:4000;overflow-y:auto}
 .idbox{width:100%;max-width:420px;border:2px solid rgba(246,185,59,.55);border-radius:20px;padding:26px 18px;background:rgba(255,255,255,.05)}
 .idl1{font-size:1.18rem;font-weight:700;line-height:2.1;letter-spacing:.5px}
@@ -124,13 +124,18 @@ var AR=['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
 function ar(n){return String(n).split('').map(function(c){return c>='0'&&c<='9'?AR[+c]:c;}).join('');}
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
-var DEF_SCHOOL='مدرسة الإمام حفص الابتدائية — الطائف';
+var DEF_SCHOOL='مدرسة الإمام حفص الابتدائية';
+var OLD_SCHOOL='مدرسة الإمام حفص الابتدائية — الطائف';
 var DEF_AUTHOR='إعداد المعلم محمد العرابي';
 var ID_IDARA='إدارة التعليم بمحافظة الطائف';
 var ID_SCHOOL='مدرسة الإمام حفص الابتدائية';
 var ID_MANAGER='محمد ناصر السالمي';
 var ID_TEACHER='إعداد المعلم محمد مساعد العرابي';
-function sch(){return (player.school!==undefined&&player.school!==null)?player.school:DEF_SCHOOL;}
+function sch(){
+  var v=(player.school!==undefined&&player.school!==null)?player.school:DEF_SCHOOL;
+  if(v===OLD_SCHOOL||v==='')v=DEF_SCHOOL;
+  return v;
+}
 function aut(){return (player.author!==undefined&&player.author!==null)?player.author:DEF_AUTHOR;}
 var TABLES=[2,3,4,5,6,7,8,9];
 var FINAL=[[9,9],[9,8],[9,7],[9,6],[9,5],[9,4],[9,3],[8,8],[8,7],[8,6],[8,4],[8,3],[7,6],[7,4]];
@@ -754,7 +759,7 @@ function showReport(){
   h+='</table><p style="font-size:.84rem;font-weight:700;color:#0a3d62;margin-top:12px;line-height:1.9">'
    +'🏆 مباريات الدوري: '+wins()+' من '+TABLES.length+'<br>🥇 حرّاس الكأس: '+cupWins()+' من '+TABLES.length+'<br>⭐ النجوم: '+allStars()+' من '+(TABLES.length*3)+'<br>🧤 التسديدات المضمونة: '+allGold()+' من 90<br>⚽ الأهداف: '+(player.goals||0)+'</p></div>'
    +'<button class="btn gold" id="pr">🖨️ طباعة / حفظ PDF</button>'
-   +'<button class="btn sec" id="bk2">رجوع</button></div>'+navBar('set');
+   +'<button class="btn sec" id="bk2">⟶ السابق</button></div>'+navBar('set');
   document.getElementById('app').innerHTML=h;bindNav();
   document.getElementById('pr').onclick=function(){window.print();};
   document.getElementById('bk2').onclick=function(){showSettings();};
