@@ -155,6 +155,15 @@
   @keyframes fly{to{transform:translate(0,-42vh) rotate(720deg) scale(.5);opacity:0}}
 
   .end .big{font-size:58px;margin:2px 0}
+  #endEmoji{position:relative;min-height:150px;display:flex;align-items:center;justify-content:center}
+  #endEmoji svg{width:140px;height:auto;animation:cuppop .8s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes cuppop{0%{transform:scale(.2) rotate(-18deg);opacity:0}60%{transform:scale(1.15) rotate(6deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+  .rays{position:absolute;inset:0;display:grid;place-items:center;z-index:-1}
+  .rays svg{width:200px;animation:spin 14s linear infinite}
+  .cupname{font-size:17px;font-weight:900;color:#8a6d00;background:var(--gold);
+    border:3px solid #0002;border-radius:999px;padding:5px 16px;display:inline-block;margin:2px 0 6px}
+  .cheer{font-size:18px;font-weight:900;color:#14532d;background:#eafaf0;border:3px dashed #1e8e4e55;
+    border-radius:16px;padding:10px;margin:8px 0 2px;line-height:1.5}
   .end h2{font-size:24px;margin:4px 0;font-weight:900}
   .result{font-size:34px;font-weight:900;letter-spacing:3px;margin:4px 0}
   .starrow{font-size:34px;letter-spacing:4px}
@@ -346,7 +355,9 @@
 <section id="s-end" class="hidden">
   <div class="card center end">
     <div class="big" id="endEmoji">🏆</div>
+    <div class="cupname" id="cupName">كأس المرحلة</div>
     <h2 id="endTitle">أحسنت!</h2>
+    <div class="cheer" id="cheer"></div>
     <div class="result" id="endResult"></div>
     <div class="starrow" id="starrow">⭐⭐⭐</div>
     <p id="endText" style="font-size:16px;font-weight:700;margin:6px 0"></p>
@@ -847,6 +858,63 @@
     show("s-play"); render();
   }
 
+  /* ================= الكأس والاحتفال ================= */
+  var CUPS = {
+    gold:{main:"#ffc83d", dark:"#d89b00", label:"الكأس الذهبي", rib:"#ffe9a8"},
+    silver:{main:"#d7dde1", dark:"#9aa7ae", label:"الكأس الفضي", rib:"#eef2f4"},
+    bronze:{main:"#d98b4a", dark:"#a2601f", label:"الكأس البرونزي", rib:"#f0c69c"}
+  };
+  var STAGE_CUP = {1:"كأس العدّ ١-١٠", 2:"كأس العدّ ١١-٢٠", 3:"كأس الجمع", 4:"كأس العدد المفقود ١-١٠", 5:"كأس العدد المفقود ١١-٢٠"};
+
+  function cupSVG(t){
+    var c = CUPS[t];
+    return '<div class="rays"><svg viewBox="0 0 200 200">'
+      + (function(){ var r=""; for(var i=0;i<12;i++){ r += '<rect x="98" y="8" width="4" height="30" rx="2" fill="'+c.main+'" opacity=".45" transform="rotate('+(i*30)+' 100 100)"/>'; } return r; })()
+      + '</svg></div>'
+      + '<svg viewBox="0 0 130 150" xmlns="http://www.w3.org/2000/svg">'
+      + '<path d="M30 30 L22 30 A16 16 0 0 0 34 58" fill="none" stroke="'+c.dark+'" stroke-width="8" stroke-linecap="round"/>'
+      + '<path d="M100 30 L108 30 A16 16 0 0 1 96 58" fill="none" stroke="'+c.dark+'" stroke-width="8" stroke-linecap="round"/>'
+      + '<path d="M30 22 H100 V52 A35 35 0 0 1 30 52 Z" fill="'+c.main+'" stroke="'+c.dark+'" stroke-width="3"/>'
+      + '<path d="M38 28 H58 V50 A10 10 0 0 1 38 50 Z" fill="#ffffff" opacity=".35"/>'
+      + '<rect x="58" y="86" width="14" height="18" fill="'+c.dark+'"/>'
+      + '<rect x="40" y="104" width="50" height="10" rx="4" fill="'+c.dark+'"/>'
+      + '<rect x="30" y="114" width="70" height="16" rx="6" fill="'+c.main+'" stroke="'+c.dark+'" stroke-width="3"/>'
+      + '<text x="65" y="128" text-anchor="middle" font-family="Cairo,sans-serif" font-size="11" font-weight="900" fill="'+c.dark+'">'+esc(P.name||"بطل")+'</text>'
+      + '<text x="65" y="50" text-anchor="middle" font-size="22">⭐</text>'
+      + '</svg>';
+  }
+
+  function cheerLine(tier, won, draw){
+    var n = esc(P.name || "بطل"), list;
+    if(tier === "gold"){
+      list = ["🌟 ما شاء الله يا "+n+"! أداء بطل حقيقي.",
+              "⚽ "+n+" هدّاف المرحلة بلا منافس!",
+              "👏 رائع يا "+n+"، إجاباتك كلها في الشبكة.",
+              "🏅 "+n+" نجم الملعب اليوم!"];
+    } else if(tier === "silver"){
+      list = ["👏 أحسنت يا "+n+"! قريب جدًا من الكأس الذهبي.",
+              "💪 جيد جدًا يا "+n+"، تحسّن واضح.",
+              "⚽ "+n+" لاعب قوي، كرّر المحاولة وتصل للذهب.",
+              "🌟 خطوة واحدة يا "+n+" وتصير هدّافًا ذهبيًا!"];
+    } else if(won || draw){
+      list = ["💪 أحسنت يا "+n+"، فزت وتقدر تفوز أحسن.",
+              "⚽ بداية طيبة يا "+n+"! درّب نفسك مرة أخرى.",
+              "👍 "+n+" وصل للنهاية، وهذا هو المهم."];
+    } else {
+      list = ["💚 لا بأس يا "+n+"، الأبطال يتدربون ثم يفوزون.",
+              "💪 حاول مرة أخرى يا "+n+"، أنت تقدر!",
+              "🌱 كل محاولة تجعلك أقوى يا "+n+"."];
+    }
+    return list[Math.floor(Math.random()*list.length)];
+  }
+
+  function party(){
+    starBurst(26);
+    setTimeout(function(){ starBurst(22); }, 420);
+    setTimeout(function(){ starBurst(26); }, 860);
+    flash("g");
+  }
+
   /* ================= النهاية ================= */
   function finish(){
     stopTimer(); show("s-end");
@@ -855,7 +923,10 @@
     var st = pr >= 0.9 ? 3 : (pr >= 0.7 ? 2 : 1);
     $("starrow").textContent = "⭐".repeat(st) + "☆".repeat(3-st);
     $("endResult").innerHTML = '<span style="color:#1e8e4e">'+num(myScore)+'</span> - <span style="color:#e2574c">'+num(oppScore)+'</span>';
-    $("endEmoji").textContent = won ? "🏆" : (draw ? "🤝" : "💪");
+    var tier = pr >= 0.9 ? "gold" : (pr >= 0.7 ? "silver" : "bronze");
+    $("endEmoji").innerHTML = cupSVG(tier);
+    $("cupName").textContent = "🏆 " + STAGE_CUP[stage] + " · " + CUPS[tier].label;
+    $("cheer").innerHTML = cheerLine(tier, won, draw);
     $("endTitle").textContent = won ? ("فاز " + P.team + "!") : (draw ? "تعادل!" : ("فاز " + OPP[stage].short + " هذه المرة"));
     $("endText").innerHTML = "ضد " + OPP[stage].em + " " + esc(OPP[stage].name) + " · المستوى: " + levelName
       + "<br>أهدافك الكلية: <b>" + num(P.goals) + "</b>";
@@ -868,8 +939,11 @@
     save();
     $("unlockText").textContent = opened ? ("🔓 فُتحت المرحلة " + num(stage+1) + "!") : "";
     $("nextStageBtn").classList.toggle("hidden", stage >= 5);
-    if(stage >= 5 && won){ $("endEmoji").textContent = "🏅"; $("endTitle").textContent = "أكملت جميع المراحل!"; }
-    if(won || draw){ starBurst(); sWin(); } else { sBuzz(); }
+    if(stage >= 5 && won){
+      $("endTitle").textContent = "🏅 أكمل " + P.name + " جميع المراحل!";
+      $("cupName").textContent = "🏆 كأس البطولة الكبرى · " + CUPS[tier].label;
+    }
+    party(); sWin();
   }
 
   /* ================= الأزرار ================= */
