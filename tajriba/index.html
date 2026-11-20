@@ -1,0 +1,1098 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>تجريبي — هدّاف الضرب</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="theme-color" content="#0a3d62">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="هدّاف الضرب">
+<meta name="description" content="لعبة تعليمية لإتقان جدول الضرب من ٢ إلى ٩">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+ --ocean-dark:#0a3d62; --ocean-mid:#0c6397; --ocean-light:#38ada9;
+ --gold:#f6b93b; --coral:#eb2f06; --emerald:#079992;
+ --green-win:#2ecc71; --red-lose:#e74c3c; --card-bg:rgba(255,255,255,.96);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Tajawal','Segoe UI',Tahoma,Verdana,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(180deg,var(--ocean-dark) 0%,var(--ocean-mid) 50%,var(--ocean-light) 100%);color:#1e272e;min-height:100vh;display:flex;justify-content:center;overflow-x:hidden}
+.app{width:100%;max-width:480px;min-height:100vh;display:flex;flex-direction:column;position:relative;padding-bottom:86px}
+
+.top-bar{background:rgba(10,61,98,.94);color:#fff;padding:10px 12px;position:sticky;top:0;z-index:100;border-bottom:2px solid rgba(255,255,255,.15);box-shadow:0 4px 15px rgba(0,0,0,.25)}
+.trow{display:flex;align-items:center;gap:10px}
+.tname{font-weight:700;font-size:.95rem;line-height:1.5}
+.tsmall{font-size:.72rem;opacity:.85;line-height:1.6}
+.credit{text-align:left;font-size:.66rem;opacity:.8;line-height:1.6;max-width:150px}
+.kufi{font-family:'Noto Naskh Arabic','Amiri','Traditional Arabic','Tajawal','Segoe UI',Tahoma,serif;color:#fff}
+.idscr{position:fixed;inset:0;background:linear-gradient(170deg,#062f52 0%,#0a3d62 45%,#0b4f7d 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px 20px;z-index:4000;overflow-y:auto}
+.idbox{width:100%;max-width:420px;border:2px solid rgba(246,185,59,.55);border-radius:20px;padding:26px 18px;background:rgba(255,255,255,.05)}
+.idl1{font-size:1.18rem;font-weight:700;line-height:2.1;letter-spacing:.5px}
+.idl2{font-size:1.42rem;font-weight:700;line-height:1.9;letter-spacing:.5px}
+.idl2s{font-size:1.18rem;font-weight:700;line-height:1.9;letter-spacing:.5px}
+.idrule{height:2px;background:linear-gradient(90deg,rgba(246,185,59,0),rgba(246,185,59,.9),rgba(246,185,59,0));margin:16px auto;width:85%}
+.idl3{font-size:1.04rem;font-weight:600;line-height:2.1}
+.idl4{font-size:1rem;font-weight:600;line-height:2.1;opacity:.95}
+.idfade{animation:idIn .7s ease both}
+@keyframes idIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.backb{width:100%;margin-top:8px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:11px;padding:7px;font-family:inherit;font-weight:700;font-size:.8rem;cursor:pointer}
+.stats{display:flex;justify-content:space-around;background:rgba(0,0,0,.25);padding:6px 8px;border-radius:12px;font-size:.85rem;font-weight:700;margin-top:8px}
+
+.screen{display:none;padding:14px;flex:1;animation:fade .25s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.card{background:var(--card-bg);border-radius:18px;padding:14px 16px;box-shadow:0 6px 15px rgba(0,0,0,.15);margin-bottom:14px}
+.card h3{color:var(--ocean-dark);font-size:1.05rem;margin-bottom:10px}
+.btn{width:100%;border:none;padding:13px;border-radius:14px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:8px;font-family:inherit}
+.btn.main{background:var(--green-win);color:#fff}
+.btn.gold{background:var(--gold);color:#2b1b00}
+.btn.sec{background:#dfe4ea;color:#2f3542}
+.btn.red{background:var(--coral);color:#fff}
+
+.in{width:100%;padding:12px;border-radius:12px;border:2px solid #ced6e0;font-size:1rem;font-family:inherit;margin-bottom:10px;text-align:center;font-weight:700}
+.nums{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:12px}
+.num{border:2px solid #ced6e0;background:#fff;border-radius:11px;padding:10px 0;font-family:inherit;font-size:1.05rem;font-weight:700;cursor:pointer}
+.num.on{border-color:var(--emerald);background:#e8f8f6}
+.lvbtn{display:block;width:100%;text-align:right;border:3px solid #ced6e0;background:#fff;border-radius:14px;padding:11px 13px;margin-bottom:9px;cursor:pointer;font-family:inherit}
+.lvbtn.on{border-color:var(--emerald);background:#e8f8f6}
+.lvbtn b{font-size:1rem;color:#0a3d62}
+.lvbtn span{display:block;font-size:.74rem;color:#57606f;margin-top:4px;line-height:1.7}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.col{border:3px solid transparent;background:#f1f2f6;border-radius:14px;padding:6px 2px;cursor:pointer}
+.col.on{border-color:var(--emerald);background:#e8f8f6}
+.col div{font-size:.72rem;font-weight:700;margin-top:2px;color:#0a3d62}
+
+.mrow{background:var(--card-bg);border-radius:18px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 15px rgba(0,0,0,.15);border-right:6px solid var(--emerald);cursor:pointer;margin-bottom:12px}
+.mrow:active{transform:scale(.99)}
+.mrow.lock{opacity:.68;background:#dfe4ea;border-right-color:#747d8c;cursor:default}
+.mleft{display:flex;align-items:center;gap:11px}
+.memo{font-size:1.5rem;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#f1f2f6;border-radius:13px;font-weight:700;color:#0a3d62}
+.minfo h4{font-size:.96rem;color:#0a3d62}
+.minfo p{font-size:.72rem;color:#57606f;margin-top:3px;line-height:1.6}
+.pill{display:inline-block;background:var(--emerald);color:#fff;font-size:.74rem;padding:4px 10px;border-radius:12px;font-weight:700}
+.lock .pill{background:#747d8c}
+
+.scoreboard{position:sticky;top:96px;z-index:50;background:var(--ocean-dark);border:2px solid rgba(255,255,255,.18);border-radius:16px;padding:10px 12px;margin-bottom:12px;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.sb{display:flex;align-items:center;gap:8px;color:#fff;padding:3px 0}
+.sb .tm{flex:1;font-size:.9rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb .nu{font-size:2rem;font-weight:800;min-width:44px;text-align:center;background:rgba(255,255,255,.12);border-radius:10px;line-height:1.2}
+.sb.me .nu{background:var(--gold);color:#2b1b00}
+.sbfoot{color:#cfe3ef;font-size:.72rem;font-weight:700;text-align:center;margin-top:6px;border-top:1px solid rgba(255,255,255,.15);padding-top:6px}
+
+.timer-wrap{width:100%;height:11px;background:#dfe4ea;border-radius:8px;overflow:hidden;margin-bottom:12px}
+.timer-bar{height:100%;width:100%;background:linear-gradient(90deg,#2ecc71,#f6b93b,#e74c3c)}
+.qbox{background:#f1f2f6;border-radius:16px;padding:18px 10px;text-align:center;margin-bottom:12px;border:2px solid #dfe4ea}
+.qtext{font-size:2.1rem;font-weight:800;color:#0a3d62;display:flex;align-items:center;justify-content:center;gap:9px}
+.blank{display:inline-flex;align-items:center;justify-content:center;min-width:58px;height:52px;background:#fff;border:3px dashed #0c6397;border-radius:12px;color:var(--coral);font-weight:900}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:12px}
+.opt{background:#fff;border:2px solid #ced6e0;border-radius:14px;padding:14px;font-size:1.5rem;font-weight:700;color:#2f3542;cursor:pointer;font-family:inherit}
+.opt.ok{background:var(--green-win)!important;color:#fff!important;border-color:#27ae60!important}
+.opt.no{background:var(--red-lose)!important;color:#fff!important;border-color:#c0392b!important}
+.fb{border-radius:14px;padding:13px;text-align:center;margin-bottom:10px}
+.fb h4{font-size:1.2rem;margin-bottom:5px}
+.fb p{font-size:.85rem;font-weight:700;line-height:1.7}
+.coachbtn{width:100%;background:#fff3cd;color:#856404;border:3px dashed var(--gold);padding:13px;border-radius:14px;font-weight:700;cursor:pointer;font-family:inherit;font-size:1rem;margin-bottom:10px}
+.coachbtn.must{background:#ffeaa7;border-color:var(--coral);color:#8a3418;animation:pulse 1.1s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+.hint{background:#fffaf0;border:2px solid var(--gold);border-radius:14px;padding:12px;margin-bottom:10px;text-align:center}
+.hint p{font-size:.85rem;font-weight:700;color:#0a3d62;line-height:1.8}
+.shake{animation:shk .5s}
+@keyframes shk{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-11px)}40%,80%{transform:translateX(11px)}}
+.star{position:fixed;pointer-events:none;z-index:9999;font-size:1.7rem;animation:fly 1s ease-out forwards}
+@keyframes fly{0%{opacity:1;transform:translate(0,0) scale(.5)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(1.4) rotate(360deg)}}
+
+.bottom-nav{position:fixed;bottom:0;width:100%;max-width:480px;background:#fff;display:flex;justify-content:space-around;padding:9px 0;border-top:1px solid #dfe4ea;box-shadow:0 -4px 12px rgba(0,0,0,.12);z-index:100}
+.nav{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:#747d8c;font-size:.76rem;font-weight:700;cursor:pointer;font-family:inherit}
+.nav.on{color:var(--ocean-mid)}
+.nav i{font-size:1.3rem;font-style:normal}
+textarea{width:100%;height:150px;padding:12px;border-radius:12px;border:2px solid #ced6e0;font-size:.82rem;line-height:1.9;font-family:inherit}
+@media print{body{background:#fff}.top-bar,.bottom-nav,.btn,.backb{display:none!important}.app{padding:0}.card{box-shadow:none;border:1px solid #ccc;background:#fff}}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+var AR=['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+function ar(n){return String(n).split('').map(function(c){return c>='0'&&c<='9'?AR[+c]:c;}).join('');}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+var DEF_SCHOOL='مدرسة الإمام حفص الابتدائية';
+var OLD_SCHOOL='مدرسة الإمام حفص الابتدائية — الطائف';
+var DEF_AUTHOR='إعداد المعلم محمد العرابي';
+var ID_IDARA='إدارة التعليم بمحافظة الطائف';
+var ID_SCHOOL='مدرسة الإمام حفص الابتدائية';
+var ID_SCHOOL2='لتحفيظ القرآن الكريم';
+var ID_MANAGER='محمد ناصر السالمي';
+var ID_TEACHER='محمد مساعد العرابي';
+function sch(){
+  var v=(player.school!==undefined&&player.school!==null)?player.school:DEF_SCHOOL;
+  if(v===OLD_SCHOOL||v==='')v=DEF_SCHOOL;
+  return v;
+}
+function aut(){return (player.author!==undefined&&player.author!==null)?player.author:DEF_AUTHOR;}
+var TABLES=[2,3,4,5,6,7,8,9];
+var FINAL=[[9,9],[9,8],[9,7],[9,6],[9,5],[9,4],[9,3],[8,8],[8,7],[8,6],[8,4],[8,3],[7,6],[7,4]];
+var GOLD=2,WIN_PCT=95;
+var LEVELS={
+ easy:{n:'مبتدئ',e:'🟢',ball:12,sec:7,max:5,d:'١٢ ثانية للكرة — هدف إذا أجبت قبل ٧ ثوانٍ<br>يصل إلى جدول ٥ فقط'},
+ mid:{n:'متوسط',e:'🟡',ball:10,sec:5,max:7,d:'١٠ ثوانٍ للكرة — هدف إذا أجبت قبل ٥ ثوانٍ<br>يصل إلى جدول ٧ فقط'},
+ pro:{n:'محترف',e:'🔴',ball:8,sec:4,max:9,d:'٨ ثوانٍ للكرة — هدف إذا أجبت قبل ٤ ثوانٍ<br>وحده يصل إلى النهائي والكأس كاملًا'}
+};
+function lvl(){return LEVELS[player.level]||LEVELS.easy;}
+var CUPT={ball:10,sec:5};
+function tim(){return penMode?CUPT:lvl();}
+function needLevel(n){return n>=8?'المحترف':(n>=6?'المتوسط أو المحترف':'');}
+var KITS=[
+ {id:'blue',n:'أزرق',c:'#1E6FD9',d:'#124A94',t:'#fff'},
+ {id:'yellow',n:'أصفر',c:'#f6b93b',d:'#a8750a',t:'#2b1b00'},
+ {id:'red',n:'أحمر',c:'#e74c3c',d:'#9b2d21',t:'#fff'},
+ {id:'green',n:'أخضر',c:'#079992',d:'#04615c',t:'#fff'},
+ {id:'purple',n:'بنفسجي',c:'#8e44ad',d:'#5b2a70',t:'#fff'},
+ {id:'black',n:'أسود',c:'#2f3542',d:'#141820',t:'#fff'}
+];
+var NUMS=[1,4,6,7,8,9,10,11,17,23];
+var PATS=[{id:'p0',n:'سادة'},{id:'p1',n:'مخطّطة طولية'},{id:'p2',n:'مخطّطة عرضية'},{id:'p3',n:'وشاح مائل'}];
+var PCOLS=[{id:'w',n:'أبيض',c:'#ffffff'},{id:'g',n:'ذهبي',c:'#f6b93b'},{id:'k',n:'أسود',c:'#2c2c2a'},{id:'s',n:'سماوي',c:'#9fd3ff'}];
+function pcol(id){var v=id||player.pc||'w';for(var i=0;i<PCOLS.length;i++)if(PCOLS[i].id===v)return PCOLS[i];return PCOLS[0];}
+function patn(id){var v=id||player.pat||'p0';for(var i=0;i<PATS.length;i++)if(PATS[i].id===v)return PATS[i];return PATS[0];}
+var SHID=0;
+var TEAM={
+2:{n:'فريق المجد',e:'🛡️',c:'#079992',k:'حارس المجد',tip:'ضِعف العدد: ٢ × ٧ هو ٧ + ٧',rev:[]},
+3:{n:'فريق البطولة',e:'🔺',c:'#8e44ad',k:'حارس البطولة',tip:'ثلاث مجموعات متساوية',rev:[2]},
+4:{n:'فريق الفتوة',e:'🦁',c:'#e67e22',k:'حارس الفتوة',tip:'ضاعف العدد مرتين',rev:[2]},
+5:{n:'فريق القوة',e:'⭐',c:'#f6b93b',k:'حارس القوة',tip:'نصف العشرة: ٥ × ٨ = نصف ٨٠',rev:[3]},
+6:{n:'فريق النحل',e:'🐝',c:'#b9770e',k:'حارس النحل',tip:'٦ = ٥ + ١ من نفس العدد',rev:[4]},
+7:{n:'فريق الصقور',e:'🦅',c:'#c0397c',k:'حارس الصقور',tip:'٧ = ٥ + ٢ من نفس العدد',rev:[3]},
+8:{n:'فريق العاصفة',e:'🐙',c:'#2980b9',k:'حارس العاصفة',tip:'ضاعف العدد ثلاث مرات',rev:[2]},
+9:{n:'منتخب الأبطال',e:'🏆',c:'#0a3d62',k:'الحارس الأسطوري',tip:'حيلة الأصابع: اثنِ الإصبع رقم العدد',rev:[]},
+};
+
+var player={name:'',team:'',num:10,kit:'blue',pat:'p0',pc:'w',teacher:false,level:'easy'};
+var cards={},prog={},cup={},muted=false;
+
+function pkey(a,b){return a<b?(a+'x'+b):(b+'x'+a);}
+function cell(t,a,b){var k=t+pkey(a,b);if(!cards[k])cards[k]={level:0,best:0};return cards[k];}
+function pr(n){if(!prog[n])prog[n]={won:0,stars:0,best:null};return prog[n];}
+function cp(n){if(!cup[n])cup[n]={won:0,best:null};return cup[n];}
+function cupOpen(n){if(player.teacher)return true;if(n>lvl().max)return false;if(n===2)return true;return !!cp(TABLES[TABLES.indexOf(n)-1]).won;}
+function cupWins(){var w=0;for(var i=0;i<TABLES.length;i++)if(cp(TABLES[i]).won)w++;return w;}
+function kit(){for(var i=0;i<KITS.length;i++)if(KITS[i].id===player.kit)return KITS[i];return KITS[0];}
+var PAIRS=[];(function(){for(var a=2;a<=10;a++)for(var b=a;b<=10;b++)PAIRS.push([a,b]);})();
+var STORE_OK=true;
+(function(){try{localStorage.setItem('__t','1');localStorage.removeItem('__t');}catch(e){STORE_OK=false;}})();
+
+function rawState(){
+  var cs='';
+  for(var i=0;i<PAIRS.length;i++){
+    var k=pkey(PAIRS[i][0],PAIRS[i][1]);
+    cs+=String(Math.min(2,(cards['d'+k]&&cards['d'+k].level)||0));
+    cs+=String(Math.min(2,(cards['b'+k]&&cards['b'+k].level)||0));
+  }
+  var ps=TABLES.map(function(n){var q=pr(n);return (q.won?1:0)+','+(q.stars||0)+','+((q.best&&q.best.me)||0)+','+((q.best&&q.best.op)||0);}).join(';');
+  var ks=TABLES.map(function(n){var q=cp(n);return (q.won?1:0)+','+((q.best&&q.best.me)||0)+','+((q.best&&q.best.op)||0);}).join(';');
+  return [player.name||'',player.team||'',player.num||10,player.kit||'blue',player.level||'easy',player.goals||0,cs,ps,ks,(player.pat||'p0')+'.'+(player.pc||'w')].join('~');
+}
+function b64e(str){
+  try{return btoa(unescape(encodeURIComponent(str))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}catch(e){return '';}
+}
+function b64d(code){
+  try{
+    var t=String(code).replace(/[^A-Za-z0-9_\-]/g,'').replace(/-/g,'+').replace(/_/g,'/');
+    while(t.length%4)t+='=';
+    return decodeURIComponent(escape(atob(t)));
+  }catch(e){return '';}
+}
+function encState(){ return b64e(rawState()); }
+function decState(code){
+  try{
+    if(!code)return false;
+    var txt=String(code);
+    if(txt.indexOf('s=')>=0)txt=txt.substring(txt.indexOf('s=')+2);
+    var raw=b64d(txt);
+    if(raw.indexOf('~')<0){ try{raw=decodeURIComponent(txt.replace(/^#?/,''));}catch(e2){raw='';} }
+    if(raw.indexOf('~')<0)return false;
+    var a=raw.split('~');
+    if(a.length<9||!a[0])return false;
+    var sc=player.school,au=player.author;
+    var kp=(a[9]||'p0.w').split('.');
+    player={name:a[0],team:a[1],num:parseInt(a[2],10)||10,kit:a[3]||'blue',pat:kp[0]||'p0',pc:kp[1]||'w',level:a[4]||'easy',goals:parseInt(a[5],10)||0,teacher:false,kitSaved:1,lvlSaved:1};
+    if(sc!==undefined)player.school=sc;
+    if(au!==undefined)player.author=au;
+    cards={};
+    var cs=a[6]||'';
+    for(var i=0;i<PAIRS.length;i++){
+      var k=pkey(PAIRS[i][0],PAIRS[i][1]);
+      var dl=parseInt(cs.charAt(i*2),10)||0,bl=parseInt(cs.charAt(i*2+1),10)||0;
+      if(dl)cards['d'+k]={level:dl,best:0};
+      if(bl)cards['b'+k]={level:bl,best:0};
+    }
+    prog={};
+    (a[7]||'').split(';').forEach(function(x,i){
+      if(!TABLES[i])return;var v=x.split(',');
+      prog[TABLES[i]]={won:+v[0]||0,stars:+v[1]||0,best:((+v[2]||+v[3])?{me:+v[2]||0,op:+v[3]||0}:null)};
+    });
+    cup={};
+    (a[8]||'').split(';').forEach(function(x,i){
+      if(!TABLES[i])return;var v=x.split(',');
+      cup[TABLES[i]]={won:+v[0]||0,best:((+v[1]||+v[2])?{me:+v[1]||0,op:+v[2]||0}:null)};
+    });
+    return true;
+  }catch(e){return false;}
+}
+function save(){
+  var code=encState();
+  try{localStorage.setItem('haddafTry',JSON.stringify({p:player,c:cards,g:prog,k:cup,m:muted}));STORE_OK=true;}catch(e){STORE_OK=false;}
+  try{sessionStorage.setItem('haddafTryC',code);}catch(e){}
+  try{if(window.history&&history.replaceState)history.replaceState(null,'','#s='+code);}catch(e){}
+}
+function load(){
+  var ok=false;
+  try{
+    var r=localStorage.getItem('haddafTry');
+    if(r){var d=JSON.parse(r);
+      if(d&&d.p){player=d.p;if(!player.name)player.name='';if(!player.team)player.team='';
+        if(!player.num)player.num=10;if(!player.kit)player.kit='blue';if(!player.level)player.level='easy';
+        cards=d.c||{};prog=d.g||{};cup=d.k||{};muted=!!d.m;ok=!!player.name;}}
+  }catch(e){STORE_OK=false;}
+  if(!ok){try{var h=location.hash||'';if(h.indexOf('s=')>=0&&decState(h))ok=!!player.name;}catch(e){}}
+  if(!ok){try{var sc=sessionStorage.getItem('haddafTryC');if(sc&&decState(sc))ok=!!player.name;}catch(e){}}
+  return ok;
+}
+function clearStores(){
+  try{localStorage.removeItem('haddafTry');}catch(e){}
+  try{sessionStorage.removeItem('haddafTryC');}catch(e){}
+  try{if(window.history&&history.replaceState)history.replaceState(null,'','#');}catch(e){}
+}
+
+function isOpen(n){if(player.teacher)return true;if(n>lvl().max)return false;if(n===2)return true;return !!pr(TABLES[TABLES.indexOf(n)-1]).won;}
+function wins(){var w=0;for(var i=0;i<TABLES.length;i++)if(pr(TABLES[i]).won)w++;return w;}
+function allStars(){var s=0;for(var i=0;i<TABLES.length;i++)s+=pr(TABLES[i]).stars;return s;}
+function allGold(){var g=0;for(var k in cards)if(cards[k].level>=GOLD)g++;return g;}
+function newPairs(n){if(n===9)return FINAL.slice();var o=[];for(var b=n;b<=10;b++)o.push([n,b]);return o;}
+function matchPct(n){var p=newPairs(n),s=0;for(var i=0;i<p.length;i++){s+=Math.min(GOLD,cell('d',p[i][0],p[i][1]).level);s+=Math.min(GOLD,cell('b',p[i][0],p[i][1]).level);}return Math.round(s/(p.length*2*GOLD)*100);}
+function buildMatch(n){
+  var set=[],seen={};
+  newPairs(n).forEach(function(p){set.push({a:p[0],b:p[1],t:'d',rev:0});set.push({a:p[0],b:p[1],t:'b',rev:0});seen[pkey(p[0],p[1])]=1;});
+  var CAP=(n===9)?(FINAL.length*2):18;
+  var need=CAP-set.length;
+  if(need>0){
+    var pool=[];
+    TEAM[n].rev.forEach(function(rt){for(var b=2;b<=10;b++){var k=pkey(rt,b);if(seen[k])continue;seen[k]=1;pool.push({a:rt,b:b,t:'d',rev:rt});pool.push({a:rt,b:b,t:'b',rev:rt});}});
+    pool.sort(function(x,y){var lx=cell(x.t,x.a,x.b).level,ly=cell(y.t,y.a,y.b).level;if(lx!==ly)return lx-ly;return Math.random()-.5;});
+    set=set.concat(pool.slice(0,need));
+  }
+  return shuffle(set).slice(0,CAP);
+}
+function buildPens(n){
+  var pool=[];
+  for(var b=2;b<=10;b++){pool.push({a:n,b:b,t:'d',rev:0});pool.push({a:n,b:b,t:'b',rev:0});}
+  pool.sort(function(x,y){var lx=cell(x.t,x.a,x.b).level,ly=cell(y.t,y.a,y.b).level;if(lx!==ly)return lx-ly;return Math.random()-.5;});
+  return shuffle(pool.slice(0,10));
+}
+
+/* صوت */
+var actx=null;
+function ac(){if(!actx){try{actx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){actx=null;}}if(actx&&actx.state==='suspended'){try{actx.resume();}catch(e){}}return actx;}
+function tone(f,s,d,ty,v){var c=ac();if(!c)return;try{var x=c.currentTime+s,o=c.createOscillator(),g=c.createGain();o.type=ty||'sine';o.frequency.setValueAtTime(f,x);g.gain.setValueAtTime(.0001,x);g.gain.exponentialRampToValueAtTime(v||.22,x+.02);g.gain.exponentialRampToValueAtTime(.0001,x+d);o.connect(g);g.connect(c.destination);o.start(x);o.stop(x+d+.05);}catch(e){}}
+function sGoal(){if(muted)return;tone(784,0,.13,'sine',.22);tone(1047,.09,.16,'sine',.2);tone(1319,.18,.3,'sine',.18);}
+function sGold(){if(muted)return;sGoal();tone(1568,.32,.2,'triangle',.16);tone(2093,.44,.3,'triangle',.13);}
+function sWin(){if(muted)return;tone(659,0,.18,'triangle',.2);tone(784,.16,.18,'triangle',.2);tone(988,.32,.2,'triangle',.2);tone(1319,.48,.5,'triangle',.18);}
+function sSave(){if(muted)return;if(navigator.vibrate)navigator.vibrate([200,70,200]);var c=ac();if(!c)return;try{var t=c.currentTime,o=c.createOscillator(),g=c.createGain();o.type='square';o.frequency.setValueAtTime(200,t);o.frequency.exponentialRampToValueAtTime(80,t+.26);g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.0001,t+.3);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.33);}catch(e){}}
+function fireworks(rounds){
+  var sym=['🎉','🎊','✨','⭐','🏆','🎆'],n=0;
+  var iv=setInterval(function(){
+    var cx=50+Math.random()*(window.innerWidth-100),cy=70+Math.random()*(window.innerHeight*.55);
+    for(var i=0;i<16;i++){
+      var s=document.createElement('div');s.className='star';
+      s.textContent=sym[Math.floor(Math.random()*sym.length)];
+      s.style.left=cx+'px';s.style.top=cy+'px';
+      var a=(Math.PI*2*i/16)+Math.random()*.3,d=50+Math.random()*120;
+      s.style.setProperty('--tx',(Math.cos(a)*d)+'px');
+      s.style.setProperty('--ty',(Math.sin(a)*d)+'px');
+      document.body.appendChild(s);
+      (function(x){setTimeout(function(){if(x.parentNode)x.parentNode.removeChild(x);},1000);})(s);
+    }
+    if(!muted)tone(660+Math.random()*500,0,.18,'triangle',.12);
+    n++;if(n>=rounds)clearInterval(iv);
+  },430);
+}
+function burst(){var sym=['⭐','🌟','✨','⚽'];for(var i=0;i<20;i++){var s=document.createElement('div');s.className='star';s.textContent=sym[Math.floor(Math.random()*4)];s.style.left=(window.innerWidth/2)+'px';s.style.top=(window.innerHeight*.4)+'px';var a=Math.random()*Math.PI*2,d=60+Math.random()*150;s.style.setProperty('--tx',(Math.cos(a)*d)+'px');s.style.setProperty('--ty',(Math.sin(a)*d-30)+'px');document.body.appendChild(s);(function(x){setTimeout(function(){if(x.parentNode)x.parentNode.removeChild(x);},1000);})(s);}}
+
+/* رسوم */
+function shirt(size,k,n,name,pat,pc){
+  var K=k||kit();
+  var P=pat||player.pat||'p0', C=pcol(pc).c;
+  var D='M34 10 L18 18 L8 36 L22 45 L26 38 L26 92 L74 92 L74 38 L78 45 L92 36 L82 18 L66 10 L60 16 Q50 24 40 16 Z';
+  var id='sh'+(++SHID);
+  var s='<svg width="'+size+'" height="'+size+'" viewBox="0 0 100 100">'
+   +'<defs><clipPath id="'+id+'"><path d="'+D+'"/></clipPath></defs>'
+   +'<g clip-path="url(#'+id+')"><rect x="0" y="0" width="100" height="100" fill="'+K.c+'"/>';
+  if(P==='p1'){for(var x=6;x<100;x+=20)s+='<rect x="'+x+'" y="0" width="9" height="100" fill="'+C+'"/>';}
+  else if(P==='p2'){for(var y=18;y<100;y+=22)s+='<rect x="0" y="'+y+'" width="100" height="10" fill="'+C+'"/>';}
+  else if(P==='p3'){s+='<path d="M0 32 L100 2 L100 26 L0 56 Z" fill="'+C+'"/>';}
+  s+='</g>'
+   +'<path d="'+D+'" fill="none" stroke="'+K.d+'" stroke-width="2.5" stroke-linejoin="round"/>'
+   +'<path d="M40 10 Q50 20 60 10" fill="none" stroke="'+K.d+'" stroke-width="3"/>';
+  if(name)s+='<text x="50" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="'+K.t+'" stroke="'+K.d+'" stroke-width="2.4" paint-order="stroke" font-family="Tajawal,sans-serif">'+name+'</text>';
+  s+='<text x="50" y="'+(name?78:72)+'" text-anchor="middle" font-size="'+(name?34:38)+'" font-weight="700" fill="'+K.t+'" stroke="'+K.d+'" stroke-width="3" paint-order="stroke" font-family="Tajawal,sans-serif">'+ar(n)+'</text></svg>';
+  return s;
+}
+function stars(k,s){var o='';for(var i=1;i<=3;i++)o+='<span style="font-size:'+(s||15)+'px;color:'+(i<=k?'#f6b93b':'#ced6e0')+'">★</span>';return o;}
+function dots(a,b,c){var w=Math.min(b,10),s='',cl=15,p=4,W=w*cl+p*2,H=a*cl+p*2;for(var r=0;r<a;r++)for(var k=0;k<w;k++)s+='<circle cx="'+(p+k*cl+cl/2)+'" cy="'+(p+r*cl+cl/2)+'" r="5" fill="'+c+'"/>';return '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+s+'</svg>';}
+
+/* ===== الواجهة ===== */
+var BACK=null;
+function topBar(){
+  return '<header class="top-bar"><div class="trow">'
+   +'<div style="width:44px">'+shirt(44,kit(),player.num,'')+'</div>'
+   +'<div style="flex:1"><div class="tname">'+player.name+' — '+player.team+'</div>'
+   +'<div class="tsmall">رقم '+ar(player.num)+' — قميص '+kit().n+' — '+lvl().e+' '+lvl().n+'</div></div>'
+   +'<div class="credit" id="cred">'+sch()+'<br>'+aut()+(player.teacher?'<br><span style="color:#f6b93b">وضع المعلم مفعّل</span>':'')+'</div></div>'
+   +'<div class="stats"><div>⭐ '+allStars()+'/'+(TABLES.length*3)+'</div><div>🏆 '+wins()+'/'+TABLES.length+'</div><div>🧤 '+allGold()+'/90</div></div>'
+   +(BACK?'<button class="backb" id="bkb">⟶ السابق</button>':'')+'</header>';
+}
+function navBar(active){
+  function b(id,ic,tx){return '<button class="nav'+(active===id?' on':'')+'" data-s="'+id+'"><i>'+ic+'</i><span>'+tx+'</span></button>';}
+  return '<nav class="bottom-nav">'+b('pick','🎮','البطولات')+b('league','🏆','الدوري')+b('pens','🥇','الكأس')+b('set','⚙️','الإعدادات')+'</nav>';
+}
+function go(s){
+  if(s==='league')showLeague();
+  else if(s==='pens')showPens();
+  else if(s==='card')showCard();
+  else if(s==='set')showSettings();
+  else showPick();
+}
+function bindNav(){
+  var ns=document.querySelectorAll('.nav');
+  for(var i=0;i<ns.length;i++)ns[i].onclick=function(){ac();go(this.getAttribute('data-s'));};
+  var bb=document.getElementById('bkb');
+  if(bb)bb.onclick=function(){ac();if(BACK)BACK();};
+  bindCred();
+}
+var TEACHER_CODE='7788';
+var tapN=0,tapT=0;
+function bindCred(){
+  var c=document.getElementById('cred');if(!c)return;
+  c.onclick=function(){
+    var now=Date.now();
+    if(now-tapT>2500)tapN=0;
+    tapT=now;tapN++;
+    if(tapN>=5){tapN=0;teacherGate();}
+  };
+}
+function teacherGate(){
+  var o=document.createElement('div');
+  o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:5000;padding:18px';
+  o.innerHTML='<div class="card" style="max-width:340px;width:100%;margin:0;text-align:center">'
+   +'<h3>🔐 دخول المعلم</h3><p style="font-size:.84rem;color:#57606f;margin-bottom:10px">أدخل رمز المعلم</p>'
+   +'<input class="in" id="tcode" type="tel" maxlength="6" placeholder="••••" style="letter-spacing:6px">'
+   +'<button class="btn main" id="tok">دخول</button><button class="btn sec" id="tno">إلغاء</button></div>';
+  document.body.appendChild(o);
+  document.getElementById('tno').onclick=function(){document.body.removeChild(o);};
+  document.getElementById('tok').onclick=function(){
+    var v=document.getElementById('tcode').value.trim();
+    if(v===TEACHER_CODE){
+      player.teacher=!player.teacher;save();
+      document.body.removeChild(o);sGoal();showLeague();
+    } else {
+      var f=document.getElementById('tcode');
+      f.style.borderColor='#e74c3c';f.className='in shake';f.value='';
+      setTimeout(function(){f.className='in';},600);
+    }
+  };
+}
+
+/* البداية */
+function showStart(){
+  document.getElementById('app').innerHTML='<div class="screen active" style="display:flex;flex-direction:column;justify-content:center;text-align:center;min-height:100vh">'
+   +'<div style="font-size:4rem">⚽</div>'
+   +'<div style="display:inline-block;background:var(--gold);color:#2b1b00;border-radius:18px;padding:12px 22px;margin:14px auto;transform:rotate(-2deg);box-shadow:0 8px 20px rgba(0,0,0,.3)"><span style="font-size:1.9rem;font-weight:800">هدّاف الضرب</span></div>'
+   +'<p style="color:#fff;font-size:1rem;font-weight:700;margin-bottom:22px">ثماني مباريات — سجّل أهدافك بجدول الضرب</p>'
+   +'<div class="card"><button class="btn main" id="go">ابدأ ⚽</button>'
+   +'<div id="stx" style="font-size:.8rem;font-weight:700;padding:8px;border-radius:10px;margin-bottom:8px;background:'+(STORE_OK?'#d4efdf':'#fadbd8')+';color:'+(STORE_OK?'#0b6a38':'#8a2318')+'">'
+   +(STORE_OK?'✅ الحفظ يعمل على هذا الجهاز':'⚠️ الحفظ معطّل في هذا العرض')+(player.name?'<br>آخر لاعب محفوظ: '+player.name:'<br>لا يوجد لاعب محفوظ بعد')+'</div>'
+   +'<p style="font-size:.74rem;color:#57606f;line-height:1.8">'+sch()+'<br>'+aut()+'</p></div></div>';
+  document.getElementById('go').onclick=function(){ac();sGoal();showIdentity();};
+}
+
+/* صفحة التعريف بالمدرسة */
+function showIdentity(){
+  document.getElementById('app').innerHTML=''
+   +'<div class="idscr">'
+   +'<div class="idbox idfade">'
+   +'<div class="kufi idl1">'+ID_IDARA+'</div>'
+   +'<div class="kufi idl2">'+ID_SCHOOL+'</div>'
+   +'<div class="kufi idl2s">'+ID_SCHOOL2+'</div>'
+   +'<div class="idrule"></div>'
+   +'<div class="kufi idl3">مدير المدرسة : '+ID_MANAGER+'</div>'
+   +'<div class="kufi idl4">إعداد المعلم : '+ID_TEACHER+'</div>'
+   +'</div>'
+   +'<div style="width:100%;max-width:420px;margin-top:22px">'
+   +'<button class="btn main" id="idgo">تابع ⚽</button>'
+   +'<button class="backb" id="idback">⟶ السابق</button>'
+   +'</div></div>';
+  document.getElementById('idgo').onclick=function(){
+    ac();sGoal();
+    if(player.name&&player.team)showPick();else wiz(1);
+  };
+  document.getElementById('idback').onclick=function(){ac();showStart();};
+}
+
+/* التجهيز خطوة خطوة */
+var WSTEPS=6;
+function wizHead(step,title,sub){
+  var dots='';
+  for(var i=1;i<=WSTEPS;i++)dots+='<span style="display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 3px;background:'+(i<=step?'#079992':'#ced6e0')+'"></span>';
+  return '<div class="card" style="text-align:center"><div>'+dots+'</div>'
+   +'<h3 style="font-size:1.25rem;margin-top:10px">'+title+'</h3>'
+   +(sub?'<p style="font-size:.84rem;color:#57606f;line-height:1.8">'+sub+'</p>':'')+'</div>';
+}
+function savedCard(label,value){
+  return '<div class="card" style="border:3px solid #2ecc71;background:#f3fbf6">'
+   +'<div style="display:flex;align-items:center;gap:10px">'
+   +'<div style="font-size:1.6rem">✅</div>'
+   +'<div style="flex:1"><div style="font-size:.76rem;color:#57606f;font-weight:700">'+label+'</div>'
+   +'<div style="font-size:1.1rem;font-weight:800;color:#0a3d62">'+value+'</div></div>'
+   +'<button class="btn sec" id="wedit" style="width:auto;margin:0;padding:9px 14px">✏️ تعديل</button>'
+   +'</div></div>';
+}
+function wiz(step,editing){
+  var h='<div class="screen active" style="padding-top:16px">';
+  var mode='';
+
+  if(step===1){
+    var have=!!player.name&&!editing;
+    h+=wizHead(1,'🧑 اسم اللاعب','يظهر على فنيلتك وفي بطاقة اللاعب.');
+    if(have){ h+=savedCard('اسم اللاعب',player.name); mode='next'; }
+    else { h+='<div class="card"><input class="in" id="nm" maxlength="10" placeholder="اكتب اسمك" value="'+(player.name||'')+'"></div>'; mode='save'; }
+  }
+  else if(step===2){
+    var have2=!!player.team&&!editing;
+    h+=wizHead(2,'🛡️ اسم فريقك','اختر أي اسم تحبه — يظهر في لوحة النتيجة.');
+    if(have2){ h+=savedCard('اسم الفريق',player.team); mode='next'; }
+    else { h+='<div class="card"><input class="in" id="tm" maxlength="16" placeholder="اكتب اسم فريقك" value="'+(player.team||'')+'"></div>'; mode='save'; }
+  }
+  else if(step===3){
+    var have3=player.kitSaved&&!editing;
+    h+=wizHead(3,'👕 صمّم فنيلتك','اختر رقمك، ولونك الأساسي، والنقش ولونه.');
+    h+='<div class="card" style="text-align:center"><div id="pv">'+shirt(120,kit(),player.num,player.name)+'</div></div>';
+    if(have3){ h+=savedCard('الفنيلة','رقم '+ar(player.num)+' — '+kit().n+' — '+patn().n); mode='next'; }
+    else {
+      h+='<div class="card"><h3>🔢 الرقم</h3><div class="nums">';
+      NUMS.forEach(function(n){h+='<button class="num'+(n===player.num?' on':'')+'" data-n="'+n+'">'+ar(n)+'</button>';});
+      h+='</div><h3>🎨 اللون الأساسي</h3><div class="cols">';
+      KITS.forEach(function(k){h+='<button class="col'+(k.id===player.kit?' on':'')+'" data-k="'+k.id+'">'+shirt(52,k,player.num,'',player.pat,player.pc)+'<div>'+k.n+'</div></button>';});
+      h+='</div><h3>🧵 النقش</h3><div class="cols">';
+      PATS.forEach(function(q){h+='<button class="col pat'+(q.id===player.pat?' on':'')+'" data-p="'+q.id+'">'+shirt(52,kit(),player.num,'',q.id,player.pc)+'<div>'+q.n+'</div></button>';});
+      h+='</div><h3>🎨 لون النقش</h3><div class="cols">';
+      PCOLS.forEach(function(q){h+='<button class="col pcol'+(q.id===player.pc?' on':'')+'" data-c="'+q.id+'">'+shirt(52,kit(),player.num,'',player.pat,q.id)+'<div>'+q.n+'</div></button>';});
+      h+='</div></div>'; mode='save';
+    }
+  }
+  else if(step===4){
+    var have4=player.lvlSaved&&!editing;
+    h+=wizHead(4,'🎚️ اختر مستواك','كلما ارتفع المستوى قلّ الوقت، ووصلت إلى مباريات أبعد.');
+    if(have4){ h+=savedCard('المستوى',lvl().e+' '+lvl().n); mode='next'; }
+    else {
+      h+='<div class="card">';
+      ['easy','mid','pro'].forEach(function(k){
+        var L=LEVELS[k];
+        h+='<button class="lvbtn'+(player.level===k?' on':'')+'" data-l="'+k+'"><b>'+L.e+' '+L.n+'</b><span>'+L.d+'</span></button>';
+      });
+      h+='</div>'; mode='save';
+    }
+  }
+  else if(step===5){
+    h+=wizHead(5,'📋 نظام البطولة','اقرأه جيدًا قبل أن تدخل الملعب.')+rulesCards(); mode='next';
+  }
+  else {
+    h+=wizHead(6,'⚽ هل أنت مستعد؟','')
+     +'<div class="card" style="text-align:center">'+shirt(140,kit(),player.num,player.name)
+     +'<h3 style="font-size:1.3rem;margin-top:8px">'+player.name+' — '+player.team+'</h3>'
+     +'<p style="font-size:.9rem;color:#57606f;font-weight:700;line-height:1.9">رقم '+ar(player.num)+' — '+kit().n+'<br>المستوى: '+lvl().e+' '+lvl().n+'</p></div>'; mode='go';
+  }
+
+  if(mode==='save') h+='<button class="btn main" id="wsave">💾 حفظ</button>';
+  else if(mode==='next') h+='<button class="btn main" id="wnext">التالي ⟵</button>';
+  else h+='<button class="btn main" id="wgo">⚽ ابدأ البطولات</button>';
+  h+='<button class="btn sec" id="wback">⟶ السابق</button></div>';
+  document.getElementById('app').innerHTML=h;
+
+  function pv(){var e=document.getElementById('pv');if(e)e.innerHTML=shirt(120,kit(),player.num,player.name);}
+  var ns=document.querySelectorAll('.num');
+  for(var i=0;i<ns.length;i++)ns[i].onclick=function(){
+    player.num=parseInt(this.getAttribute('data-n'),10);ac();tone(880,0,.1,'sine',.18);
+    for(var j=0;j<ns.length;j++)ns[j].className='num';this.className='num on';pv();
+  };
+  var cs=document.querySelectorAll('.col');
+  for(var i2=0;i2<cs.length;i2++)cs[i2].onclick=function(){
+    player.kit=this.getAttribute('data-k');ac();tone(880,0,.1,'sine',.18);
+    for(var j=0;j<cs.length;j++)cs[j].className='col';this.className='col on';pv();
+  };
+  var ps2=document.querySelectorAll('.pat');
+  for(var ip=0;ip<ps2.length;ip++)ps2[ip].onclick=function(){
+    player.pat=this.getAttribute('data-p');ac();tone(880,0,.1,'sine',.18);wiz(3,true);
+  };
+  var pc2=document.querySelectorAll('.pcol');
+  for(var ic=0;ic<pc2.length;ic++)pc2[ic].onclick=function(){
+    player.pc=this.getAttribute('data-c');ac();tone(880,0,.1,'sine',.18);wiz(3,true);
+  };
+  var ls=document.querySelectorAll('.lvbtn');
+  for(var i3=0;i3<ls.length;i3++)ls[i3].onclick=function(){
+    player.level=this.getAttribute('data-l');ac();tone(880,0,.1,'sine',.18);
+    for(var j=0;j<ls.length;j++)ls[j].className='lvbtn';this.className='lvbtn on';
+  };
+
+  var ed=document.getElementById('wedit');
+  if(ed)ed.onclick=function(){ac();wiz(step,true);};
+
+  var sv=document.getElementById('wsave');
+  if(sv)sv.onclick=function(){
+    if(step===1){
+      var v=document.getElementById('nm').value.replace(/\s+/g,' ').trim();
+      if(!v){document.getElementById('nm').style.borderColor='#e74c3c';return;}
+      player.name=v;
+    }
+    if(step===2){
+      var t=document.getElementById('tm').value.replace(/\s+/g,' ').trim();
+      if(!t){document.getElementById('tm').style.borderColor='#e74c3c';return;}
+      player.team=t;
+    }
+    if(step===3)player.kitSaved=1;
+    if(step===4)player.lvlSaved=1;
+    save();ac();sGoal();wiz(step,false);
+  };
+
+  var nx=document.getElementById('wnext');
+  if(nx)nx.onclick=function(){ac();sGoal();wiz(step+1,false);};
+  var gobtn=document.getElementById('wgo');
+  if(gobtn)gobtn.onclick=function(){ac();sWin();showPick();};
+  document.getElementById('wback').onclick=function(){ac();if(step>1)wiz(step-1,false);else showStart();};
+}
+
+
+function rulesCards(){
+  var rows='';
+  TABLES.forEach(function(n){
+    var warn=(n>=8);
+    rows+='<tr style="border-bottom:1px solid #eee;'+(warn?'background:#fdecea':'')+'">'
+     +'<td style="padding:7px;font-weight:700">'+TEAM[n].e+' جدول '+ar(n)+'</td>'
+     +'<td style="padding:7px;font-weight:800;color:'+(warn?'#c0392b':'#0a3d62')+'">'+ar(n)+' أهداف للخصم</td></tr>';
+  });
+  return '<div class="card"><h3>⚽ الكرة الواحدة — ثلاث نتائج</h3>'
+   +'<div style="font-size:.88rem;line-height:2;font-weight:700;color:#2f3542">'
+   +'<div style="padding:8px;background:#d4efdf;border-radius:10px;margin-bottom:7px">⚽ <b>قول!</b> — إذا أجبت بسرعة قبل حدّ مستواك ← <b>هدف لك</b></div>'
+   +'<div style="padding:8px;background:#fff3cd;border-radius:10px;margin-bottom:7px">🧤 <b>أنقذتَ مرماك</b> — إجابة صحيحة لكن متأخرة ← <b>لا لك ولا عليك</b></div>'
+   +'<div style="padding:8px;background:#fadbd8;border-radius:10px">⚠️ <b>هجمة مرتدة</b> — خطأ أو انتهى الوقت ← <b>الخصم يسجّل</b></div>'
+   +'</div></div>'
+   +'<div class="card"><h3>💥 ثمن الخطأ يختلف من مباراة لأخرى</h3>'
+   +'<p style="font-size:.84rem;color:#57606f;line-height:1.8;margin-bottom:8px">كلما كبر الجدول غلا الخطأ:</p>'
+   +'<table style="width:100%;font-size:.85rem;border-collapse:collapse">'+rows+'</table></div>'
+   +'<div class="card" style="border:3px solid #e74c3c;background:#fff6f5"><h3 style="color:#c0392b">⚠️ تحذير مهم</h3>'
+   +'<p style="font-size:.92rem;font-weight:700;color:#8a2318;line-height:2">'
+   +'انتبه جيدًا في <b>جدول ٨ والمباراة النهائية</b>.<br>'
+   +'كل خطأ في جدول ٨ يضع <b>٨ أهداف</b> في مرماك، وفي النهائي <b>تسعة</b>.<br>'
+   +'خطأ واحد قد يكلّفك المباراة كلها. إن لم تكن متأكدًا، تمهّل قليلًا — الإجابة المتأخرة الصحيحة تنقذ مرماك، أما التخمين فيهدم شباكك.</p></div>'
+   +'<div class="card"><h3>🏆 كيف تفوز؟</h3>'
+   +'<p style="font-size:.88rem;font-weight:700;line-height:2;color:#2f3542">'
+   +'• <b>الدوري:</b> ١٨ كرة في كل مباراة (والنهائي '+ar(FINAL.length*2)+')، وتفوز إذا كانت أهدافك أكثر من أهداف الخصم.<br>'
+   +'• لا ينتقل إلى المباراة التالية إلا من فاز.<br>'
+   +'• <b>النجوم:</b> ⭐⭐⭐ إذا لم يسجّل عليك الخصم وسجّلت ١٢ فأكثر، ⭐⭐ إذا حقّقت واحدة منهما، ⭐ للفوز العادي.<br>'
+   +'• <b>الكأس:</b> عشر ركلات أمام كل حارس، وتهزمه بـ<b>٦ أهداف فأكثر</b>. المتأخرة يمسكها الحارس.</p></div>'
+   +'<div class="card"><h3>🎚️ مستواك يحدّد سرعتك</h3>'
+   +'<p style="font-size:.88rem;font-weight:700;line-height:2;color:#2f3542">'
+   +'🟢 مبتدئ: ١٢ ثانية للكرة، والهدف قبل ٧ — حتى جدول ٥.<br>'
+   +'🟡 متوسط: ١٠ ثوانٍ، والهدف قبل ٥ — حتى جدول ٧.<br>'
+   +'🔴 محترف: ٨ ثوانٍ، والهدف قبل ٤ — إلى النهائي والكأس كاملًا.</p></div>';
+}
+
+/* جدول الدوري */
+function showLeague(){
+  BACK=showPick;
+  var h=topBar()+'<div class="screen active">';
+  TABLES.forEach(function(n){
+    var t=TEAM[n],o=isOpen(n),pp=pr(n),fin=(n===TABLES[TABLES.length-1]);
+    h+='<div class="mrow'+(o?'':' lock')+'" data-n="'+n+'" style="border-right-color:'+(o?t.c:'#747d8c')+'">'
+     +'<div class="mleft"><div class="memo">'+(o?t.e:'🔒')+'</div><div class="minfo"><h4>'+t.n+' — جدول '+ar(n)+(fin?' 🏁 النهائي':'')+'</h4>'
+     +'<p>'+(o?((fin?(ar(FINAL.length*2)+' كرة من أصعب المسائل'):'١٨ كرة'+(t.rev.length?' ومعها مراجعة جدول '+t.rev.map(function(x){return ar(x);}).join('، '):''))+'<br>إتقانك: '+ar(matchPct(n))+'٪')
+        :(n>lvl().max?('🎚️ تحتاج المستوى '+needLevel(n)):'تُفتح بعد الفوز في المباراة السابقة'))+'</p></div></div>'
+     +'<div style="text-align:left">'+(pp.won?('<div>'+stars(pp.stars,15)+'</div><div style="font-size:.8rem;font-weight:700;color:#079992;margin-top:3px">'+(pp.best?ar(pp.best.op)+' - '+ar(pp.best.me):'')+'</div>')
+        :'<span class="pill">'+(o?'إلعب ⚽':'مقفلة')+'</span>')+'</div></div>';
+  });
+  h+='</div>'+navBar('league');
+  document.getElementById('app').innerHTML=h;bindNav();
+  var rs=document.querySelectorAll('.mrow');
+  for(var i=0;i<rs.length;i++)rs[i].onclick=function(){
+    var n=parseInt(this.getAttribute('data-n'),10);
+    if(!isOpen(n)){sSave();return;}
+    ac();startMatch(n);
+  };
+}
+
+/* تعليمات البطولة */
+function showRules(fromPick){
+  BACK=showPick;
+  var h='<div class="screen active" style="padding-top:16px">'
+   +'<button class="btn sec" id="rbk" style="margin-bottom:10px">⟶ السابق</button>'
+   +'<div class="card" style="text-align:center"><div style="font-size:2.4rem">📋</div>'
+   +'<h3 style="font-size:1.3rem">تعليمات البطولة</h3></div>'
+   +rulesCards()
+   +'<button class="btn main" id="rok">فهمت — إلى البطولات ⚽</button></div>';
+  document.getElementById('app').innerHTML=h;
+  document.getElementById('rbk').onclick=function(){ac();showPick();};
+  document.getElementById('rok').onclick=function(){ac();sGoal();showPick();};
+}
+
+/* اختيار البطولة */
+function showPick(){
+  BACK=showStart;
+  var h=topBar()+'<div class="screen active">'
+   +'<div class="card" style="text-align:center"><div style="font-size:2.4rem">🎮</div>'
+   +'<h3 style="font-size:1.25rem">أي بطولة تريد؟</h3></div>'
+   +'<div class="mrow" id="p1" style="border-right-color:#f6b93b"><div class="mleft"><div class="memo">🏆</div>'
+   +'<div class="minfo"><h4>بطولة الدوري</h4><p>ثماني مباريات، آخرها النهائي. كل مباراة ١٨ كرة،<br>وتفوز إذا كانت أهدافك أكثر من أهداف الخصم.<br>فيها المستويات: مبتدئ ومتوسط ومحترف.</p></div></div>'
+   +'<div style="text-align:left"><span class="pill" style="background:#f6b93b;color:#2b1b00">'+wins()+'/9</span></div></div>'
+   +'<div class="mrow" id="p2" style="border-right-color:#9aa7b1"><div class="mleft"><div class="memo">🥇</div>'
+   +'<div class="minfo"><h4>بطولة الكأس</h4><p>ركلات ترجيح أمام حرّاس الفرق.<br>عشر ركلات لكل حارس — تهزمه بستة أهداف فأكثر.<br>ولا تنتقل لحارس حتى تهزم الذي قبله.</p></div></div>'
+   +'<div style="text-align:left"><span class="pill" style="background:#9aa7b1;color:#fff">'+cupWins()+'/9</span></div></div>'
+   +'<div class="mrow" id="p3" style="border-right-color:#079992"><div class="mleft"><div class="memo">🏅</div>'
+   +'<div class="minfo"><h4>بطاقة اللاعب</h4><p>فنيلتك وإنجازاتك وشهاداتك.</p></div></div></div>'
+   +'<div class="mrow" id="p4" style="border-right-color:#0c6397"><div class="mleft"><div class="memo">📋</div>'
+   +'<div class="minfo"><h4>تعليمات البطولة</h4><p>ثمن الخطأ في كل جدول وكيف تفوز.</p></div></div></div>'
+   +'<button class="btn main" id="psave" style="margin-top:4px">💾 احفظ تقدّمي الآن</button>'
+   +'<p style="text-align:center;font-size:.74rem;color:#dff3ea;font-weight:700">'+(STORE_OK?'الحفظ تلقائي بعد كل كرة':'⚠️ الحفظ التلقائي معطّل في هذا الجهاز — خذ رمز الحفظ من الإعدادات')+'</p>'
+   +'</div>'+navBar('pick');
+  document.getElementById('app').innerHTML=h;bindNav();
+  document.getElementById('p1').onclick=function(){ac();showLeague();};
+  document.getElementById('p2').onclick=function(){ac();showPens();};
+  document.getElementById('p3').onclick=function(){ac();showCard();};
+  document.getElementById('p4').onclick=function(){ac();showRules(true);};
+  document.getElementById('psave').onclick=function(){save();sGoal();this.textContent='✅ تم حفظ تقدّمك';var b=this;setTimeout(function(){b.textContent='💾 احفظ تقدّمي الآن';},2200);};
+}
+
+/* الإعدادات */
+function msg(pct){return pct>=90?'أحسنت! واصل إلى ١٠٠٪':(pct>=60?'قريب — اجتهد حتى تصل':'اجتهد حتى تصل');}
+function showSettings(){
+  BACK=showPick;
+  var h=topBar()+'<div class="screen active">'
+   +'<div class="card"><h3>📊 تقدّمك في الجداول</h3>';
+  TABLES.forEach(function(n){
+    var pct=matchPct(n),p=pr(n),c=cp(n);
+    h+='<div style="padding:9px 0;border-bottom:1px solid #eee">'
+     +'<div style="display:flex;justify-content:space-between;font-weight:700;font-size:.92rem"><span>'+TEAM[n].e+' جدول '+ar(n)+'</span><span style="color:'+(pct>=90?'#079992':'#b9770e')+'">'+pct+'٪</span></div>'
+     +'<div class="timer-wrap" style="height:9px;margin:6px 0 4px"><div style="height:100%;width:'+pct+'%;background:'+(pct>=90?'#2ecc71':'#f6b93b')+'"></div></div>'
+     +'<div style="font-size:.76rem;color:#57606f;font-weight:700">حصلت على '+pct+'٪ من ١٠٠٪ — '+msg(pct)+'</div>'
+     +'<div style="font-size:.72rem;color:#8a95a1;margin-top:3px">الدوري: '+(p.won?'فائز ✅':'لم تعبر بعد')+' — الكأس: '+(c.won?'هزمت الحارس ✅':'لم تهزمه بعد')+'</div></div>';
+  });
+  h+='</div>'
+   +(STORE_OK?'':'<div class="card" style="border:3px solid #e74c3c;background:#fff6f5"><h3 style="color:#c0392b">⚠️ هذا الجهاز لا يحفظ تلقائيًا</h3>'
+     +'<p style="font-size:.84rem;font-weight:700;color:#8a2318;line-height:1.9">المتصفح هنا يمنع الحفظ التلقائي. انسخ <b>رمز الحفظ</b> أدناه واحتفظ به، وألصقه في أي وقت لتستعيد تقدّمك.</p></div>')
+   +'<div class="card"><h3>💾 رمز الحفظ</h3>'
+   +'<p style="font-size:.82rem;color:#57606f;line-height:1.8">انسخ هذا الرمز واحتفظ به. يستعيد اسمك وفريقك ومستواك وكل نتائجك على أي جهاز.</p>'
+   +'<textarea id="code" readonly style="height:90px;font-size:.72rem;direction:ltr">'+encState()+'</textarea>'
+   +'<button class="btn gold" id="cpc">📋 انسخ رمز الحفظ</button>'
+   +'<h3 style="margin-top:12px">📥 استعادة بالرمز</h3>'
+   +'<textarea id="rcode" placeholder="الصق الرمز هنا" style="height:70px;font-size:.72rem;direction:ltr"></textarea>'
+   +'<div id="rmsg"></div>'
+   +'<button class="btn main" id="rst">📥 استعِد تقدّمي</button></div>'
+   +'<div class="card"><h3>🏫 بيانات المدرسة والمعلم</h3>'
+   +'<input class="in" id="sc" maxlength="60" placeholder="اسم المدرسة" value="'+sch().replace(/"/g,'&quot;')+'">'
+   +'<input class="in" id="au" maxlength="60" placeholder="إعداد المعلم" value="'+aut().replace(/"/g,'&quot;')+'">'
+   +'<button class="btn main" id="sv">حفظ البيانات</button></div>'
+   +'<div class="card"><h3>📄 نسخة للطباعة</h3>'
+   +'<p style="font-size:.82rem;color:#57606f;line-height:1.8">تفتح صفحة التقرير ثم اختر «طباعة» ومنها «حفظ بصيغة PDF».</p>'
+   +'<button class="btn gold" id="pdf">📄 تقرير الإنجاز — PDF</button></div>'
+   +'<div class="card"><h3>♻️ البداية من جديد</h3>'
+   +'<p style="font-size:.82rem;color:#57606f;line-height:1.8">يمسح بيانات الطالب ونتائجه كاملة ويبدأ من الصفر.<br>اسم المدرسة واسم المعلم يبقيان.</p>'
+   +'<button class="btn red" id="rs">♻️ ابدأ من الصفر</button></div>'
+   +'</div>'+navBar('set');
+  document.getElementById('app').innerHTML=h;bindNav();
+  document.getElementById('cpc').onclick=function(){
+    var t=document.getElementById('code');t.select();
+    var d=false;try{d=document.execCommand('copy');}catch(e){}
+    if(!d&&navigator.clipboard){try{navigator.clipboard.writeText(t.value);d=true;}catch(e){}}
+    this.textContent=d?'✅ تم نسخ الرمز':'حدّد الرمز وانسخه';sGoal();
+  };
+  document.getElementById('rst').onclick=function(){
+    var f=document.getElementById('rcode'),m=document.getElementById('rmsg');
+    var v=(f.value||'').replace(/\s+/g,'');
+    if(!v){m.innerHTML='<p style="color:#c0392b;font-weight:700;font-size:.84rem">الصق الرمز أولًا</p>';return;}
+    if(decState(v)){save();sWin();showSettings();alertBox('✅ تمت استعادة تقدّمك','رجع اسمك وفريقك وكل نتائجك.');}
+    else{m.innerHTML='<p style="color:#c0392b;font-weight:700;font-size:.84rem">⚠️ الرمز غير صحيح — تأكد أنك نسخته كاملًا</p>';sSave();}
+  };
+  document.getElementById('sv').onclick=function(){
+    player.school=document.getElementById('sc').value.trim();
+    player.author=document.getElementById('au').value.trim();
+    save();sGoal();showSettings();
+  };
+  document.getElementById('pdf').onclick=function(){ac();showReport();};
+  document.getElementById('rs').onclick=function(){ac();askReset();};
+}
+
+function doReset(){
+  var sc=player.school,au=player.author;
+  clearStores();
+  cards={};prog={};cup={};
+  player={name:'',team:'',num:10,kit:'blue',pat:'p0',pc:'w',teacher:false,level:'easy'};
+  player.school=sc;player.author=au;
+  save();
+  showStart();
+}
+function alertBox(title,msg){
+  var o=document.createElement('div');
+  o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:6000;padding:18px';
+  o.innerHTML='<div class="card" style="max-width:320px;width:100%;margin:0;text-align:center">'
+   +'<h3>'+title+'</h3><p style="font-size:.86rem;color:#57606f;line-height:1.9;margin:8px 0 12px">'+msg+'</p>'
+   +'<button class="btn main" id="abok">تمام</button></div>';
+  document.body.appendChild(o);
+  document.getElementById('abok').onclick=function(){document.body.removeChild(o);};
+}
+function askReset(){
+  var o=document.createElement('div');
+  o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:5000;padding:18px';
+  o.innerHTML='<div class="card" style="max-width:340px;width:100%;margin:0;text-align:center">'
+   +'<div style="font-size:2.4rem">♻️</div><h3 style="color:#c0392b">البداية من جديد</h3>'
+   +'<p style="font-size:.86rem;color:#57606f;line-height:1.9;margin-bottom:12px">'
+   +'سيُمسح <b>اسم اللاعب واسم الفريق والفنيلة والمستوى وكل النتائج والنجوم والأهداف والإتقان</b>،'
+   +' ويبدأ البرنامج من الصفر.<br><br>'
+   +'ويبقى <b>اسم المدرسة واسم المعلم</b> كما هما.</p>'
+   +'<button class="btn red" id="r1">نعم، ابدأ من الصفر</button>'
+   +'<button class="btn sec" id="r0">إلغاء</button></div>';
+  document.body.appendChild(o);
+  document.getElementById('r0').onclick=function(){document.body.removeChild(o);};
+  document.getElementById('r1').onclick=function(){document.body.removeChild(o);doReset();};
+}
+
+function showReport(){
+  BACK=showSettings;
+  var h='<div class="screen active" id="rep">'
+   +'<div class="card" style="text-align:center"><div style="font-size:2.4rem">📄</div>'
+   +'<h3>تقرير إنجاز اللاعب</h3>'
+   +'<p style="font-size:.86rem;color:#57606f;line-height:1.9">'+player.name+' — '+player.team+'<br>رقم القميص '+ar(player.num)+' — المستوى '+lvl().n+'<br>'+sch()+'<br>'+aut()+'<br>'+new Date().toLocaleDateString('ar-EG')+'</p></div>'
+   +'<div class="card"><table style="width:100%;font-size:.85rem;border-collapse:collapse">'
+   +'<tr style="background:#f1f2f6;font-weight:700"><td style="padding:7px">الجدول</td><td style="padding:7px">الإتقان</td><td style="padding:7px">الدوري</td><td style="padding:7px">الكأس</td></tr>';
+  TABLES.forEach(function(n){
+    var pct=matchPct(n);
+    h+='<tr style="border-bottom:1px solid #eee"><td style="padding:7px;font-weight:700">جدول '+ar(n)+'</td>'
+     +'<td style="padding:7px;color:'+(pct>=90?'#079992':'#b9770e')+';font-weight:700">'+pct+'٪</td>'
+     +'<td style="padding:7px">'+(pr(n).won?'✅':'—')+'</td><td style="padding:7px">'+(cp(n).won?'✅':'—')+'</td></tr>';
+  });
+  h+='</table><p style="font-size:.84rem;font-weight:700;color:#0a3d62;margin-top:12px;line-height:1.9">'
+   +'🏆 مباريات الدوري: '+wins()+' من '+TABLES.length+'<br>🥇 حرّاس الكأس: '+cupWins()+' من '+TABLES.length+'<br>⭐ النجوم: '+allStars()+' من '+(TABLES.length*3)+'<br>🧤 التسديدات المضمونة: '+allGold()+' من 90<br>⚽ الأهداف: '+(player.goals||0)+'</p></div>'
+   +'<button class="btn gold" id="pr">🖨️ طباعة / حفظ PDF</button>'
+   +'<button class="btn sec" id="bk2">⟶ السابق</button></div>'+navBar('set');
+  document.getElementById('app').innerHTML=h;bindNav();
+  document.getElementById('pr').onclick=function(){window.print();};
+  document.getElementById('bk2').onclick=function(){showSettings();};
+}
+
+/* بطولة الكأس — ركلات الترجيح */
+function showPens(){
+  BACK=showPick;
+  var done=cupWins();
+  var h=topBar()+'<div class="screen active">'
+   +'<div class="card" style="text-align:center;border:3px solid #9aa7b1"><div style="font-size:2.4rem">🥇</div>'
+   +'<h3 style="font-size:1.2rem">بطولة الكأس — ركلات الترجيح</h3>'
+   +'<p style="font-size:.84rem;color:#57606f;line-height:1.9">عشر ركلات أمام كل حارس. تغلّب على الحرّاس كلهم لترفع الكأس.<br>'
+   +'بلا مستويات — عشر ثوانٍ للركلة، والهدف قبل خمس.</p>'
+   +'<p style="font-weight:700;color:#0a3d62;margin-top:8px">الحرّاس المهزومون: '+done+' / 9</p></div>';
+  TABLES.forEach(function(n){
+    var t=TEAM[n],c=cp(n),o=cupOpen(n);
+    h+='<div class="mrow'+(o?'':' lock')+'" data-n="'+n+'" style="border-right-color:'+(c.won?'#9aa7b1':(o?t.c:'#747d8c'))+'">'
+     +'<div class="mleft"><div class="memo">'+(c.won?'✅':(o?'🧤':'🔒'))+'</div><div class="minfo"><h4>'+t.k+'</h4>'
+     +'<p>'+(o?('جدول '+ar(n)+' — عشر ركلات<br>'+(c.best?('أفضل نتيجة: '+c.best.op+' - '+c.best.me):'لم تواجهه بعد')):(n>lvl().max?('🎚️ تحتاج المستوى '+needLevel(n)):'يُفتح بعد هزيمة الحارس السابق'))+'</p></div></div>'
+     +'<div style="text-align:left"><span class="pill" style="background:'+(c.won?'#9aa7b1':(o?'#f6b93b':'#747d8c'))+';color:'+(c.won||!o?'#fff':'#2b1b00')+'">'+(c.won?'هُزم':(o?'سدّد':'مقفل'))+'</span></div></div>';
+  });
+  h+='</div>'+navBar('pens');
+  document.getElementById('app').innerHTML=h;bindNav();
+  var rs=document.querySelectorAll('.mrow');
+  for(var i=0;i<rs.length;i++)rs[i].onclick=function(){
+    var n=parseInt(this.getAttribute('data-n'),10);
+    if(!cupOpen(n)){sSave();return;}
+    ac();startPens(n);
+  };
+}
+function showCupChampion(){
+  clearInterval(timer);BACK=showPens;
+  var txt='🥇 بطل كأس ركلات الترجيح 🥇\n\nالفريق: '+player.team+'\nاللاعب: '+player.name+' — قميص رقم '+player.num
+   +'\nالحرّاس المهزومون: '+TABLES.length+' من '+TABLES.length+'\n\nنشكر فريق '+player.team+' واللاعب '+player.name
+   +' على رفع كأس ركلات الترجيح بعد أن تغلّب على الحرّاس كلهم.\n\n'+sch()+'\n'+aut()
+   +'\nالتاريخ: '+new Date().toLocaleDateString('ar-EG');
+  var h='<div class="screen active" style="padding-top:18px">'
+   +'<button class="btn sec" id="cbk" style="margin-bottom:10px">⟶ السابق</button>'
+   +'<div class="card" style="text-align:center;background:linear-gradient(180deg,#f7fbff,#e9f1f7);border:4px solid #9aa7b1">'
+   +'<div style="font-size:5.5rem;line-height:1">🥇</div>'
+   +'<div style="display:inline-block;background:#5d6d7e;color:#fff;border-radius:16px;padding:9px 20px;transform:rotate(-2deg);margin:6px 0 12px"><span style="font-size:1.4rem;font-weight:800">بطل كأس الترجيح</span></div>'
+   +'<h3 style="font-size:1.55rem;color:#0a3d62;margin:6px 0">'+player.team+'</h3>'
+   +'<div style="margin:10px 0">'+shirt(120,kit(),player.num,player.name)+'</div>'
+   +'<p style="font-weight:700;color:#0a3d62">🧤 هزمت الحرّاس كلهم</p></div>'
+   +'<div class="card" style="border-right:6px solid #9aa7b1"><h3>🎖️ كلمة الكأس</h3>'
+   +'<p style="font-size:.95rem;line-height:2.1;color:#2f3542;font-weight:700">'
+   +'نشكر فريق <span style="color:#5d6d7e">'+player.team+'</span> واللاعب <span style="color:#5d6d7e">'+player.name+'</span> '
+   +'صاحب القميص رقم '+ar(player.num)+' على رفع كأس ركلات الترجيح.<br><br>'
+   +'وقف أمام الحرّاس واحدًا بعد الآخر فلم يتراجع، وسدّد بثقة وهدوء حتى هزمهم جميعًا.<br><br>'
+   +'أحسنت يا قنّاص الركلات.</p>'
+   +'<p style="font-size:.78rem;color:#57606f;margin-top:12px;text-align:center;line-height:1.9">'+sch()+'<br>'+aut()+'</p></div>'
+   +'<textarea id="tx" readonly style="display:none">'+txt+'</textarea>'
+   +'<button class="btn sec" id="cp" style="background:#5d6d7e;color:#fff">📋 انسخ شهادة الكأس</button>'
+   +'<button class="btn sec" id="bk">🧤 بطولة الكأس</button></div>'+navBar('pens');
+  document.getElementById('app').innerHTML=h;bindNav();
+  fireworks(9);sWin();setTimeout(function(){sWin();},1400);
+  document.getElementById('bk').onclick=function(){showPens();};
+  document.getElementById('cbk').onclick=function(){ac();showPens();};
+  document.getElementById('cp').onclick=function(){
+    var t=document.getElementById('tx');t.style.display='block';t.select();
+    var d=false;try{d=document.execCommand('copy');}catch(e){}
+    if(!d&&navigator.clipboard){try{navigator.clipboard.writeText(t.value);d=true;}catch(e){}}
+    t.style.display='none';this.textContent=d?'✅ تم نسخ الشهادة':'حدّد النص وانسخه';
+  };
+}
+
+/* بطاقة اللاعب */
+function showCard(){
+  BACK=showPick;
+  var L='بطاقة لاعب — هدّاف الضرب\n'+sch()+'\n'+aut()+'\n\nاللاعب: '+player.name+'\nالفريق: '+player.team+'\nرقم القميص: '+player.num+'\nالمباريات المكسوبة: '+wins()+' من '+TABLES.length+'\nالنجوم: '+allStars()+' من 27\nالتسديدات المضمونة: '+allGold()+' من 90\n';
+  TABLES.forEach(function(n){var p=pr(n);if(p.won)L+='- '+TEAM[n].n+': '+(p.best?p.best.op+'-'+p.best.me:'')+' ('+p.stars+' نجوم)\n';});
+  L+='\nالتاريخ: '+new Date().toLocaleDateString('ar-EG');
+  var h=topBar()+'<div class="screen active">'
+   +'<div class="card" style="text-align:center">'+shirt(140,kit(),player.num,player.name)
+   +'<h3 style="margin-top:8px">'+player.name+' — '+player.team+'</h3>'
+   +'<p style="font-size:.84rem;color:#57606f">🏆 '+ar(wins())+' فوز — ⭐ '+ar(allStars())+' نجمة — 🧤 '+ar(allGold())+'/٩٠</p></div>'
+   +'<div class="card"><h3>📜 شهادة اللاعب</h3><textarea id="tx" readonly>'+L+'</textarea>'
+   +'<button class="btn gold" id="cp" style="margin-top:10px">📋 انسخ البطاقة</button></div>'
+   +(wins()>=TABLES.length?'<button class="btn gold" id="champ">🏆 شهادة البطولة</button>':'')
+   +'<button class="btn sec" id="lv">🎚️ المستوى: '+lvl().e+' '+lvl().n+' — غيّره</button>'
+   +'<button class="btn sec" id="ed">✏️ غيّر الاسم والفريق والرقم واللون</button>'
+   +'</div>'+navBar('card');
+  document.getElementById('app').innerHTML=h;bindNav();
+  document.getElementById('ed').onclick=function(){wiz(2);};
+  document.getElementById('lv').onclick=function(){wiz(1);};
+  var ch=document.getElementById('champ');
+  if(ch)ch.onclick=function(){showChampion();};
+  document.getElementById('cp').onclick=function(){var t=document.getElementById('tx');t.select();var d=false;try{d=document.execCommand('copy');}catch(e){}if(!d&&navigator.clipboard){try{navigator.clipboard.writeText(t.value);d=true;}catch(e){}}this.textContent=d?'✅ تم النسخ':'حدّد النص وانسخه';sGoal();};
+}
+
+/* ===== المباراة ===== */
+var qs=[],idx=0,me=0,op=0,timer=null,t0=0,locked=false,team=2,penMode=false,usedHint=false,goldNow=0,mustCoach=false;
+
+function faceOf(c){
+  var a=c.a,b=c.b,p=a*b,fl=Math.random()<.5;
+  if(c.t==='d'){var x=fl?b:a,y=fl?a:b;return{h:'<span>'+ar(x)+' × '+ar(y)+' =</span> <span class="blank" id="bl">؟</span>',ans:p,st:Math.min(a,b)};}
+  if(fl)return{h:'<span>'+ar(a)+' ×</span> <span class="blank" id="bl">؟</span> <span>= '+ar(p)+'</span>',ans:b,st:1};
+  return{h:'<span class="blank" id="bl">؟</span> <span>× '+ar(b)+' = '+ar(p)+'</span>',ans:a,st:1};
+}
+function optsFor(c,st){var s=[c],o=[-1,1,-2,2,-3,3,-4,4,5,6,7];for(var i=0;i<o.length&&s.length<4;i++){var v=c+o[i]*st;if(v>0&&s.indexOf(v)<0)s.push(v);}var e=c+st*8,g=0;while(s.length<4&&g<60){if(s.indexOf(e)<0)s.push(e);e+=st;g++;}return shuffle(s);}
+
+function startMatch(n){penMode=false;team=n;qs=buildMatch(n);idx=0;me=0;op=0;goldNow=0;showQ();}
+function startPens(n){penMode=true;team=n;qs=buildPens(n);idx=0;me=0;op=0;goldNow=0;showQ();}
+
+function board(T){
+  return '<div class="scoreboard">'
+   +'<div class="sb"><span class="tm">'+T.e+' '+T.n+'</span><span class="nu" id="opN">'+op+'</span></div>'
+   +'<div class="sb me"><span class="tm">👕 '+player.team+'</span><span class="nu" id="meN">'+me+'</span></div>'
+   +'<div class="sbfoot">'+(penMode?'ركلة':'الكرة')+' '+ar(idx+1)+' من '+ar(qs.length)+' — '+(penMode?'🥇 الكأس':lvl().e+' '+lvl().n)+' — الهدف قبل '+ar(tim().sec)+' ثوانٍ'+(penMode?'':' — الخطأ يعطي الخصم '+ar(team))+'</div></div>';
+}
+function showQ(){
+  BACK=function(){clearInterval(timer);if(penMode)showPens();else showLeague();};
+  if(idx>=qs.length)return showResult();
+  locked=false;usedHint=false;mustCoach=false;
+  var c=qs[idx],T=TEAM[team];
+  var f=faceOf(c);c._a=f.ans;
+  var o=optsFor(f.ans,f.st);
+  var h=topBar()+'<div class="screen active">'+board(T)
+   +'<div class="timer-wrap"><div class="timer-bar" id="tb"></div></div>'
+   +(c.rev?'<div style="text-align:center;margin-bottom:10px"><span class="pill" style="background:var(--gold);color:#2b1b00">⚡ كرة ثابتة — مراجعة جدول '+ar(c.rev)+'</span></div>':'')
+   +'<div class="qbox" id="qb"><div class="qtext">'+f.h+'</div></div>'
+   +'<div class="opts">';
+  o.forEach(function(v){h+='<button class="opt" data-v="'+v+'">'+ar(v)+'</button>';});
+  h+='</div><div id="fb"></div><div id="coach"></div><div id="coachwrap"></div><div id="nx"></div></div>'+navBar('');
+  document.getElementById('app').innerHTML=h;
+  var bs=document.querySelectorAll('.opt');
+  for(var i=0;i<bs.length;i++)bs[i].onclick=function(){answer(parseInt(this.getAttribute('data-v'),10),this);};
+
+  var ns=document.querySelectorAll('.nav');
+  for(var j=0;j<ns.length;j++)ns[j].onclick=function(){clearInterval(timer);ac();var s=this.getAttribute('data-s');if(s==='league')showLeague();else if(s==='pens')showPens();else showCard();};
+  bindCred();
+  run();
+}
+function hintHtml(c){
+  var a=c.a,b=c.b,T=TEAM[Math.min(a,b)]||TEAM[a];
+  return '<div class="hint"><p>🛟 المدرّب يقول</p><div style="display:flex;justify-content:center;margin:8px 0">'+dots(Math.min(a,b),Math.max(a,b),'#0c6397')+'</div>'
+   +'<p>'+ar(Math.min(a,b))+' صفوف × '+ar(Math.max(a,b))+' = '+ar(a*b)+'<br>'+(T?T.tip:'')+'</p></div>';
+}
+function run(){
+  clearInterval(timer);t0=Date.now();
+  timer=setInterval(function(){
+    var tb=document.getElementById('tb');
+    var B=tim().ball;var left=Math.max(0,B-(Date.now()-t0)/1000);
+    if(tb)tb.style.width=((left/B)*100)+'%';
+    if(left<=0){clearInterval(timer);answer(null,null);}
+  },70);
+}
+function showNext(){
+  var last=(idx>=qs.length-1);
+  document.getElementById('nx').innerHTML='<button class="btn main" id="nb">'+(last?'🏁 النتيجة النهائية':'الكرة التالية ⚽')+'</button>';
+  document.getElementById('nb').onclick=function(){idx++;showQ();};
+}
+function answer(v,el){
+  if(locked)return;locked=true;clearInterval(timer);
+  var secs=(Date.now()-t0)/1000,c=qs[idx],st=cell(c.t,c.a,c.b);
+  var ok=(v===c._a),p=c.a*c.b;
+  var bs=document.querySelectorAll('.opt');
+  for(var i=0;i<bs.length;i++){bs[i].disabled=true;if(parseInt(bs[i].getAttribute('data-v'),10)===c._a)bs[i].className='opt ok';}
+  if(!ok&&el)el.className='opt no';
+  var bl=document.getElementById('bl');if(bl)bl.textContent=ar(c._a);
+  var qb=document.getElementById('qb'),fb=document.getElementById('fb');
+  var head,line,bg,col;
+  if(ok&&secs<tim().sec){
+    me++;player.goals=(player.goals||0)+1;
+    var was=st.level>=GOLD,gold=false;
+    if(!usedHint){st.level=GOLD;if(!st.best||secs<st.best)st.best=secs;gold=!was&&st.level>=GOLD;if(gold)goldNow++;}
+    burst();if(gold)sGold();else sGoal();
+    bg='#d4efdf';col='#0b6a38';head='⚽ قـــول! سجّلتَ هدفًا';
+    line=ar(c.a)+' × '+ar(c.b)+' = '+ar(p)+' في '+ar(secs.toFixed(1))+' ثانية'+(gold?'<br>🧤 وصارت تسديدة مضمونة':'');
+  } else if(ok){
+    if(!usedHint){st.level=Math.max(1,st.level);if(!st.best||secs<st.best)st.best=secs;}
+    sGoal();
+    bg='#fff3cd';col='#856404';
+    if(penMode){
+      op++;
+      head='🧤 أمسكها الحارس';
+      line=ar(c.a)+' × '+ar(c.b)+' = '+ar(p)+' — تأخرت '+ar(secs.toFixed(1))+' ثانية<br>سدّد في أقل من '+ar(tim().sec)+' ثوانٍ ليدخل';
+    } else {
+      head='🧤 أنقذتَ مرماك من هدف';
+      line=ar(c.a)+' × '+ar(c.b)+' = '+ar(p)+' — تأخرت '+ar(secs.toFixed(1))+' ثانية<br>أجِب في أقل من '+ar(tim().sec)+' ثوانٍ ليصير هدفًا';
+    }
+  } else {
+    var cost=penMode?1:team;
+    op+=cost;st.level=Math.max(0,st.level-1);mustCoach=true;
+    sSave();if(qb)qb.className='qbox shake';
+    bg='#fadbd8';col='#8a2318';
+    head=penMode?'🧤 تصدّاها الحارس':('⚠️ هجمة مرتدة — الخصم سجّل '+ar(cost));
+    line=ar(c.a)+' × '+ar(c.b)+' = '+ar(p)+(penMode?'':'<br>كل خطأ في هذه المباراة يعطي الخصم '+ar(team)+' أهداف');
+  }
+  var mn=document.getElementById('meN'),on=document.getElementById('opN');
+  if(mn)mn.textContent=me; if(on)on.textContent=op;
+  fb.innerHTML='<div class="fb" style="background:'+bg+'"><h4 style="color:'+col+'">'+head+'</h4><p style="color:'+col+'">'+line+'</p></div>';
+  if(mustCoach){
+    document.getElementById('coachwrap').innerHTML='<button class="coachbtn must" id="hint">🛟 لازم تسأل المدرّب قبل الكرة التالية</button>';
+    document.getElementById('hint').onclick=function(){
+      this.style.display='none';
+      document.getElementById('coach').innerHTML=hintHtml(c);
+      mustCoach=false;showNext();
+    };
+  } else showNext();
+  save();
+}
+
+function showResult(){
+  clearInterval(timer);BACK=function(){if(penMode)showPens();else showLeague();};
+  var T=TEAM[team],won=(me>op);
+  if(!penMode&&won){
+    var p=pr(team),s=((op===0&&me>=12)?3:((op===0||me>=12)?2:1));
+    if(!p.best||me>p.best.me)p.best={me:me,op:op};
+    if(s>p.stars)p.stars=s;
+    p.won=1;save();
+    if(wins()>=TABLES.length) return showChampion();
+  }
+  if(penMode&&won){
+    var c=cp(team);
+    if(!c.best||me>c.best.me)c.best={me:me,op:op};
+    c.won=1;save();
+    if(cupWins()>=TABLES.length) return showCupChampion();
+  }
+  var h=topBar()+'<div class="screen active"><div class="card" style="text-align:center">'
+   +'<div style="font-size:3rem">'+(penMode?(won?'🥇':'🧤'):(won?'🏆':'😟'))+'</div>'
+   +'<h3 style="font-size:1.25rem">'+(penMode?(won?'🥇 هزمت '+T.k:'الحارس صمد أمامك'):(won?'فوز!':(me===op?'تعادل — تحتاج هدفًا واحدًا على الأقل':'خسارة')))+'</h3>'
+   +'<div class="scoreboard" style="position:static;margin-top:12px">'
+   +'<div class="sb"><span class="tm">'+T.e+' '+T.n+'</span><span class="nu">'+op+'</span></div>'
+   +'<div class="sb me"><span class="tm">👕 '+player.team+'</span><span class="nu">'+me+'</span></div></div>';
+  if(!penMode&&won)h+='<p style="margin-top:12px;font-size:1.8rem">'+stars((op===0&&me>=12)?3:((op===0||me>=12)?2:1),30)+'</p>';
+  h+='</div>';
+  h+='<div class="card">'
+   +(penMode
+     ?'<p style="font-size:.9rem;font-weight:700;color:#0a3d62;line-height:1.9">سجّلت '+ar(me)+' من '+ar(qs.length)+' ركلة، وصدّ الحارس '+ar(op)+'.<br>تهزمه إذا سجّلت أكثر مما صدّ.</p>'
+     :'<p style="font-size:.9rem;font-weight:700;color:#0a3d62;line-height:1.9">أهدافك '+ar(me)+' — وأهداف الخصم '+ar(op)+'.<br>كل خطأ في جدول '+ar(team)+' يعطي الخصم '+ar(team)+' أهداف، والإجابة المتأخرة تنقذ مرماك ولا تسجّل.</p>')
+   +'<div style="display:flex;justify-content:space-between;font-size:.9rem;font-weight:700;margin-top:12px"><span>🧤 تسديدات مضمونة جديدة</span><span style="color:#b9770e">'+ar(goldNow)+'</span></div>';
+  if(!penMode){
+    var pct=matchPct(team);
+    h+='<div style="display:flex;justify-content:space-between;font-size:.9rem;font-weight:700;margin-top:10px"><span>إتقانك لجدول '+ar(team)+'</span><span style="color:#079992">'+ar(pct)+'٪</span></div>'
+     +'<div class="timer-wrap" style="margin-top:8px;height:10px"><div style="height:100%;width:'+pct+'%;background:#079992"></div></div>';
+    if(!won)h+='<p style="font-size:.84rem;color:#8a3418;font-weight:700;margin-top:10px">أعد المباراة — الكرات التي أخطأت فيها تعود إليك أولًا.</p>';
+  }
+  h+='</div>';
+  if(!penMode)h+='<button class="btn main" id="again">🔄 '+(won?'العب مرة أخرى':'أعد المباراة')+'</button>';
+  else h+='<button class="btn main" id="again">🔄 ركلات أخرى</button>';
+  h+='<button class="btn sec" id="bk">🏆 جدول البطولة</button></div>'+navBar(penMode?'pens':'league');
+  document.getElementById('app').innerHTML=h;bindNav();
+  if(won||penMode){burst();sWin();}
+  document.getElementById('again').onclick=function(){if(penMode)startPens(team);else startMatch(team);};
+  document.getElementById('bk').onclick=function(){if(penMode)showPens();else showLeague();};
+}
+
+function showChampion(){
+  clearInterval(timer);BACK=showPick;
+  var g=player.goals||0;
+  var txt='🏆 بطل بطولة هدّاف الضرب 🏆\n\n'
+   +'الفريق البطل: '+player.team+'\n'
+   +'اللاعب: '+player.name+' — قميص رقم '+player.num+'\n'
+   +'المباريات: '+TABLES.length+' من '+TABLES.length+'\nالأهداف: '+g+'\nالنجوم: '+allStars()+' من 27\nالتسديدات المضمونة: '+allGold()+' من 90\n\n'
+   +'نشكر فريق '+player.team+' واللاعب '+player.name+' على الفوز ببطولة هدّاف الضرب.\n'
+   +'لقد كان قويًا سريعًا، تخطّى تسعة حُرّاس، وأتقن جدول الضرب من ٢ إلى ٩.\n\n'
+   +sch()+'\n'+aut()+'\nالتاريخ: '+new Date().toLocaleDateString('ar-EG');
+
+  var h='<div class="screen active" style="padding-top:18px">'
+   +'<button class="btn sec" id="cbk" style="margin-bottom:10px">⟶ السابق</button>'
+   +'<div class="card" style="text-align:center;background:linear-gradient(180deg,#fffdf5,#fff6dd);border:4px solid var(--gold)">'
+   +'<div style="font-size:5.5rem;line-height:1">🏆</div>'
+   +'<div style="display:inline-block;background:var(--gold);color:#2b1b00;border-radius:16px;padding:9px 20px;transform:rotate(-2deg);margin:6px 0 12px"><span style="font-size:1.5rem;font-weight:800">بطل البطولة</span></div>'
+   +'<h3 style="font-size:1.6rem;color:#0a3d62;margin:6px 0">'+player.team+'</h3>'
+   +'<div style="margin:10px 0">'+shirt(120,kit(),player.num,player.name)+'</div>'
+   +'<p style="font-size:1.6rem">'+stars(3,30)+'</p>'
+   +'<div style="display:flex;justify-content:space-around;margin-top:12px;font-weight:700;font-size:.9rem;color:#0a3d62">'
+   +'<div>⚽<br>'+g+'<br><span style="font-size:.72rem;color:#57606f">هدف</span></div>'
+   +'<div>🏆<br>'+TABLES.length+'/'+TABLES.length+'<br><span style="font-size:.72rem;color:#57606f">مباراة</span></div>'
+   +'<div>⭐<br>'+allStars()+'/'+(TABLES.length*3)+'<br><span style="font-size:.72rem;color:#57606f">نجمة</span></div>'
+   +'<div>🧤<br>'+allGold()+'/90<br><span style="font-size:.72rem;color:#57606f">مضمونة</span></div></div></div>'
+
+   +'<div class="card" style="border-right:6px solid var(--gold)">'
+   +'<h3>🎖️ كلمة البطولة</h3>'
+   +'<p style="font-size:.95rem;line-height:2.1;color:#2f3542;font-weight:700">'
+   +'نشكر فريق <span style="color:#b9770e">'+player.team+'</span> واللاعب <span style="color:#b9770e">'+player.name+'</span> '
+   +'صاحب القميص رقم '+ar(player.num)+' على فوزه ببطولة هدّاف الضرب.<br><br>'
+   +'لقد كان قويًا سريعًا لا يهاب الحرّاس، تخطّى الحرّاس واحدًا بعد الآخر، وسجّل '+ar(g)+' هدفًا، '
+   +'وأتقن جدول الضرب من ٢ إلى ٩.<br><br>'
+   +'أحسنت يا بطل، وإلى بطولات أكبر بإذن الله.</p>'
+   +'<p style="font-size:.78rem;color:#57606f;margin-top:12px;text-align:center;line-height:1.9">'+sch()+'<br>'+aut()+'</p></div>'
+
+   +'<textarea id="tx" readonly style="display:none">'+txt+'</textarea>'
+   +'<button class="btn gold" id="cp">📋 انسخ شهادة البطولة</button>'
+   +'<button class="btn sec" id="bk">🏆 جدول البطولة</button></div>'+navBar('league');
+  document.getElementById('app').innerHTML=h;bindNav();
+  fireworks(9);sWin();
+  setTimeout(function(){sWin();},1400);
+  document.getElementById('bk').onclick=function(){showLeague();};
+  document.getElementById('cbk').onclick=function(){ac();showPick();};
+  document.getElementById('cp').onclick=function(){
+    var t=document.getElementById('tx');t.style.display='block';t.select();
+    var d=false;try{d=document.execCommand('copy');}catch(e){}
+    if(!d&&navigator.clipboard){try{navigator.clipboard.writeText(t.value);d=true;}catch(e){}}
+    t.style.display='none';
+    this.textContent=d?'✅ تم نسخ الشهادة':'حدّد النص وانسخه';
+  };
+}
+
+load();
+showStart();
+</script>
+</body>
+</html>
