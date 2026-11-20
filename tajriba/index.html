@@ -152,12 +152,15 @@ var CUPT={ball:10,sec:5};
 function tim(){return penMode?CUPT:lvl();}
 function needLevel(n){return n>=8?'المحترف':(n>=6?'المتوسط أو المحترف':'');}
 var KITS=[
- {id:'blue',n:'أزرق',c:'#1E6FD9',d:'#124A94',t:'#fff'},
- {id:'yellow',n:'أصفر',c:'#f6b93b',d:'#a8750a',t:'#2b1b00'},
+ {id:'white',n:'أبيض',c:'#ffffff',d:'#8d99a6',t:'#2b2b2b'},
+ {id:'black',n:'أسود',c:'#2f3542',d:'#141820',t:'#fff'},
  {id:'red',n:'أحمر',c:'#e74c3c',d:'#9b2d21',t:'#fff'},
- {id:'green',n:'أخضر',c:'#079992',d:'#04615c',t:'#fff'},
+ {id:'green',n:'أخضر',c:'#1e9e5a',d:'#0f6e3c',t:'#fff'},
+ {id:'yellow',n:'أصفر',c:'#f6b93b',d:'#a8750a',t:'#2b1b00'},
+ {id:'blue',n:'أزرق',c:'#1E6FD9',d:'#124A94',t:'#fff'},
  {id:'purple',n:'بنفسجي',c:'#8e44ad',d:'#5b2a70',t:'#fff'},
- {id:'black',n:'أسود',c:'#2f3542',d:'#141820',t:'#fff'}
+ {id:'orange',n:'برتقالي',c:'#e8710a',d:'#9c4a05',t:'#fff'},
+ {id:'sky',n:'سماوي',c:'#4bb3e8',d:'#1f6f99',t:'#083a52'}
 ];
 var NUMS=[1,4,6,7,8,9,10,11,17,23];
 var PATS=[{id:'p0',n:'سادة'},{id:'p1',n:'مخطّطة طولية'},{id:'p2',n:'مخطّطة عرضية'},{id:'p3',n:'وشاح مائل'}];
@@ -343,7 +346,8 @@ function shirt(size,k,n,name,pat,pc){
    +'<path d="'+D+'" fill="none" stroke="'+K.d+'" stroke-width="2.5" stroke-linejoin="round"/>'
    +'<path d="M40 10 Q50 20 60 10" fill="none" stroke="'+K.d+'" stroke-width="3"/>';
   if(name)s+='<text x="50" y="42" text-anchor="middle" font-size="11" font-weight="700" fill="'+K.t+'" stroke="'+K.d+'" stroke-width="2.4" paint-order="stroke" font-family="Tajawal,sans-serif">'+name+'</text>';
-  s+='<text x="50" y="'+(name?78:72)+'" text-anchor="middle" font-size="'+(name?34:38)+'" font-weight="700" fill="'+K.t+'" stroke="'+K.d+'" stroke-width="3" paint-order="stroke" font-family="Tajawal,sans-serif">'+ar(n)+'</text></svg>';
+  var nn=String(n);
+  s+='<text x="50" y="'+(name?78:72)+'" text-anchor="middle" font-size="'+(name?(nn.length>1?30:34):(nn.length>1?34:38))+'" font-weight="700" fill="'+K.t+'" stroke="'+K.d+'" stroke-width="3" paint-order="stroke" font-family="Arial,Helvetica,sans-serif" letter-spacing="1">'+nn+'</text></svg>';
   return s;
 }
 function stars(k,s){var o='';for(var i=1;i<=3;i++)o+='<span style="font-size:'+(s||15)+'px;color:'+(i<=k?'#f6b93b':'#ced6e0')+'">★</span>';return o;}
@@ -487,8 +491,13 @@ function wiz(step,editing){
     h+='<div class="card" style="text-align:center"><div id="pv">'+shirt(120,kit(),player.num,player.name)+'</div></div>';
     if(have3){ h+=savedCard('الفنيلة','رقم '+ar(player.num)+' — '+kit().n+' — '+patn().n); mode='next'; }
     else {
-      h+='<div class="card"><h3>🔢 الرقم</h3><div class="nums">';
-      NUMS.forEach(function(n){h+='<button class="num'+(n===player.num?' on':'')+'" data-n="'+n+'">'+ar(n)+'</button>';});
+      h+='<div class="card"><h3>🔢 الرقم (من 1 إلى 99)</h3>'
+       +'<div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:10px">'
+       +'<button class="num" id="nmin" style="min-width:52px">−</button>'
+       +'<input id="nfld" type="number" min="1" max="99" value="'+player.num+'" inputmode="numeric" style="width:96px;text-align:center;font-size:1.5rem;font-weight:700;padding:8px;border-radius:12px;border:2px solid #ced6e0;direction:ltr">'
+       +'<button class="num" id="nplus" style="min-width:52px">+</button></div>'
+       +'<div class="nums">';
+      NUMS.forEach(function(n){h+='<button class="num'+(n===player.num?' on':'')+'" data-n="'+n+'">'+n+'</button>';});
       h+='</div><h3>🎨 اللون الأساسي</h3><div class="cols">';
       KITS.forEach(function(k){h+='<button class="col'+(k.id===player.kit?' on':'')+'" data-k="'+k.id+'">'+shirt(52,k,player.num,'',player.pat,player.pc)+'<div>'+k.n+'</div></button>';});
       h+='</div><h3>🧵 النقش</h3><div class="cols">';
@@ -530,9 +539,17 @@ function wiz(step,editing){
   function pv(){var e=document.getElementById('pv');if(e)e.innerHTML=shirt(120,kit(),player.num,player.name);}
   var ns=document.querySelectorAll('.num');
   for(var i=0;i<ns.length;i++)ns[i].onclick=function(){
-    player.num=parseInt(this.getAttribute('data-n'),10);ac();tone(880,0,.1,'sine',.18);
-    for(var j=0;j<ns.length;j++)ns[j].className='num';this.className='num on';pv();
+    ac();tone(880,0,.1,'sine',.18);
+    for(var j=0;j<ns.length;j++)if(ns[j].getAttribute('data-n'))ns[j].className='num';
+    this.className='num on';setNum(this.getAttribute('data-n'));
   };
+  function setNum(v){v=parseInt(v,10);if(isNaN(v))v=1;if(v<1)v=1;if(v>99)v=99;player.num=v;
+    var f=document.getElementById('nfld');if(f&&parseInt(f.value,10)!==v)f.value=v;pv();}
+  var fld=document.getElementById('nfld');
+  if(fld)fld.oninput=function(){setNum(this.value);};
+  var bmin=document.getElementById('nmin'),bpl=document.getElementById('nplus');
+  if(bmin)bmin.onclick=function(){ac();tone(660,0,.08,'sine',.15);setNum(player.num-1);};
+  if(bpl)bpl.onclick=function(){ac();tone(880,0,.08,'sine',.15);setNum(player.num+1);};
   var cs=document.querySelectorAll('.col');
   for(var i2=0;i2<cs.length;i2++)cs[i2].onclick=function(){
     player.kit=this.getAttribute('data-k');ac();tone(880,0,.1,'sine',.18);
