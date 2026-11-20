@@ -76,6 +76,12 @@
   .stage-btn .num{flex:0 0 46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:22px;color:#fff;background:var(--green)}
   .stage-btn[data-stage="2"] .num{background:var(--blue)}
   .stage-btn[data-stage="3"] .num{background:#b43ec8}
+  .stage-btn[data-stage="4"] .num{background:#e67e22}
+  .stage-btn[data-stage="5"] .num{background:#00897b}
+  .seq{display:flex;gap:8px;justify-content:center;align-items:center}
+  .sq{min-width:58px;padding:10px 6px;font-size:30px;font-weight:900;background:#fff;
+    border:3px solid #0002;border-radius:14px;text-align:center}
+  .sq.q{background:#fff3cd;border-style:dashed;border-color:#2f6fed;color:#2f6fed}
   .stage-btn small{display:block;font-size:12px;font-weight:700;color:#5d7a6e;margin-top:2px}
   .stage-btn .tick{margin-right:auto;font-size:20px;text-align:center;line-height:1.1}
   .stage-btn .tick b{display:block;font-size:10px;color:#4a7a60;letter-spacing:1px}
@@ -190,7 +196,7 @@
       <button class="btn grey" id="newBtn">👤 لاعب جديد</button>
       <div class="hint" id="contHint"></div>
     </div>
-    <div class="foot">🐯 النمور · 🦁 الأسود · 🦅 النسور — فرق تنتظر مواجهتك</div>
+    <div class="foot">٥ مراحل · 🐯 النمور · 🦁 الأسود · 🦅 النسور · 🐺 الذئاب · 🐆 الفهود</div>
   </div>
 </section>
 
@@ -243,6 +249,16 @@
       <button class="stage-btn" data-stage="3">
         <span class="num">٣</span>
         <span>الجمع من ٠ إلى ١٠<small>ضد فريق النسور 🦅</small></span>
+        <span class="tick"></span>
+      </button>
+      <button class="stage-btn" data-stage="4">
+        <span class="num">٤</span>
+        <span>العدد المفقود ١ إلى ١٠<small>ضد فريق الذئاب 🐺</small></span>
+        <span class="tick"></span>
+      </button>
+      <button class="stage-btn" data-stage="5">
+        <span class="num">٥</span>
+        <span>العدد المفقود ١١ إلى ٢٠<small>ضد فريق الفهود 🐆</small></span>
         <span class="tick"></span>
       </button>
     </div>
@@ -410,7 +426,9 @@
   var OPP = {
     1:{name:"فريق النمور", short:"النمور", em:"🐯"},
     2:{name:"فريق الأسود", short:"الأسود", em:"🦁"},
-    3:{name:"فريق النسور", short:"النسور", em:"🦅"}
+    3:{name:"فريق النسور", short:"النسور", em:"🦅"},
+    4:{name:"فريق الذئاب", short:"الذئاب", em:"🐺"},
+    5:{name:"فريق الفهود", short:"الفهود", em:"🐆"}
   };
 
   /* ================= الحالة ================= */
@@ -432,7 +450,7 @@
       P.team = String(o.team || "").slice(0,16);
       P.kit = o.kit || "blue";
       P.no = (typeof o.no === "number") ? o.no : 10;
-      P.unlocked = Math.max(1, Math.min(3, o.unlocked || 1));
+      P.unlocked = Math.max(1, Math.min(5, o.unlocked || 1));
       P.cleared = o.cleared || {};
       P.best = o.best || {};
       P.goals = o.goals || 0;
@@ -626,16 +644,16 @@
   function openMenu(){ show("s-menu"); paintMenu(); }
 
   /* ================= الإعدادات والتقدم ================= */
-  var STAGE_TITLES = {1:"المرحلة ١ · الأعداد ١ إلى ١٠", 2:"المرحلة ٢ · الأعداد ١١ إلى ٢٠", 3:"المرحلة ٣ · الجمع ٠ إلى ١٠"};
+  var STAGE_TITLES = {1:"المرحلة ١ · الأعداد ١ إلى ١٠", 2:"المرحلة ٢ · الأعداد ١١ إلى ٢٠", 3:"المرحلة ٣ · الجمع ٠ إلى ١٠", 4:"المرحلة ٤ · العدد المفقود ١ إلى ١٠", 5:"المرحلة ٥ · العدد المفقود ١١ إلى ٢٠"};
   var LVLS = [{s:"15",n:"مبتدئ"},{s:"10",n:"متوسط"},{s:"5",n:"محترف"}];
 
   function renderSettings(){
     $("setCard").innerHTML = jersey(kitById(P.kit), P.name, P.no, {})
       + '<div><div class="pn">'+esc(P.name||"لاعب")+' <span style="direction:ltr;display:inline-block">#'+P.no+'</span></div>'
-      + '<div class="pt">'+esc(P.team||"فريقي")+' · المرحلة المفتوحة: '+num(P.unlocked)+' من ٣</div></div>';
+      + '<div class="pt">'+esc(P.team||"فريقي")+' · المرحلة المفتوحة: '+num(P.unlocked)+' من ٥</div></div>';
 
     var html = "", sum = 0;
-    [1,2,3].forEach(function(s){
+    [1,2,3,4,5].forEach(function(s){
       var vals = LVLS.map(function(l){ return P.best[s+":"+l.s] || 0; });
       var top = Math.max.apply(null, vals);
       sum += (vals[0]+vals[1]+vals[2])/3;
@@ -652,7 +670,7 @@
         + '<div class="st">'+state+'</div>' + rows + '</div>';
     });
     $("progList").innerHTML = html;
-    $("totalBox").innerHTML = "التقدّم الكلي: " + num(Math.round(sum/3)) + "% · مجموع الأهداف: " + num(P.goals);
+    $("totalBox").innerHTML = "التقدّم الكلي: " + num(Math.round(sum/5)) + "% · مجموع الأهداف: " + num(P.goals);
     $("setNum").textContent = arabicNumerals ? "🔢 الأرقام: ١٢٣" : "🔢 الأرقام: 123";
     $("setSnd").textContent = soundOn ? "🔊 الصوت: مفتوح" : "🔇 الصوت: مكتوم";
   }
@@ -678,6 +696,12 @@
     } else if(st === 2){
       shuffle(range(11,20)).forEach(function(n){
         qs.push({type:"count10",n:n,emoji:pick(EMOJI),answer:n,choices:makeChoices(n,11,20)}); });
+    } else if(st === 4 || st === 5){
+      var lo = (st === 4) ? 2 : 12, hi = (st === 4) ? 9 : 19;
+      var clo = (st === 4) ? 1 : 11, chi = (st === 4) ? 10 : 20;
+      shuffle(range(lo,hi)).forEach(function(n){
+        qs.push({type:"missing", n:n, answer:n, choices:makeChoices(n,clo,chi)});
+      });
     } else {
       var pairs = [];
       for(var a=0;a<=10;a++) for(var b=0;b<=10;b++) if(a+b<=10 && a+b>=2) pairs.push([a,b]);
@@ -746,6 +770,12 @@
       $("qtext").textContent = "كم عددها؟";
       obj.innerHTML = '<div class="group"><span class="cap">عشرة</span>'+items(10,q.emoji)+'</div>'
         + '<div class="group"><span class="cap">و</span>'+items(q.n-10,q.emoji,.35)+'</div>';
+    } else if(q.type === "missing"){
+      $("qtext").textContent = "ما العدد المفقود؟";
+      obj.innerHTML = '<div class="seq" dir="ltr">'
+        + '<span class="sq">' + num(q.n-1) + '</span>'
+        + '<span class="sq q">؟</span>'
+        + '<span class="sq">' + num(q.n+1) + '</span></div>';
     } else {
       $("qtext").textContent = "كم المجموع؟";
       obj.innerHTML = '<div class="group">'+items(q.a,q.emoji)+(q.a===0?'<span class="cap">لا شيء</span>':'')+'</div>'
@@ -763,7 +793,8 @@
       ch.appendChild(b);
     });
 
-    $("netmsg").textContent = (q.type==="add") ? "اجمع المجموعتين ثم اختر!" : "عُدّ الأشياء ثم اختر العدد!";
+    $("netmsg").textContent = (q.type==="add") ? "اجمع المجموعتين ثم اختر!"
+      : (q.type==="missing" ? "ما العدد الذي بين العددين؟" : "عُدّ الأشياء ثم اختر العدد!");
     locked = false; startTimer();
   }
   function lockChoices(){ Array.prototype.forEach.call($("choices").children, function(b){ b.disabled = true; }); }
@@ -820,7 +851,8 @@
   function finish(){
     stopTimer(); show("s-end");
     var won = myScore > oppScore, draw = myScore === oppScore;
-    var st = myScore >= 9 ? 3 : (myScore >= 7 ? 2 : 1);
+    var pr = myScore / questions.length;
+    var st = pr >= 0.9 ? 3 : (pr >= 0.7 ? 2 : 1);
     $("starrow").textContent = "⭐".repeat(st) + "☆".repeat(3-st);
     $("endResult").innerHTML = '<span style="color:#1e8e4e">'+num(myScore)+'</span> - <span style="color:#e2574c">'+num(oppScore)+'</span>';
     $("endEmoji").textContent = won ? "🏆" : (draw ? "🤝" : "💪");
@@ -832,11 +864,11 @@
     var pct = Math.round(myScore / questions.length * 100), bk = stage + ":" + secs;
     if(!P.best[bk] || pct > P.best[bk]) P.best[bk] = pct;
     var opened = false;
-    if(stage < 3 && P.unlocked < stage+1){ P.unlocked = stage+1; opened = true; }
+    if(stage < 5 && P.unlocked < stage+1){ P.unlocked = stage+1; opened = true; }
     save();
     $("unlockText").textContent = opened ? ("🔓 فُتحت المرحلة " + num(stage+1) + "!") : "";
-    $("nextStageBtn").classList.toggle("hidden", stage >= 3);
-    if(stage >= 3 && won){ $("endEmoji").textContent = "🏅"; $("endTitle").textContent = "أكملت جميع المراحل!"; }
+    $("nextStageBtn").classList.toggle("hidden", stage >= 5);
+    if(stage >= 5 && won){ $("endEmoji").textContent = "🏅"; $("endTitle").textContent = "أكملت جميع المراحل!"; }
     if(won || draw){ starBurst(); sWin(); } else { sBuzz(); }
   }
 
@@ -869,7 +901,7 @@
   $("homeBtn").onclick = function(){ stopTimer(); openMenu(); };
   $("menuBtn").onclick = openMenu;
   $("againBtn").onclick = function(){ startMatch(stage); };
-  $("nextStageBtn").onclick = function(){ startMatch(Math.min(3, stage+1)); };
+  $("nextStageBtn").onclick = function(){ startMatch(Math.min(5, stage+1)); };
 
   Array.prototype.forEach.call(document.querySelectorAll(".stage-btn"), function(b){
     b.onclick = function(){
