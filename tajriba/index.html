@@ -72,6 +72,11 @@ body{background:linear-gradient(180deg,var(--ocean-dark) 0%,var(--ocean-mid) 50%
 .lvbtn b{font-size:1rem;color:#0a3d62}
 .lvbtn span{display:block;font-size:.74rem;color:#57606f;margin-top:4px;line-height:1.7}
 .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.chip{border:3px solid transparent;background:#f1f2f6;border-radius:14px;padding:8px 2px;cursor:pointer}
+.chip span{display:block;width:34px;height:34px;border-radius:10px;margin:0 auto 4px;border:2px solid #cfd6de}
+.chip div{font-size:.72rem;font-weight:700;color:#2f3542}
+.chip.on{border-color:#079992;background:#e8f8f5}
 .col{border:3px solid transparent;background:#f1f2f6;border-radius:14px;padding:6px 2px;cursor:pointer}
 .col.on{border-color:var(--emerald);background:#e8f8f6}
 .col div{font-size:.72rem;font-weight:700;margin-top:2px;color:#0a3d62}
@@ -159,17 +164,41 @@ function needLevel(n){return n>=8?'المحترف':(n>=6?'المتوسط أو ا
 var KITS=[
  {id:'white',n:'أبيض',c:'#ffffff',d:'#8d99a6',t:'#2b2b2b'},
  {id:'black',n:'أسود',c:'#2f3542',d:'#141820',t:'#fff'},
+ {id:'gray',n:'رمادي',c:'#95a5a6',d:'#5d6d6e',t:'#fff'},
  {id:'red',n:'أحمر',c:'#e74c3c',d:'#9b2d21',t:'#fff'},
- {id:'green',n:'أخضر',c:'#1e9e5a',d:'#0f6e3c',t:'#fff'},
- {id:'yellow',n:'أصفر',c:'#f6b93b',d:'#a8750a',t:'#2b1b00'},
- {id:'blue',n:'أزرق',c:'#1E6FD9',d:'#124A94',t:'#fff'},
- {id:'purple',n:'بنفسجي',c:'#8e44ad',d:'#5b2a70',t:'#fff'},
+ {id:'maroon',n:'عنابي',c:'#8e1b2e',d:'#54101c',t:'#fff'},
  {id:'orange',n:'برتقالي',c:'#e8710a',d:'#9c4a05',t:'#fff'},
- {id:'sky',n:'سماوي',c:'#4bb3e8',d:'#1f6f99',t:'#083a52'}
+ {id:'yellow',n:'أصفر',c:'#f6b93b',d:'#a8750a',t:'#2b1b00'},
+ {id:'gold',n:'ذهبي',c:'#c9a227',d:'#7d6210',t:'#2b1b00'},
+ {id:'green',n:'أخضر',c:'#1e9e5a',d:'#0f6e3c',t:'#fff'},
+ {id:'dgreen',n:'أخضر غامق',c:'#0b5f3a',d:'#063d25',t:'#fff'},
+ {id:'teal',n:'فيروزي',c:'#079992',d:'#04615c',t:'#fff'},
+ {id:'sky',n:'سماوي',c:'#4bb3e8',d:'#1f6f99',t:'#083a52'},
+ {id:'blue',n:'أزرق',c:'#1E6FD9',d:'#124A94',t:'#fff'},
+ {id:'navy',n:'كحلي',c:'#14315e',d:'#0a1c38',t:'#fff'},
+ {id:'purple',n:'بنفسجي',c:'#8e44ad',d:'#5b2a70',t:'#fff'},
+ {id:'pink',n:'وردي',c:'#e84393',d:'#99235c',t:'#fff'},
+ {id:'brown',n:'بني',c:'#7b4b2a',d:'#4a2c16',t:'#fff'},
+ {id:'cream',n:'بيج',c:'#f1e3c6',d:'#b09a6e',t:'#4a3a12'}
 ];
 var NUMS=[1,4,6,7,8,9,10,11,17,23];
 var PATS=[{id:'p0',n:'سادة'},{id:'p1',n:'مخطّطة طولية'},{id:'p2',n:'مخطّطة عرضية'},{id:'p3',n:'وشاح مائل'}];
-var PCOLS=[{id:'w',n:'أبيض',c:'#ffffff'},{id:'g',n:'ذهبي',c:'#f6b93b'},{id:'k',n:'أسود',c:'#2c2c2a'},{id:'s',n:'سماوي',c:'#9fd3ff'}];
+var PCOLS=[
+ {id:'w',n:'أبيض',c:'#ffffff'},
+ {id:'k',n:'أسود',c:'#2c2c2a'},
+ {id:'g',n:'ذهبي',c:'#f6b93b'},
+ {id:'o',n:'برتقالي',c:'#e8710a'},
+ {id:'r',n:'أحمر',c:'#e74c3c'},
+ {id:'m',n:'عنابي',c:'#8e1b2e'},
+ {id:'e',n:'أخضر',c:'#1e9e5a'},
+ {id:'t',n:'فيروزي',c:'#079992'},
+ {id:'s',n:'سماوي',c:'#9fd3ff'},
+ {id:'b',n:'أزرق',c:'#1E6FD9'},
+ {id:'n',n:'كحلي',c:'#14315e'},
+ {id:'p',n:'بنفسجي',c:'#8e44ad'},
+ {id:'i',n:'وردي',c:'#e84393'},
+ {id:'y',n:'رمادي',c:'#b2bec3'}
+];
 function pcol(id){var v=id||player.pc||'w';for(var i=0;i<PCOLS.length;i++)if(PCOLS[i].id===v)return PCOLS[i];return PCOLS[0];}
 function patn(id){var v=id||player.pat||'p0';for(var i=0;i<PATS.length;i++)if(PATS[i].id===v)return PATS[i];return PATS[0];}
 var SHID=0;
@@ -522,11 +551,11 @@ function wiz(step,editing){
        +'<div class="nums">';
       NUMS.forEach(function(n){h+='<button class="num'+(n===player.num?' on':'')+'" data-n="'+n+'">'+n+'</button>';});
       h+='</div><h3>🎨 اللون الأساسي</h3><div class="cols">';
-      KITS.forEach(function(k){h+='<button class="col'+(k.id===player.kit?' on':'')+'" data-k="'+k.id+'">'+shirt(52,k,player.num,'',player.pat,player.pc)+'<div>'+k.n+'</div></button>';});
+      KITS.forEach(function(k){h+='<button class="col colk'+(k.id===player.kit?' on':'')+'" data-k="'+k.id+'">'+shirt(52,k,player.num,'',player.pat,player.pc)+'<div>'+k.n+'</div></button>';});
       h+='</div><h3>🧵 النقش</h3><div class="cols">';
       PATS.forEach(function(q){h+='<button class="col pat'+(q.id===player.pat?' on':'')+'" data-p="'+q.id+'">'+shirt(52,kit(),player.num,'',q.id,player.pc)+'<div>'+q.n+'</div></button>';});
-      h+='</div><h3>🎨 لون النقش</h3><div class="cols">';
-      PCOLS.forEach(function(q){h+='<button class="col pcol'+(q.id===player.pc?' on':'')+'" data-c="'+q.id+'">'+shirt(52,kit(),player.num,'',player.pat,q.id)+'<div>'+q.n+'</div></button>';});
+      h+='</div><h3>🎨 لون النقش</h3><div class="chips">';
+      PCOLS.forEach(function(q){h+='<button class="chip pcol'+(q.id===player.pc?' on':'')+'" data-c="'+q.id+'" title="'+q.n+'"><span style="background:'+q.c+'"></span><div>'+q.n+'</div></button>';});
       h+='</div></div>'; mode='save';
     }
   }
@@ -573,10 +602,10 @@ function wiz(step,editing){
   var bmin=document.getElementById('nmin'),bpl=document.getElementById('nplus');
   if(bmin)bmin.onclick=function(){ac();tone(660,0,.08,'sine',.15);setNum(player.num-1);};
   if(bpl)bpl.onclick=function(){ac();tone(880,0,.08,'sine',.15);setNum(player.num+1);};
-  var cs=document.querySelectorAll('.col');
+  var cs=document.querySelectorAll('.colk');
   for(var i2=0;i2<cs.length;i2++)cs[i2].onclick=function(){
     player.kit=this.getAttribute('data-k');ac();tone(880,0,.1,'sine',.18);
-    for(var j=0;j<cs.length;j++)cs[j].className='col';this.className='col on';pv();
+    for(var j=0;j<cs.length;j++)cs[j].className='col colk';this.className='col colk on';pv();
   };
   var ps2=document.querySelectorAll('.pat');
   for(var ip=0;ip<ps2.length;ip++)ps2[ip].onclick=function(){
