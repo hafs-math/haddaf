@@ -297,6 +297,14 @@
       <button class="btn alt" id="againBtn">🔁 إعادة</button>
       <button class="btn grey" id="menuBtn">🏠 القائمة</button>
     </div>
+    <div style="margin-top:10px;border-top:2px dashed #0002;padding-top:8px">
+      <button class="btn grey" id="zeroBtn" style="font-size:16px">🔄 ابدأ من الصفر</button>
+      <div id="zeroConfirm" class="hidden">
+        <div class="hint" style="font-size:14px;font-weight:900;color:#9c2f27">سيُحذف الاسم والفنيلة والتقدّم ويبدأ لاعب جديد. متأكد؟</div>
+        <button class="btn" id="zeroYes" style="font-size:16px;background:#e2574c;box-shadow:0 5px 0 #9c2f27">نعم، ابدأ من الصفر</button>
+        <button class="btn grey" id="zeroNo" style="font-size:16px">لا، رجوع</button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -770,6 +778,19 @@
   $("editBtn").onclick = function(){
     sClick(); tmp = { name:P.name, team:P.team, kit:P.kit, no:P.no };
     step = 1; show("s-setup"); renderSetup();
+  };
+  $("zeroBtn").onclick = function(){
+    sClick(); $("zeroBtn").classList.add("hidden"); $("zeroConfirm").classList.remove("hidden");
+  };
+  $("zeroNo").onclick = function(){
+    sClick(); $("zeroConfirm").classList.add("hidden"); $("zeroBtn").classList.remove("hidden");
+  };
+  $("zeroYes").onclick = function(){
+    P = { name:"", team:"", kit:"blue", no:10, unlocked:1, cleared:{}, goals:0 };
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    $("contWrap").classList.add("hidden");
+    $("zeroConfirm").classList.add("hidden"); $("zeroBtn").classList.remove("hidden");
+    sLock(); show("s-welcome");
   };
   $("homeBtn").onclick = function(){ stopTimer(); openMenu(); };
   $("menuBtn").onclick = openMenu;
