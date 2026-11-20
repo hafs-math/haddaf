@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>هدّاف الأعداد</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#1e8e4e; --green-d:#15693a; --sky:#8ed7ff; --cream:#fff8e7;
+    --ink:#153a2b; --gold:#ffc83d; --red:#e2574c; --red-d:#9c2f27; --blue:#2f6fed;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:'Cairo',system-ui,sans-serif;
+    background:linear-gradient(180deg,var(--sky) 0%, #c9efff 40%, #e9ffe9 100%);
+    color:var(--ink);min-height:100vh;overflow-x:hidden}
+  .wrap{max-width:600px;margin:0 auto;padding:10px 10px 26px;position:relative;z-index:2}
+  .card{background:var(--cream);border-radius:22px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+
+  .topbar{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+  .pill{background:#fff;border:2px solid #0002;border-radius:999px;padding:5px 11px;font-weight:700;font-size:14px;display:flex;align-items:center;gap:5px}
+  .pill.goals{background:var(--gold)}
+  .icon-btn{background:#fff;border:2px solid #0002;border-radius:999px;width:40px;height:40px;font-size:17px;cursor:pointer;font-family:inherit;font-weight:900;line-height:1}
+  .spacer{flex:1}
+
+  h1{margin:6px 0 2px;font-size:33px;font-weight:900;color:#0b4a2c;text-shadow:0 2px 0 #fff;text-align:center}
+  .sub{margin:0;font-size:15px;font-weight:700;color:#2c5e49;text-align:center}
+  .ball-big{font-size:58px;text-align:center;animation:spin 6s linear infinite;display:block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .label{font-size:15px;font-weight:900;color:#2c5e49;margin:14px 2px 6px}
+  .center{text-align:center}
+
+  .btn{font-family:inherit;font-size:18px;font-weight:900;color:#fff;background:var(--green);
+    border:none;border-radius:16px;padding:13px 20px;margin:5px 3px;cursor:pointer;box-shadow:0 5px 0 var(--green-d)}
+  .btn.alt{background:var(--blue);box-shadow:0 5px 0 #1a4bb0}
+  .btn.grey{background:#78909c;box-shadow:0 5px 0 #546e7a}
+  .btn.big{font-size:24px;padding:16px 42px;border-radius:20px}
+  .btn:active{transform:translateY(3px);box-shadow:none}
+  .btn:disabled{background:#b0bec5;box-shadow:0 5px 0 #90a4ae;cursor:default}
+
+  /* ===== إعداد اللاعب ===== */
+  .steps{display:flex;gap:6px;justify-content:center;margin-bottom:6px}
+  .sdot{width:11px;height:11px;border-radius:50%;background:#fff;border:2px solid #0002}
+  .sdot.on{background:var(--green);border-color:var(--green-d)}
+  .inp{width:100%;font-family:inherit;font-size:22px;font-weight:900;text-align:center;
+    padding:12px;border:3px solid #0002;border-radius:16px;background:#fff;color:var(--ink)}
+  .hint{font-size:13px;font-weight:700;color:#5d7a6e;text-align:center;margin-top:6px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+  .chip{font-family:inherit;font-size:14px;font-weight:900;background:#fff;border:2px solid #0002;
+    border-radius:999px;padding:7px 13px;cursor:pointer;color:var(--ink)}
+  .chip:active{transform:translateY(2px)}
+  .kits{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+  .kit{background:#fff;border:3px solid #0001;border-radius:16px;padding:6px 4px;cursor:pointer;
+    font-family:inherit;font-size:12px;font-weight:900;color:#4a6a5c;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+  .kit svg{width:100%;height:auto;display:block}
+  .kit.on{border-color:var(--green);background:#eafaf0;box-shadow:0 4px 0 var(--green-d)}
+  .navrow{display:flex;gap:8px;align-items:center;margin-top:14px}
+  .navrow .btn{flex:1;margin:0;font-size:17px;padding:13px 6px}
+  .bigjersey{max-width:230px;margin:6px auto 0}
+  .bigjersey svg{width:100%;height:auto;display:block;filter:drop-shadow(0 6px 10px #0003)}
+
+  /* ===== المراحل والمستويات ===== */
+  .levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .lvl{font-family:inherit;font-weight:900;font-size:15px;color:var(--ink);background:#fff;
+    border:3px solid #0001;border-radius:16px;padding:9px 4px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.14)}
+  .lvl span{display:block;font-size:12px;font-weight:700;color:#5d7a6e;margin-top:2px}
+  .lvl.on{background:var(--green);color:#fff;box-shadow:0 4px 0 var(--green-d)}
+  .lvl.on span{color:#eaffe9}
+
+  .stages{display:grid;gap:9px;margin-top:4px}
+  .stage-btn{display:flex;align-items:center;gap:10px;text-align:right;background:#fff;
+    border:3px solid #0001;border-radius:20px;padding:11px;font-family:inherit;font-size:17px;
+    font-weight:900;color:var(--ink);cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.16)}
+  .stage-btn:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(0,0,0,.16)}
+  .stage-btn .num{flex:0 0 46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:22px;color:#fff;background:var(--green)}
+  .stage-btn[data-stage="2"] .num{background:var(--blue)}
+  .stage-btn[data-stage="3"] .num{background:#b43ec8}
+  .stage-btn small{display:block;font-size:12px;font-weight:700;color:#5d7a6e;margin-top:2px}
+  .stage-btn .tick{margin-right:auto;font-size:20px;text-align:center;line-height:1.1}
+  .stage-btn .tick b{display:block;font-size:10px;color:#4a7a60;letter-spacing:1px}
+  .stage-btn.locked{background:#eceff1;color:#8a9aa1;box-shadow:0 5px 0 #cfd8dc}
+  .stage-btn.locked .num{background:#b0bec5}
+  .stage-btn.nope{animation:shake .3s}
+  .playercard{display:flex;align-items:center;gap:10px;background:#fff;border:3px solid #0001;border-radius:18px;padding:8px;margin-bottom:4px}
+  .playercard svg{width:52px;height:auto;display:block}
+  .playercard .pn{font-size:17px;font-weight:900;line-height:1.2}
+  .playercard .pt{font-size:13px;font-weight:700;color:#5d7a6e}
+
+  /* ===== الملعب ===== */
+  .arena{display:grid;grid-template-columns:1fr 124px;gap:9px;align-items:start}
+  .board{background:#0f1a14;border:3px solid #061009;border-radius:16px;padding:7px 6px;
+    color:#ffeb99;box-shadow:inset 0 0 18px #000a}
+  .bt{text-align:center;font-size:11px;font-weight:900;color:#9fd8b4;letter-spacing:1px;border-bottom:1px dashed #ffffff33;padding-bottom:4px;margin-bottom:5px}
+  .brow{display:flex;align-items:center;gap:5px;padding:4px 3px;border-radius:10px}
+  .brow svg{width:26px;height:auto;display:block;flex:0 0 26px}
+  .brow .bn{font-size:11px;font-weight:900;line-height:1.1;flex:1;color:#fff}
+  .brow .bs{font-size:27px;font-weight:900;font-family:'Cairo';color:#ffd84d;min-width:28px;text-align:center;text-shadow:0 0 10px #ffb30099}
+  .brow.hit{animation:glow .7s}
+  @keyframes glow{0%,100%{background:#0000}40%{background:#ffffff26}}
+  .brow .em{font-size:22px;flex:0 0 26px;text-align:center}
+  .vsline{text-align:center;font-size:10px;font-weight:900;color:#8fb7a0;margin:2px 0}
+  .bq{text-align:center;font-size:11px;font-weight:900;color:#9fd8b4;margin-top:5px;border-top:1px dashed #ffffff33;padding-top:4px}
+
+  .timerbox{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+  .tnum{font-size:20px;font-weight:900;min-width:52px;text-align:center;background:#fff;border:3px solid #0002;border-radius:13px;padding:3px 0}
+  .tbar{flex:1;height:16px;background:#fff;border:3px solid #0002;border-radius:999px;overflow:hidden}
+  .tfill{height:100%;width:100%;background:var(--green);transition:width .1s linear}
+  .tfill.mid{background:var(--gold)} .tfill.low{background:var(--red)}
+  .tnum.low{color:var(--red);animation:tick .5s infinite}
+  @keyframes tick{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+  .netmsg{text-align:center;font-weight:900;font-size:15px;min-height:22px;color:#14532d;margin:2px 0 6px}
+  .dots{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-bottom:6px}
+  .dot{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #0002}
+  .dot.ok{background:var(--gold);border-color:#c99400}
+  .dot.no{background:var(--red);border-color:var(--red-d)}
+  .dot.now{box-shadow:0 0 0 3px #ffffffaa}
+
+  .qtext{text-align:center;font-size:21px;font-weight:900;margin:4px 0 6px}
+  .objects{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;align-items:center;
+    min-height:88px;padding:8px;background:#fff;border-radius:14px;border:3px dashed #0002}
+  .obj{font-size:30px;line-height:1;animation:pop .22s backwards}
+  @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+  .group{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;padding:6px;border-radius:12px;background:#f3fbf5;border:2px solid #0001;max-width:200px}
+  .group .cap{width:100%;text-align:center;font-size:12px;font-weight:900;color:#4a7a60}
+  .plus{font-size:30px;font-weight:900;color:var(--blue)}
+  .eq{text-align:center;font-size:27px;font-weight:900;margin:8px 0 0;letter-spacing:2px}
+
+  .choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .choice{font-family:inherit;font-size:32px;font-weight:900;color:#fff;background:var(--blue);
+    border:none;border-radius:16px;padding:11px 0;cursor:pointer;box-shadow:0 5px 0 #1a4bb0}
+  .choice:active{transform:translateY(3px);box-shadow:0 2px 0 #1a4bb0}
+  .choice.right{background:var(--green);box-shadow:0 5px 0 var(--green-d);animation:bounce .4s}
+  .choice.wrong{background:var(--red);box-shadow:0 5px 0 var(--red-d);animation:shake .3s}
+  .choice.dim{opacity:.4}
+  @keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+  #flash{position:fixed;inset:0;z-index:50;pointer-events:none;opacity:0}
+  #flash.g{background:radial-gradient(circle,#2ad46a55,#0b7f3e66);animation:fl .6s}
+  #flash.r{background:radial-gradient(circle,#ff6b5e55,#b4231766);animation:fl .6s}
+  @keyframes fl{0%{opacity:.9}100%{opacity:0}}
+  #stars-layer{position:fixed;inset:0;z-index:60;pointer-events:none;overflow:hidden}
+  .star{position:absolute;left:50%;top:45%;font-size:28px;animation:burst 1.1s ease-out forwards}
+  @keyframes burst{0%{transform:translate(0,0) scale(.3);opacity:1}70%{opacity:1}
+    100%{transform:translate(var(--x),var(--y)) scale(1.25) rotate(var(--r));opacity:0}}
+  .fly{position:fixed;left:50%;bottom:30%;font-size:42px;z-index:70;pointer-events:none;animation:fly .7s ease-out forwards}
+  @keyframes fly{to{transform:translate(0,-42vh) rotate(720deg) scale(.5);opacity:0}}
+
+  .end .big{font-size:58px;margin:2px 0}
+  .end h2{font-size:24px;margin:4px 0;font-weight:900}
+  .result{font-size:34px;font-weight:900;letter-spacing:3px;margin:4px 0}
+  .starrow{font-size:34px;letter-spacing:4px}
+  .saved{font-size:13px;font-weight:900;color:var(--green)}
+  .hidden{display:none!important}
+  .foot{text-align:center;font-size:12px;color:#4a6a5c;margin-top:10px;font-weight:700}
+</style>
+</head>
+<body>
+<div id="flash"></div>
+<div id="stars-layer"></div>
+
+<div class="wrap">
+
+<!-- ================= ١) شاشة البداية ================= -->
+<section id="s-welcome">
+  <div class="card center">
+    <span class="ball-big">⚽</span>
+    <h1>هدّاف الأعداد</h1>
+    <p class="sub">الصف الأول الابتدائي · عُدّ، اجمع، وسجّل الأهداف!</p>
+    <div style="margin-top:18px">
+      <button class="btn big" id="startBtn">ابدأ ▶</button>
+    </div>
+    <div id="contWrap" class="hidden" style="margin-top:6px">
+      <button class="btn alt" id="contBtn">متابعة اللعب 👟</button>
+      <div class="hint" id="contHint"></div>
+    </div>
+    <div class="foot">🐯 النمور · 🦁 الأسود · 🦅 النسور — فرق تنتظر مواجهتك</div>
+  </div>
+</section>
+
+<!-- ================= ٢) إعداد اللاعب ================= -->
+<section id="s-setup" class="hidden">
+  <div class="card">
+    <div class="steps" id="steps"></div>
+    <h1 style="font-size:24px" id="setupTitle">اكتب اسمك</h1>
+    <p class="sub" id="setupSub">سيُكتب اسمك على فنيلتك</p>
+    <div id="setupBody" style="margin-top:12px"></div>
+    <div class="navrow">
+      <button class="btn grey" id="prevBtn">◀ السابق</button>
+      <button class="btn alt" id="saveBtn">💾 حفظ اللعبة</button>
+      <button class="btn" id="nextBtn2">التالي ▶</button>
+    </div>
+    <div class="hint" id="setupMsg"></div>
+  </div>
+</section>
+
+<!-- ================= ٣) القائمة ================= -->
+<section id="s-menu" class="hidden">
+  <div class="topbar">
+    <button class="icon-btn" id="numBtn" title="شكل الأرقام">١٢٣</button>
+    <button class="icon-btn" id="sndBtn" title="الصوت">🔊</button>
+    <div class="spacer"></div>
+    <button class="icon-btn" id="editBtn" title="تعديل اللاعب">👕</button>
+    <button class="icon-btn" id="resetBtn" title="إعادة التقدم">↺</button>
+    <div class="pill goals">⚽ <span id="totalGoals">٠</span></div>
+  </div>
+  <div class="card">
+    <div class="playercard" id="playercard"></div>
+    <div class="label">اختر المستوى (الوقت لكل سؤال)</div>
+    <div class="levels">
+      <button class="lvl on" data-sec="15">مبتدئ<span>١٥ ثانية</span></button>
+      <button class="lvl" data-sec="10">متوسط<span>١٠ ثوانٍ</span></button>
+      <button class="lvl" data-sec="5">محترف<span>٥ ثوانٍ</span></button>
+    </div>
+    <div class="label">اختر المرحلة</div>
+    <div class="stages" id="stages">
+      <button class="stage-btn" data-stage="1">
+        <span class="num">١</span>
+        <span>الأعداد ١ إلى ١٠<small>ضد فريق النمور 🐯</small></span>
+        <span class="tick"></span>
+      </button>
+      <button class="stage-btn" data-stage="2">
+        <span class="num">٢</span>
+        <span>الأعداد ١١ إلى ٢٠<small>ضد فريق الأسود 🦁</small></span>
+        <span class="tick"></span>
+      </button>
+      <button class="stage-btn" data-stage="3">
+        <span class="num">٣</span>
+        <span>الجمع من ٠ إلى ١٠<small>ضد فريق النسور 🦅</small></span>
+        <span class="tick"></span>
+      </button>
+    </div>
+    <div class="foot" id="lockNote">المرحلة تُفتح بعد إنهاء المرحلة التي قبلها · تقدّمك يُحفظ تلقائيًا</div>
+  </div>
+</section>
+
+<!-- ================= ٤) اللعب ================= -->
+<section id="s-play" class="hidden">
+  <div class="topbar">
+    <button class="icon-btn" id="homeBtn" title="القائمة">🏠</button>
+    <button class="icon-btn" id="sndBtn2" title="الصوت">🔊</button>
+    <div class="spacer"></div>
+    <div class="pill" id="lvlPill">مبتدئ</div>
+    <div class="pill" id="stagePill">المرحلة ١</div>
+  </div>
+
+  <div class="arena">
+    <div>
+      <div class="timerbox">
+        <div class="tnum" id="tnum">١٥</div>
+        <div class="tbar"><div class="tfill" id="tfill"></div></div>
+      </div>
+      <div class="card">
+        <div class="dots" id="dots"></div>
+        <div class="netmsg" id="netmsg">استعد… عُدّ بدقة!</div>
+        <div class="qtext" id="qtext">كم عددها؟</div>
+        <div class="objects" id="objects"></div>
+        <div class="eq hidden" id="eq"></div>
+        <div class="choices" id="choices"></div>
+      </div>
+    </div>
+
+    <!-- شاشة الملعب (يسار) -->
+    <div class="board">
+      <div class="bt">شاشة النتائج</div>
+      <div class="brow" id="rowMe">
+        <span id="boardKit"></span>
+        <span class="bn" id="boardMyName">أنا</span>
+        <span class="bs" id="scoreMe">٠</span>
+      </div>
+      <div class="vsline">— VS —</div>
+      <div class="brow" id="rowOpp">
+        <span class="em" id="oppEmoji">🐯</span>
+        <span class="bn" id="oppName">النمور</span>
+        <span class="bs" id="scoreOpp">٠</span>
+      </div>
+      <div class="bq" id="boardQ">١ / ١٠</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ٥) النهاية ================= -->
+<section id="s-end" class="hidden">
+  <div class="card center end">
+    <div class="big" id="endEmoji">🏆</div>
+    <h2 id="endTitle">أحسنت!</h2>
+    <div class="result" id="endResult"></div>
+    <div class="starrow" id="starrow">⭐⭐⭐</div>
+    <p id="endText" style="font-size:16px;font-weight:700;margin:6px 0"></p>
+    <p id="unlockText" style="font-size:16px;font-weight:900;color:#1e8e4e;margin:4px 0"></p>
+    <div class="saved" id="savedNote">💾 تم حفظ تقدّمك</div>
+    <div style="margin-top:8px">
+      <button class="btn" id="nextStageBtn">المرحلة التالية ▶</button>
+      <button class="btn alt" id="againBtn">🔁 إعادة</button>
+      <button class="btn grey" id="menuBtn">🏠 القائمة</button>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ================= الفنايل (ألوان وتصاميم) ================= */
+  var KITS = [
+    {id:"blue",  name:"أزرق وأبيض",  body:"#1565d8", sleeve:"#ffffff", pat:"solid",  text:"#ffffff", num:"#ffffff"},
+    {id:"yelblk",name:"أصفر وأسود",  body:"#f6d502", sleeve:"#111111", pat:"vstripe",pc:"#111111", text:"#111111", num:"#111111"},
+    {id:"yelblu",name:"أصفر وأزرق",  body:"#f9d617", sleeve:"#0b3b8f", pat:"hoops",  pc:"#0b3b8f", text:"#0b3b8f", num:"#0b3b8f"},
+    {id:"grn",   name:"أخضر وأبيض",  body:"#0f8f45", sleeve:"#ffffff", pat:"sash",   pc:"#ffffff", text:"#ffffff", num:"#ffffff"},
+    {id:"red",   name:"أحمر وأبيض",  body:"#d32f2f", sleeve:"#ffffff", pat:"vstripe",pc:"#ffffff", text:"#ffffff", num:"#ffffff"},
+    {id:"blk",   name:"أسود وذهبي",  body:"#1b1b1b", sleeve:"#d4af37", pat:"solid",  text:"#d4af37", num:"#d4af37"},
+    {id:"wht",   name:"أبيض وأزرق",  body:"#ffffff", sleeve:"#1565d8", pat:"hoops",  pc:"#1565d8", text:"#1565d8", num:"#1565d8"},
+    {id:"org",   name:"برتقالي",     body:"#f57c00", sleeve:"#1b1b1b", pat:"solid",  text:"#ffffff", num:"#ffffff"},
+    {id:"pur",   name:"بنفسجي",      body:"#7b2ff7", sleeve:"#ffd700", pat:"sash",   pc:"#ffd700", text:"#ffffff", num:"#ffffff"}
+  ];
+
+  var uid = 0;
+  function jersey(kit, name, no, opts){
+    opts = opts || {};
+    var k = kit, id = "j" + (++uid);
+    var body = 'M70 16 L52 24 L52 196 Q100 208 148 196 L148 24 L130 16 Q100 40 70 16 Z';
+    var pat = "";
+    if(k.pat === "vstripe"){
+      for(var i=0;i<4;i++) pat += '<rect x="'+(60+i*22)+'" y="10" width="11" height="200" fill="'+k.pc+'"/>';
+    } else if(k.pat === "hoops"){
+      for(var j=0;j<4;j++) pat += '<rect x="40" y="'+(46+j*38)+'" width="130" height="17" fill="'+k.pc+'"/>';
+    } else if(k.pat === "sash"){
+      pat = '<path d="M40 40 L80 10 L180 150 L140 180 Z" fill="'+k.pc+'" opacity=".95"/>';
+    }
+    var showText = opts.mini !== true;
+    return '<svg viewBox="0 0 200 215" xmlns="http://www.w3.org/2000/svg" aria-label="فنيلة">'
+      + '<defs><clipPath id="'+id+'"><path d="'+body+'"/></clipPath></defs>'
+      + '<path d="M50 22 L14 46 L30 88 L54 78 L54 42 Z" fill="'+k.sleeve+'" stroke="#0003" stroke-width="2"/>'
+      + '<path d="M150 22 L186 46 L170 88 L146 78 L146 42 Z" fill="'+k.sleeve+'" stroke="#0003" stroke-width="2"/>'
+      + '<path d="'+body+'" fill="'+k.body+'"/>'
+      + '<g clip-path="url(#'+id+')">'+pat+'</g>'
+      + '<path d="'+body+'" fill="none" stroke="#0003" stroke-width="2.5"/>'
+      + '<path d="M70 16 Q100 42 130 16" fill="none" stroke="'+k.sleeve+'" stroke-width="9"/>'
+      + (showText ?
+          '<text x="100" y="78" text-anchor="middle" font-family="Cairo,sans-serif" font-size="19" font-weight="900" fill="'+k.text+'">'
+            + esc(name || "") + '</text>'
+        + '<text x="100" y="160" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="74" font-weight="700" fill="'+k.num+'" direction="ltr">'
+            + (no === 0 || no ? String(no) : "") + '</text>'
+        : '')
+      + '</svg>';
+  }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function kitById(id){ for(var i=0;i<KITS.length;i++) if(KITS[i].id===id) return KITS[i]; return KITS[0]; }
+
+  /* ================= الخصوم ================= */
+  var OPP = {
+    1:{name:"فريق النمور", short:"النمور", em:"🐯"},
+    2:{name:"فريق الأسود", short:"الأسود", em:"🦁"},
+    3:{name:"فريق النسور", short:"النسور", em:"🦅"}
+  };
+
+  /* ================= الحالة ================= */
+  var P = { name:"", team:"", kit:"blue", no:10, unlocked:1, cleared:{}, goals:0 };
+  var arabicNumerals = true, soundOn = true;
+  var secs = 15, levelName = "مبتدئ";
+  var stage = 1, qIndex = 0, myScore = 0, oppScore = 0, locked = false;
+  var questions = [], results = [];
+  var EMOJI = ["🌸","🍎","⚽","⭐","🎈","🐠","🍓","🦋","🍊","🌻","🐥","🧸"];
+  var STARS = ["⭐","🌟","✨","💫","🏅"];
+  var KEY = "haddaf-player-v2";
+
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(P)); }catch(e){} }
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY); if(!raw) return false;
+      var o = JSON.parse(raw); if(!o || !o.name) return false;
+      P.name = String(o.name).slice(0,14);
+      P.team = String(o.team || "").slice(0,16);
+      P.kit = o.kit || "blue";
+      P.no = (typeof o.no === "number") ? o.no : 10;
+      P.unlocked = Math.max(1, Math.min(3, o.unlocked || 1));
+      P.cleared = o.cleared || {};
+      P.goals = o.goals || 0;
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function num(n){
+    var s = String(n);
+    if(!arabicNumerals) return s;
+    var m = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+    return s.replace(/[0-9]/g, function(d){ return m[+d]; });
+  }
+
+  /* ================= الصوت ================= */
+  var ac = null, noiseBuf = null;
+  function actx(){ try{ if(!ac) ac = new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==="suspended") ac.resume(); return ac; }catch(e){ return null; } }
+  function tone(f,d,t,dl,v){
+    if(!soundOn) return; var c = actx(); if(!c) return;
+    var s = c.currentTime+(dl||0), o = c.createOscillator(), g = c.createGain();
+    o.type = t||"sine"; o.frequency.value = f;
+    g.gain.setValueAtTime(.0001,s); g.gain.exponentialRampToValueAtTime(v||.22,s+.02);
+    g.gain.exponentialRampToValueAtTime(.0001,s+d);
+    o.connect(g); g.connect(c.destination); o.start(s); o.stop(s+d+.05);
+  }
+  function noise(c){ if(noiseBuf) return noiseBuf;
+    var len = Math.floor(c.sampleRate*.5); noiseBuf = c.createBuffer(1,len,c.sampleRate);
+    var d = noiseBuf.getChannelData(0); for(var i=0;i<len;i++) d[i]=Math.random()*2-1; return noiseBuf; }
+  function clap(c,t,v){
+    var s = c.createBufferSource(); s.buffer = noise(c);
+    var bp = c.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=1400+Math.random()*900; bp.Q.value=.9;
+    var g = c.createGain();
+    g.gain.setValueAtTime(.0001,t); g.gain.linearRampToValueAtTime(v,t+.004);
+    g.gain.exponentialRampToValueAtTime(.0001,t+.11);
+    s.connect(bp); bp.connect(g); g.connect(c.destination); s.start(t); s.stop(t+.2);
+  }
+  function applause(){
+    if(!soundOn) return; var c = actx(); if(!c) return; var t0 = c.currentTime;
+    for(var i=0;i<22;i++) clap(c, t0+.02+i*.055+Math.random()*.03, .14+Math.random()*.12);
+    for(var j=0;j<10;j++) clap(c, t0+.25+Math.random()*.9, .05+Math.random()*.06);
+  }
+  function sGoal(){ tone(660,.13,"triangle",0,.2); tone(880,.13,"triangle",.11,.2); tone(1180,.22,"triangle",.22,.2); applause(); }
+  function sBuzz(){ tone(165,.22,"square",0,.22); tone(120,.3,"sawtooth",.02,.2);
+    tone(110,.26,"square",.22,.2); tone(80,.3,"sawtooth",.24,.18); }
+  function sWin(){ [523,659,784,1046].forEach(function(f,i){ tone(f,.22,"triangle",i*.14,.2); }); applause(); }
+  function sClick(){ tone(760,.08,"triangle",0,.14); }
+  function sLock(){ tone(200,.12,"square",0,.15); tone(150,.14,"square",.1,.15); }
+
+  /* ================= مؤثرات ================= */
+  function flash(k){ var f = $("flash"); f.className=""; void f.offsetWidth; f.className = k; }
+  function starBurst(n){
+    var layer = $("stars-layer");
+    for(var i=0;i<(n||30);i++){
+      var s = document.createElement("span");
+      s.className = "star"; s.textContent = STARS[Math.floor(Math.random()*STARS.length)];
+      var a = Math.random()*Math.PI*2, d = 90+Math.random()*230;
+      s.style.setProperty("--x",(Math.cos(a)*d).toFixed(0)+"px");
+      s.style.setProperty("--y",(Math.sin(a)*d-40).toFixed(0)+"px");
+      s.style.setProperty("--r",(Math.random()*720-360).toFixed(0)+"deg");
+      s.style.fontSize = (20+Math.random()*26).toFixed(0)+"px";
+      s.style.animationDelay = (Math.random()*.18).toFixed(2)+"s";
+      layer.appendChild(s);
+      (function(el){ setTimeout(function(){ el.remove(); },1500); })(s);
+    }
+  }
+  function flyBall(){ var s = document.createElement("div"); s.className="fly"; s.textContent="⚽";
+    document.body.appendChild(s); setTimeout(function(){ s.remove(); },760); }
+
+  /* ================= شاشات ================= */
+  function show(id){
+    ["s-welcome","s-setup","s-menu","s-play","s-end"].forEach(function(x){
+      $(x).classList.toggle("hidden", x !== id);
+    });
+    window.scrollTo(0,0);
+  }
+
+  /* ================= إعداد اللاعب ================= */
+  var step = 1, TOTAL = 5, tmp = {};
+  var TEAMS = ["الصواريخ","الفهود","الأبطال","الصقور","العاصفة","الفرسان","النجوم"];
+
+  function renderSteps(){
+    var h = "";
+    for(var i=1;i<=TOTAL;i++) h += '<span class="sdot'+(i<=step?" on":"")+'"></span>';
+    $("steps").innerHTML = h;
+  }
+  function renderSetup(){
+    renderSteps();
+    var b = $("setupBody"); $("setupMsg").textContent = "";
+    $("prevBtn").disabled = (step === 1);
+    $("nextBtn2").textContent = (step === TOTAL) ? "يلا نلعب ⚽" : "التالي ▶";
+
+    if(step === 1){
+      $("setupTitle").textContent = "اكتب اسمك";
+      $("setupSub").textContent = "سيُكتب اسمك على فنيلتك";
+      b.innerHTML = '<input class="inp" id="iName" maxlength="14" placeholder="مثال: محمد" value="'+esc(tmp.name||"")+'">'
+        + '<div class="hint">من حرف إلى ١٤ حرفًا</div>';
+      $("iName").focus();
+    } else if(step === 2){
+      $("setupTitle").textContent = "اسم فريقك";
+      $("setupSub").textContent = "اكتب أي اسم تحبه، أو اختر من الأسماء";
+      b.innerHTML = '<input class="inp" id="iTeam" maxlength="16" placeholder="مثال: فريق الصواريخ" value="'+esc(tmp.team||"")+'">'
+        + '<div class="chips" id="teamChips"></div>';
+      TEAMS.forEach(function(t){
+        var c = document.createElement("button");
+        c.className = "chip"; c.textContent = t;
+        c.onclick = function(){ $("iTeam").value = "فريق " + t; sClick(); };
+        $("teamChips").appendChild(c);
+      });
+    } else if(step === 3){
+      $("setupTitle").textContent = "اختر لون الفنيلة";
+      $("setupSub").textContent = "اضغط على الفنيلة التي تحبها";
+      var h = '<div class="kits" id="kitGrid"></div>';
+      b.innerHTML = h;
+      KITS.forEach(function(k){
+        var d = document.createElement("button");
+        d.className = "kit" + (tmp.kit === k.id ? " on" : "");
+        d.innerHTML = jersey(k, "", "", {mini:true}) + k.name;
+        d.onclick = function(){ tmp.kit = k.id; sClick(); renderSetup(); };
+        $("kitGrid").appendChild(d);
+      });
+    } else if(step === 4){
+      $("setupTitle").textContent = "رقم الفنيلة";
+      $("setupSub").textContent = "الأرقام على الفنيلة بالإنجليزي (1 – 99)";
+      b.innerHTML = '<input class="inp" id="iNo" inputmode="numeric" maxlength="2" dir="ltr" placeholder="10" value="'+(tmp.no||"")+'">'
+        + '<div class="chips" id="noChips"></div>';
+      [7,9,10,11,20,99].forEach(function(n){
+        var c = document.createElement("button");
+        c.className = "chip"; c.textContent = n; c.style.direction = "ltr";
+        c.onclick = function(){ $("iNo").value = n; sClick(); };
+        $("noChips").appendChild(c);
+      });
+    } else {
+      $("setupTitle").textContent = "هذه فنيلتك!";
+      $("setupSub").textContent = (tmp.team || "فريقي") + " · المستوى يُختار قبل كل مباراة";
+      b.innerHTML = '<div class="bigjersey">' + jersey(kitById(tmp.kit), tmp.name, tmp.no, {}) + '</div>';
+      starBurst(14);
+    }
+  }
+  function collect(){
+    if(step === 1){
+      var v = ($("iName").value || "").trim();
+      if(!v){ $("setupMsg").textContent = "✍️ اكتب اسمك أولًا"; sLock(); return false; }
+      tmp.name = v;
+    } else if(step === 2){
+      var t = ($("iTeam").value || "").trim();
+      tmp.team = t || "فريقي";
+    } else if(step === 4){
+      var n = parseInt(($("iNo").value || "").replace(/[^0-9]/g,""), 10);
+      if(!n || n < 1 || n > 99){ $("setupMsg").textContent = "اكتب رقمًا من 1 إلى 99"; sLock(); return false; }
+      tmp.no = n;
+    }
+    return true;
+  }
+  function commit(){
+    P.name = tmp.name || P.name || "لاعب";
+    P.team = tmp.team || P.team || "فريقي";
+    P.kit = tmp.kit || P.kit;
+    P.no = tmp.no || P.no || 10;
+    save();
+  }
+
+  $("prevBtn").onclick = function(){ if(step > 1){ collect(); step--; sClick(); renderSetup(); } };
+  $("nextBtn2").onclick = function(){
+    if(!collect()) return;
+    sClick();
+    if(step < TOTAL){ step++; renderSetup(); }
+    else { commit(); openMenu(); }
+  };
+  $("saveBtn").onclick = function(){
+    collect(); commit();
+    $("setupMsg").textContent = "💾 تم حفظ اللعبة — يمكنك المتابعة في أي وقت";
+    tone(880,.1,"triangle",0,.18); tone(1180,.14,"triangle",.1,.18);
+  };
+
+  /* ================= القائمة ================= */
+  function paintMenu(){
+    $("playercard").innerHTML = jersey(kitById(P.kit), P.name, P.no, {})
+      + '<div><div class="pn">'+esc(P.name)+' <span style="direction:ltr;display:inline-block">#'+P.no+'</span></div>'
+      + '<div class="pt">'+esc(P.team)+'</div></div>';
+    $("totalGoals").textContent = num(P.goals);
+    Array.prototype.forEach.call(document.querySelectorAll(".stage-btn"), function(b){
+      var s = +b.dataset.stage, isLocked = s > P.unlocked;
+      b.classList.toggle("locked", isLocked);
+      var marks = ["15","10","5"].map(function(sec){
+        return P.cleared[s+":"+sec] ? "★" : "☆";
+      }).join("");
+      b.querySelector(".tick").innerHTML = isLocked ? "🔒" : (marks + "<b>م و ح</b>");
+    });
+  }
+  function openMenu(){ show("s-menu"); paintMenu(); }
+
+  /* ================= الأسئلة ================= */
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  function range(a,b){ var r=[]; for(var i=a;i<=b;i++) r.push(i); return r; }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function makeChoices(c, lo, hi){
+    var set = [c], pool = range(lo,hi).filter(function(n){ return n!==c; });
+    pool.sort(function(a,b){ return Math.abs(a-c)-Math.abs(b-c); });
+    var near = shuffle(pool.slice(0,5));
+    while(set.length<4 && near.length) set.push(near.pop());
+    while(set.length<4 && pool.length) set.push(pool.pop());
+    return shuffle(set);
+  }
+  function buildQuestions(st){
+    var qs = [];
+    if(st === 1){
+      shuffle(range(1,10)).forEach(function(n){
+        qs.push({type:"count",n:n,emoji:pick(EMOJI),answer:n,choices:makeChoices(n,1,10)}); });
+    } else if(st === 2){
+      shuffle(range(11,20)).forEach(function(n){
+        qs.push({type:"count10",n:n,emoji:pick(EMOJI),answer:n,choices:makeChoices(n,11,20)}); });
+    } else {
+      var pairs = [];
+      for(var a=0;a<=10;a++) for(var b=0;b<=10;b++) if(a+b<=10 && a+b>=2) pairs.push([a,b]);
+      shuffle(pairs);
+      var used = {}, ch = [];
+      for(var i=0;i<pairs.length && ch.length<10;i++){
+        var s = pairs[i][0]+pairs[i][1];
+        if((used[s]||0) < 2){ used[s]=(used[s]||0)+1; ch.push(pairs[i]); }
+      }
+      shuffle(ch).forEach(function(p){
+        qs.push({type:"add",a:p[0],b:p[1],emoji:pick(EMOJI),answer:p[0]+p[1],choices:makeChoices(p[0]+p[1],0,10)}); });
+    }
+    return qs;
+  }
+
+  /* ================= المؤقت ================= */
+  var timer = null, left = 0;
+  function stopTimer(){ if(timer){ clearInterval(timer); timer = null; } }
+  function startTimer(){
+    stopTimer(); left = secs*1000; paintTimer();
+    timer = setInterval(function(){
+      left -= 100;
+      if(left <= 0){ left = 0; paintTimer(); stopTimer(); timeUp(); } else paintTimer();
+    },100);
+  }
+  function paintTimer(){
+    var pct = Math.max(0,left/(secs*1000))*100, f = $("tfill"), n = $("tnum");
+    f.style.width = pct+"%";
+    f.className = "tfill" + (pct<=25?" low":(pct<=55?" mid":""));
+    n.textContent = num(Math.ceil(left/1000));
+    n.className = "tnum" + (pct<=25?" low":"");
+  }
+
+  /* ================= اللعب ================= */
+  function items(c, e, dl){
+    var h = "";
+    for(var i=0;i<c;i++) h += '<span class="obj" style="animation-delay:'+((dl||0)+i*.035).toFixed(2)+'s">'+e+'</span>';
+    return h;
+  }
+  function paintBoard(){
+    $("scoreMe").textContent = num(myScore);
+    $("scoreOpp").textContent = num(oppScore);
+    $("boardQ").textContent = num(Math.min(qIndex+1,questions.length)) + " / " + num(questions.length);
+  }
+  function render(){
+    var q = questions[qIndex];
+    $("lvlPill").textContent = levelName;
+    $("stagePill").textContent = "المرحلة " + num(stage);
+    paintBoard();
+
+    var d = "";
+    for(var i=0;i<questions.length;i++){
+      var c = "dot";
+      if(results[i] === true) c += " ok"; else if(results[i] === false) c += " no";
+      if(i === qIndex) c += " now";
+      d += '<span class="'+c+'"></span>';
+    }
+    $("dots").innerHTML = d;
+
+    var obj = $("objects"), eq = $("eq");
+    eq.classList.add("hidden");
+    if(q.type === "count"){
+      $("qtext").textContent = "كم عددها؟";
+      obj.innerHTML = items(q.n,q.emoji);
+    } else if(q.type === "count10"){
+      $("qtext").textContent = "كم عددها؟";
+      obj.innerHTML = '<div class="group"><span class="cap">عشرة</span>'+items(10,q.emoji)+'</div>'
+        + '<div class="group"><span class="cap">و</span>'+items(q.n-10,q.emoji,.35)+'</div>';
+    } else {
+      $("qtext").textContent = "كم المجموع؟";
+      obj.innerHTML = '<div class="group">'+items(q.a,q.emoji)+(q.a===0?'<span class="cap">لا شيء</span>':'')+'</div>'
+        + '<span class="plus">+</span>'
+        + '<div class="group">'+items(q.b,q.emoji,.25)+(q.b===0?'<span class="cap">لا شيء</span>':'')+'</div>';
+      eq.classList.remove("hidden");
+      eq.innerHTML = num(q.a)+" + "+num(q.b)+" = <span style='color:#2f6fed'>؟</span>";
+    }
+
+    var ch = $("choices"); ch.innerHTML = "";
+    q.choices.forEach(function(v){
+      var b = document.createElement("button");
+      b.className = "choice"; b.textContent = num(v); b.dataset.val = v;
+      b.onclick = function(){ answer(b,v); };
+      ch.appendChild(b);
+    });
+
+    $("netmsg").textContent = (q.type==="add") ? "اجمع المجموعتين ثم اختر!" : "عُدّ الأشياء ثم اختر العدد!";
+    locked = false; startTimer();
+  }
+  function lockChoices(){ Array.prototype.forEach.call($("choices").children, function(b){ b.disabled = true; }); }
+  function showCorrect(){
+    var a = questions[qIndex].answer;
+    Array.prototype.forEach.call($("choices").children, function(b){
+      if(+b.dataset.val === a) b.classList.add("right"); else b.classList.add("dim");
+    });
+  }
+  function hitRow(id){
+    var r = $(id); r.classList.remove("hit"); void r.offsetWidth; r.classList.add("hit");
+  }
+  function answer(btn, val){
+    if(locked) return;
+    locked = true; stopTimer(); lockChoices();
+    var q = questions[qIndex];
+    if(val === q.answer){
+      btn.classList.add("right");
+      Array.prototype.forEach.call($("choices").children, function(b){ if(b!==btn) b.classList.add("dim"); });
+      myScore++; P.goals++; results[qIndex] = true;
+      paintBoard(); hitRow("rowMe");
+      $("netmsg").textContent = "⚽ هدف لـ " + P.team + "!";
+      flash("g"); starBurst(); flyBall(); sGoal(); save();
+      setTimeout(next, 1250);
+    } else {
+      btn.classList.add("wrong"); results[qIndex] = false; showCorrect();
+      oppScore++; paintBoard(); hitRow("rowOpp");
+      $("netmsg").textContent = "❌ خطأ · الصحيحة " + num(q.answer) + " — هدف لـ " + OPP[stage].short;
+      flash("r"); sBuzz();
+      setTimeout(next, 1700);
+    }
+  }
+  function timeUp(){
+    if(locked) return;
+    locked = true; lockChoices(); results[qIndex] = false; showCorrect();
+    oppScore++; paintBoard(); hitRow("rowOpp");
+    $("netmsg").textContent = "⏰ انتهى الوقت · الصحيحة " + num(questions[qIndex].answer);
+    flash("r"); sBuzz();
+    setTimeout(next, 1700);
+  }
+  function next(){ qIndex++; if(qIndex >= questions.length) finish(); else render(); }
+
+  function startMatch(st){
+    stage = st; qIndex = 0; myScore = 0; oppScore = 0; results = [];
+    questions = buildQuestions(st);
+    $("boardKit").innerHTML = jersey(kitById(P.kit), "", "", {mini:true});
+    $("boardMyName").textContent = P.team;
+    $("oppEmoji").textContent = OPP[st].em;
+    $("oppName").textContent = OPP[st].short;
+    show("s-play"); render();
+  }
+
+  /* ================= النهاية ================= */
+  function finish(){
+    stopTimer(); show("s-end");
+    var won = myScore > oppScore, draw = myScore === oppScore;
+    var st = myScore >= 9 ? 3 : (myScore >= 7 ? 2 : 1);
+    $("starrow").textContent = "⭐".repeat(st) + "☆".repeat(3-st);
+    $("endResult").innerHTML = '<span style="color:#1e8e4e">'+num(myScore)+'</span> - <span style="color:#e2574c">'+num(oppScore)+'</span>';
+    $("endEmoji").textContent = won ? "🏆" : (draw ? "🤝" : "💪");
+    $("endTitle").textContent = won ? ("فاز " + P.team + "!") : (draw ? "تعادل!" : ("فاز " + OPP[stage].short + " هذه المرة"));
+    $("endText").innerHTML = "ضد " + OPP[stage].em + " " + esc(OPP[stage].name) + " · المستوى: " + levelName
+      + "<br>أهدافك الكلية: <b>" + num(P.goals) + "</b>";
+
+    P.cleared[stage + ":" + secs] = true;
+    var opened = false;
+    if(stage < 3 && P.unlocked < stage+1){ P.unlocked = stage+1; opened = true; }
+    save();
+    $("unlockText").textContent = opened ? ("🔓 فُتحت المرحلة " + num(stage+1) + "!") : "";
+    $("nextStageBtn").classList.toggle("hidden", stage >= 3);
+    if(stage >= 3 && won){ $("endEmoji").textContent = "🏅"; $("endTitle").textContent = "أكملت جميع المراحل!"; }
+    if(won || draw){ starBurst(); sWin(); } else { sBuzz(); }
+  }
+
+  /* ================= الأزرار ================= */
+  $("startBtn").onclick = function(){
+    sClick();
+    tmp = { name:P.name||"", team:P.team||"", kit:P.kit||"blue", no:P.no||10 };
+    step = 1; show("s-setup"); renderSetup();
+  };
+  $("contBtn").onclick = function(){ sClick(); openMenu(); };
+  $("editBtn").onclick = function(){
+    sClick(); tmp = { name:P.name, team:P.team, kit:P.kit, no:P.no };
+    step = 1; show("s-setup"); renderSetup();
+  };
+  $("homeBtn").onclick = function(){ stopTimer(); openMenu(); };
+  $("menuBtn").onclick = openMenu;
+  $("againBtn").onclick = function(){ startMatch(stage); };
+  $("nextStageBtn").onclick = function(){ startMatch(Math.min(3, stage+1)); };
+
+  Array.prototype.forEach.call(document.querySelectorAll(".stage-btn"), function(b){
+    b.onclick = function(){
+      var s = +b.dataset.stage;
+      if(s > P.unlocked){
+        sLock(); b.classList.remove("nope"); void b.offsetWidth; b.classList.add("nope");
+        $("lockNote").textContent = "🔒 أنهِ المرحلة " + num(s-1) + " أولًا لتُفتح المرحلة " + num(s);
+        return;
+      }
+      startMatch(s);
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".lvl"), function(b){
+    b.onclick = function(){
+      Array.prototype.forEach.call(document.querySelectorAll(".lvl"), function(x){ x.classList.remove("on"); });
+      b.classList.add("on"); secs = +b.dataset.sec;
+      levelName = b.textContent.replace(/[٠-٩0-9].*$/,"").trim(); sClick();
+    };
+  });
+  $("resetBtn").onclick = function(){
+    P.unlocked = 1; P.cleared = {}; P.goals = 0; save(); paintMenu();
+    $("lockNote").textContent = "تم إعادة التقدم · ابدأ من المرحلة ١"; sLock();
+  };
+  $("numBtn").onclick = function(){
+    arabicNumerals = !arabicNumerals;
+    $("numBtn").textContent = arabicNumerals ? "123" : "١٢٣";
+    paintMenu();
+  };
+  function soundLabel(){ var t = soundOn?"🔊":"🔇"; $("sndBtn").textContent = t; $("sndBtn2").textContent = t; }
+  function toggleSound(){ soundOn = !soundOn; soundLabel(); if(soundOn) tone(880,.1,"triangle",0,.18); }
+  $("sndBtn").onclick = toggleSound; $("sndBtn2").onclick = toggleSound;
+
+  /* ================= البداية ================= */
+  if(load()){
+    $("contWrap").classList.remove("hidden");
+    $("contBtn").textContent = "متابعة: " + P.name + " 👟";
+    $("contHint").textContent = "فريق " + P.team + " · المرحلة المفتوحة: " + num(P.unlocked);
+  }
+  soundLabel(); show("s-welcome");
+})();
+</script>
+</body>
+</html>
