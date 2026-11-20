@@ -153,6 +153,19 @@
   .result{font-size:34px;font-weight:900;letter-spacing:3px;margin:4px 0}
   .starrow{font-size:34px;letter-spacing:4px}
   .saved{font-size:13px;font-weight:900;color:var(--green)}
+  /* ===== تقدم الطالب ===== */
+  .pstage{background:#fff;border:3px solid #0001;border-radius:16px;padding:9px 10px;margin-bottom:8px}
+  .pstage h3{margin:0 0 2px;font-size:15px;font-weight:900;display:flex;align-items:center;gap:6px}
+  .pstage h3 .pc{margin-right:auto;font-size:16px;color:var(--green)}
+  .pstage .st{font-size:12px;font-weight:700;color:#5d7a6e;margin-bottom:6px}
+  .prow{display:flex;align-items:center;gap:7px;margin-top:5px}
+  .prow .pl{font-size:12px;font-weight:900;width:46px;color:#4a6a5c}
+  .pbar{flex:1;height:14px;background:#eceff1;border:2px solid #0002;border-radius:999px;overflow:hidden}
+  .pbar i{display:block;height:100%;background:var(--green);width:0}
+  .pbar i.half{background:var(--gold)}
+  .pbar i.low{background:var(--red)}
+  .prow .pv{font-size:12px;font-weight:900;width:40px;text-align:left;direction:ltr}
+  .totalbox{background:var(--gold);border:3px solid #0002;border-radius:16px;padding:10px;text-align:center;font-size:16px;font-weight:900;margin-top:4px}
   .hidden{display:none!important}
   .foot{text-align:center;font-size:12px;color:#4a6a5c;margin-top:10px;font-weight:700}
 </style>
@@ -204,7 +217,7 @@
     <button class="icon-btn" id="sndBtn" title="الصوت">🔊</button>
     <div class="spacer"></div>
     <button class="icon-btn" id="editBtn" title="تعديل اللاعب">👕</button>
-    <button class="icon-btn" id="resetBtn" title="إعادة التقدم">↺</button>
+    <button class="icon-btn" id="setBtn" title="الإعدادات والتقدم">⚙️</button>
     <div class="pill goals">⚽ <span id="totalGoals">٠</span></div>
   </div>
   <div class="card">
@@ -234,6 +247,37 @@
       </button>
     </div>
     <div class="foot" id="lockNote">المرحلة تُفتح بعد إنهاء المرحلة التي قبلها · تقدّمك يُحفظ تلقائيًا</div>
+  </div>
+</section>
+
+<!-- ================= الإعدادات والتقدم ================= -->
+<section id="s-settings" class="hidden">
+  <div class="topbar">
+    <button class="icon-btn" id="setBack" title="رجوع">🏠</button>
+    <div class="spacer"></div>
+    <div class="pill">⚙️ الإعدادات</div>
+  </div>
+  <div class="card">
+    <div class="playercard" id="setCard"></div>
+
+    <div class="label">تقدّم الطالب في كل مرحلة</div>
+    <div id="progList"></div>
+
+    <div class="totalbox" id="totalBox"></div>
+
+    <div class="label">خيارات</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn alt" id="setNum" style="flex:1;font-size:15px;margin:0">🔢 شكل الأرقام</button>
+      <button class="btn alt" id="setSnd" style="flex:1;font-size:15px;margin:0">🔊 الصوت</button>
+    </div>
+    <div style="margin-top:12px;border-top:2px dashed #0002;padding-top:10px">
+      <button class="btn grey" id="zeroBtn2" style="font-size:16px;width:100%;margin:0">🔄 البدء من الصفر</button>
+      <div id="zeroConfirm2" class="hidden" style="margin-top:8px">
+        <div class="hint" style="font-size:14px;font-weight:900;color:#9c2f27">سيُحذف الاسم والفنيلة وكل التقدّم. متأكد؟</div>
+        <button class="btn" id="zeroYes2" style="font-size:15px;background:#e2574c;box-shadow:0 5px 0 #9c2f27">نعم، احذف وابدأ</button>
+        <button class="btn grey" id="zeroNo2" style="font-size:15px">لا، رجوع</button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -370,7 +414,7 @@
   };
 
   /* ================= الحالة ================= */
-  var P = { name:"", team:"", kit:"blue", no:10, unlocked:1, cleared:{}, goals:0 };
+  var P = { name:"", team:"", kit:"blue", no:10, unlocked:1, cleared:{}, best:{}, goals:0 };
   var arabicNumerals = true, soundOn = true;
   var secs = 15, levelName = "مبتدئ";
   var stage = 1, qIndex = 0, myScore = 0, oppScore = 0, locked = false;
@@ -390,6 +434,7 @@
       P.no = (typeof o.no === "number") ? o.no : 10;
       P.unlocked = Math.max(1, Math.min(3, o.unlocked || 1));
       P.cleared = o.cleared || {};
+      P.best = o.best || {};
       P.goals = o.goals || 0;
       return true;
     }catch(e){ return false; }
@@ -459,7 +504,7 @@
 
   /* ================= شاشات ================= */
   function show(id){
-    ["s-welcome","s-setup","s-menu","s-play","s-end"].forEach(function(x){
+    ["s-welcome","s-setup","s-menu","s-settings","s-play","s-end"].forEach(function(x){
       $(x).classList.toggle("hidden", x !== id);
     });
     window.scrollTo(0,0);
@@ -579,6 +624,39 @@
     });
   }
   function openMenu(){ show("s-menu"); paintMenu(); }
+
+  /* ================= الإعدادات والتقدم ================= */
+  var STAGE_TITLES = {1:"المرحلة ١ · الأعداد ١ إلى ١٠", 2:"المرحلة ٢ · الأعداد ١١ إلى ٢٠", 3:"المرحلة ٣ · الجمع ٠ إلى ١٠"};
+  var LVLS = [{s:"15",n:"مبتدئ"},{s:"10",n:"متوسط"},{s:"5",n:"محترف"}];
+
+  function renderSettings(){
+    $("setCard").innerHTML = jersey(kitById(P.kit), P.name, P.no, {})
+      + '<div><div class="pn">'+esc(P.name||"لاعب")+' <span style="direction:ltr;display:inline-block">#'+P.no+'</span></div>'
+      + '<div class="pt">'+esc(P.team||"فريقي")+' · المرحلة المفتوحة: '+num(P.unlocked)+' من ٣</div></div>';
+
+    var html = "", sum = 0;
+    [1,2,3].forEach(function(s){
+      var vals = LVLS.map(function(l){ return P.best[s+":"+l.s] || 0; });
+      var top = Math.max.apply(null, vals);
+      sum += (vals[0]+vals[1]+vals[2])/3;
+      var rows = "";
+      LVLS.forEach(function(l,i){
+        var v = vals[i], cls = v >= 70 ? "" : (v >= 40 ? "half" : "low");
+        rows += '<div class="prow"><span class="pl">'+l.n+'</span>'
+          + '<span class="pbar"><i class="'+cls+'" style="width:'+v+'%"></i></span>'
+          + '<span class="pv">'+num(v)+'%</span></div>';
+      });
+      var state = s > P.unlocked ? "🔒 مقفلة" : (top > 0 ? "تم اللعب" : "مفتوحة — لم تُلعب بعد");
+      html += '<div class="pstage"><h3>'+(s>P.unlocked?"🔒":"⚽")+' '+STAGE_TITLES[s]
+        + '<span class="pc">'+num(top)+'%</span></h3>'
+        + '<div class="st">'+state+'</div>' + rows + '</div>';
+    });
+    $("progList").innerHTML = html;
+    $("totalBox").innerHTML = "التقدّم الكلي: " + num(Math.round(sum/3)) + "% · مجموع الأهداف: " + num(P.goals);
+    $("setNum").textContent = arabicNumerals ? "🔢 الأرقام: ١٢٣" : "🔢 الأرقام: 123";
+    $("setSnd").textContent = soundOn ? "🔊 الصوت: مفتوح" : "🔇 الصوت: مكتوم";
+  }
+  function openSettings(){ show("s-settings"); renderSettings(); }
 
   /* ================= الأسئلة ================= */
   function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
@@ -751,6 +829,8 @@
       + "<br>أهدافك الكلية: <b>" + num(P.goals) + "</b>";
 
     P.cleared[stage + ":" + secs] = true;
+    var pct = Math.round(myScore / questions.length * 100), bk = stage + ":" + secs;
+    if(!P.best[bk] || pct > P.best[bk]) P.best[bk] = pct;
     var opened = false;
     if(stage < 3 && P.unlocked < stage+1){ P.unlocked = stage+1; opened = true; }
     save();
@@ -769,7 +849,7 @@
   $("contBtn").onclick = function(){ sClick(); openMenu(); };
   $("newBtn").onclick = function(){
     sClick();
-    P = { name:"", team:"", kit:"blue", no:10, unlocked:1, cleared:{}, goals:0 };
+    P = { name:"", team:"", kit:"blue", no:10, unlocked:1, cleared:{}, best:{}, goals:0 };
     try{ localStorage.removeItem(KEY); }catch(e){}
     $("contWrap").classList.add("hidden");
     tmp = { name:"", team:"", kit:"blue", no:10 };
@@ -785,13 +865,7 @@
   $("zeroNo").onclick = function(){
     sClick(); $("zeroConfirm").classList.add("hidden"); $("zeroBtn").classList.remove("hidden");
   };
-  $("zeroYes").onclick = function(){
-    P = { name:"", team:"", kit:"blue", no:10, unlocked:1, cleared:{}, goals:0 };
-    try{ localStorage.removeItem(KEY); }catch(e){}
-    $("contWrap").classList.add("hidden");
-    $("zeroConfirm").classList.add("hidden"); $("zeroBtn").classList.remove("hidden");
-    sLock(); show("s-welcome");
-  };
+  $("zeroYes").onclick = function(){ wipe(); };
   $("homeBtn").onclick = function(){ stopTimer(); openMenu(); };
   $("menuBtn").onclick = openMenu;
   $("againBtn").onclick = function(){ startMatch(stage); };
@@ -815,10 +889,26 @@
       levelName = b.textContent.replace(/[٠-٩0-9].*$/,"").trim(); sClick();
     };
   });
-  $("resetBtn").onclick = function(){
-    P.unlocked = 1; P.cleared = {}; P.goals = 0; save(); paintMenu();
-    $("lockNote").textContent = "تم إعادة التقدم · ابدأ من المرحلة ١"; sLock();
-  };
+  $("setBtn").onclick = function(){ sClick(); openSettings(); };
+  $("setBack").onclick = function(){ sClick(); openMenu(); };
+  $("setNum").onclick = function(){ arabicNumerals = !arabicNumerals;
+    $("numBtn").textContent = arabicNumerals ? "123" : "١٢٣"; sClick(); renderSettings(); };
+  $("setSnd").onclick = function(){ soundOn = !soundOn; soundLabel();
+    if(soundOn) tone(880,.1,"triangle",0,.18); renderSettings(); };
+  $("zeroBtn2").onclick = function(){ sClick();
+    $("zeroBtn2").classList.add("hidden"); $("zeroConfirm2").classList.remove("hidden"); };
+  $("zeroNo2").onclick = function(){ sClick();
+    $("zeroConfirm2").classList.add("hidden"); $("zeroBtn2").classList.remove("hidden"); };
+  $("zeroYes2").onclick = function(){ wipe(); };
+
+  function wipe(){
+    P = { name:"", team:"", kit:"blue", no:10, unlocked:1, cleared:{}, best:{}, goals:0 };
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    $("contWrap").classList.add("hidden");
+    $("zeroConfirm2").classList.add("hidden"); $("zeroBtn2").classList.remove("hidden");
+    $("zeroConfirm").classList.add("hidden"); $("zeroBtn").classList.remove("hidden");
+    sLock(); show("s-welcome");
+  }
   $("numBtn").onclick = function(){
     arabicNumerals = !arabicNumerals;
     $("numBtn").textContent = arabicNumerals ? "123" : "١٢٣";
