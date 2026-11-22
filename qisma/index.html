@@ -43,6 +43,10 @@ body{background:linear-gradient(180deg,var(--ocean-dark) 0%,var(--ocean-mid) 50%
 .idl4{font-size:1rem;font-weight:600;line-height:2.1;opacity:.95}
 .idfade{animation:idIn .7s ease both}
 .netwrap{display:flex;justify-content:center;margin:2px 0 8px}
+.dvb{background:#fff;border-radius:12px;padding:10px 8px;margin-top:8px;animation:idIn .45s ease both}
+.dvt{text-align:center;font-size:.92rem;color:#0a3d62;font-weight:700;margin-bottom:6px}
+.dvb2{text-align:center;font-size:1rem;font-weight:800;color:#0b6a38;margin-top:6px}
+.dvb3{text-align:center;font-size:.86rem;color:#57606f;margin-top:2px}
 .ballfly{animation:ballfly .75s cubic-bezier(.22,.68,.35,1) forwards}
 @keyframes ballfly{0%{transform:translate(168px,128px) scale(.55);opacity:0}15%{opacity:1}100%{transform:translate(48px,42px) scale(1)}}
 .netsh{transform-origin:50% 50%;animation:netsh .55s .62s ease-out}
@@ -963,10 +967,51 @@ var qs=[],idx=0,me=0,op=0,timer=null,t0=0,locked=false,team=2,penMode=false,used
 function faceOf(c){
   var a=c.a,b=c.b,p=a*b;
   if(c.t==='d'){
+    c._p=a;c._e=b;
     return{h:'<span>'+ar(p)+' ÷ '+ar(a)+' =</span> <span class="blank" id="bl">؟</span>',ans:b,st:1};
   }
-  if(Math.random()<.5)return{h:'<span>'+ar(p)+' ÷</span> <span class="blank" id="bl">؟</span> <span>= '+ar(b)+'</span>',ans:a,st:1};
+  if(Math.random()<.5){c._p=a;c._e=b;return{h:'<span>'+ar(p)+' ÷</span> <span class="blank" id="bl">؟</span> <span>= '+ar(b)+'</span>',ans:a,st:1};}
+  c._p=b;c._e=a;
   return{h:'<span>'+ar(p)+' ÷</span> <span class="blank" id="bl">؟</span> <span>= '+ar(a)+'</span>',ans:b,st:1};
+}
+var BALLSYM='<symbol id="blsym" viewBox="0 0 24 24">'
+ +'<circle cx="12" cy="12" r="10.5" fill="#ffffff" stroke="#263238" stroke-width="1.6"/>'
+ +'<path d="M12 6.4 L16.2 9.5 L14.6 14.5 L9.4 14.5 L7.8 9.5 Z" fill="#263238"/>'
+ +'<path d="M12 2.2 L12 6.4 M16.2 9.5 L20.9 8.3 M14.6 14.5 L17.6 19.2 M9.4 14.5 L6.4 19.2 M7.8 9.5 L3.1 8.3" stroke="#263238" stroke-width="1.5" stroke-linecap="round" fill="none"/>'
+ +'</symbol>';
+function grp(cx,cy,r,k,d,num){
+  var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="#2ecc71" stroke="#ffffff" stroke-width="3"/>'
+   +'<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#1e8449" stroke-width="1.5"/>';
+  if(num){
+    s+='<use href="#blsym" x="'+(cx-11)+'" y="'+(cy-r*0.72)+'" width="22" height="22"/>'
+     +'<text x="'+cx+'" y="'+(cy+r*0.55)+'" text-anchor="middle" font-size="'+(r*0.78)+'" font-weight="700" fill="#ffffff" stroke="#1e8449" stroke-width="2" paint-order="stroke" font-family="Tajawal,sans-serif">'+ar(k)+'</text>';
+    return s;
+  }
+  var cols=Math.ceil(Math.sqrt(k)),rows=Math.ceil(k/cols),gap=(r*1.55)/cols,n=0;
+  for(var i=0;i<rows;i++){
+    var inRow=Math.min(cols,k-n);
+    for(var j=0;j<inRow;j++){
+      var x=cx+(j-(inRow-1)/2)*gap,y=cy+(i-(rows-1)/2)*gap;
+      s+='<use href="#blsym" x="'+(x-d).toFixed(1)+'" y="'+(y-d).toFixed(1)+'" width="'+(d*2)+'" height="'+(d*2)+'"/>';
+      n++;
+    }
+  }
+  return s;
+}
+function divBoard(total,parts,each,hid){
+  var num=(total>60),W=300,per=Math.min(4,parts),rows=Math.ceil(parts/per);
+  var r=per<=2?44:(per===3?36:30),d=per<=2?8.5:(per===3?6.6:5.4);
+  var H=rows*(r*2+12)+8,g='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;max-width:300px;height:auto">'+BALLSYM;
+  for(var i=0;i<parts;i++){
+    var row=Math.floor(i/per),col=i%per,inRow=Math.min(per,parts-row*per);
+    var cx=W/2+((inRow-1)/2-col)*(W/(inRow+0.35));
+    g+=grp(cx,row*(r*2+12)+r+4,r,each,d,num);
+  }
+  g+='</svg>';
+  return '<div class="dvb"><div class="dvt">'+ar(total)+' كرة وُزّعت على '+ar(parts)+' '+(parts===2?'مجموعتين':'مجموعات')+'</div>'
+   +'<div style="display:flex;justify-content:center">'+g+'</div>'
+   +'<div class="dvb2">'+(hid?('عدد المجموعات: '+ar(parts)):('في كل مجموعة '+ar(each)+' '+(each===1?'كرة':'كرات')))+'</div>'
+   +'<div class="dvb3">'+ar(total)+' ÷ '+ar(parts)+' = '+ar(each)+'</div></div>';
 }
 function optsFor(c,st){var s=[c],o=[-1,1,-2,2,-3,3,-4,4,5,6,7];for(var i=0;i<o.length&&s.length<4;i++){var v=c+o[i]*st;if(v>0&&s.indexOf(v)<0)s.push(v);}var e=c+st*8,g=0;while(s.length<4&&g<60){if(s.indexOf(e)<0)s.push(e);e+=st;g++;}return shuffle(s);}
 
@@ -1060,7 +1105,8 @@ function answer(v,el){
   }
   var mn=document.getElementById('meN'),on=document.getElementById('opN');
   if(mn)mn.textContent=me; if(on)on.textContent=op;
-  fb.innerHTML='<div class="fb" style="background:'+bg+'">'+(scored?goalNet():'')+'<h4 style="color:'+col+'">'+head+'</h4><p style="color:'+col+'">'+line+'</p></div>';
+  var dv=ok?divBoard(c.a*c.b,c._p||c.a,c._e||c.b,c.t==='b'):'';
+  fb.innerHTML='<div class="fb" style="background:'+bg+'">'+(scored?goalNet():'')+'<h4 style="color:'+col+'">'+head+'</h4><p style="color:'+col+'">'+line+'</p>'+dv+'</div>';
   if(mustCoach){
     document.getElementById('coachwrap').innerHTML='<button class="coachbtn must" id="hint">🛟 لازم تسأل المدرّب قبل الكرة التالية</button>';
     document.getElementById('hint').onclick=function(){
