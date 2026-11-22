@@ -76,6 +76,10 @@ body{background:linear-gradient(180deg,var(--ocean-dark) 0%,var(--ocean-mid) 50%
 @keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
 .dmwrap{text-align:center}
+.xnote{background:#fff;border:2px solid #f6b93b;border-radius:10px;padding:8px;margin:6px 0;font-size:.78rem;font-weight:700;color:#2f3542;line-height:1.8}
+.xbig{font-weight:800;color:#0a3d62;font-size:.92rem}
+.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.btnrow .btn{margin:0}
 .dmtxt{font-size:.95rem;font-weight:800;color:#0a3d62;line-height:1.9;margin:8px 0}
 .dmbig{font-size:1.5rem;font-weight:800;color:#0a3d62;margin:6px 0}
 .dmlbl{font-size:.74rem;font-weight:800;color:#57606f;margin-bottom:2px}
@@ -999,14 +1003,19 @@ function fndRun(id,list,i,miss){
   }
   var x=list[i],ansv=(f.typ==='c')?x[1]:x[0]*2;
   var o=shuffle([ansv].concat(badFor({ans:ansv,a:x[0],b:x[1],op:'+'})));
-  var h=topBar(1)+'<div class="screen active">'
-   +'<div class="card" style="text-align:center;padding:9px"><div style="font-size:.82rem;font-weight:800;color:#0c6397">'+f.e+' '+f.n+' — بطاقة '+ar(i+1)+' من '+ar(list.length)+'</div>'
-   +'<div style="font-size:.76rem;color:#57606f;font-weight:700;margin-top:2px">أتقنت '+ar(fndCount(f))+' من '+ar(fndFacts(f).length)+'</div></div>'
+  var h=topBar(1)+'<div class="screen active"><div class="qgrid" id="qgrid">'
+   +'<div class="ga-score"><div class="card" style="text-align:center;padding:9px;margin:0">'
+   +'<div style="font-size:1.5rem">'+f.e+'</div>'
+   +'<div style="font-size:.8rem;font-weight:800;color:#0c6397">'+f.n+'</div>'
+   +'<div style="font-size:.74rem;color:#57606f;font-weight:700;margin-top:2px">بطاقة '+ar(i+1)+' من '+ar(list.length)+'</div>'
+   +'<div style="font-size:.92rem;font-weight:800;color:#0b6a38;margin-top:4px">أتقنت '+ar(fndCount(f))+'/'+ar(fndFacts(f).length)+'</div></div></div>'
+   +'<div class="ga-side" id="ffb"></div>'
+   +'<div class="ga-main">'
    +'<div class="timer-wrap"><div class="timer-bar" id="ftb"></div></div>'
    +'<div class="qbox"><div class="qtext">'+fndCard(f,x)+'</div></div>'
    +'<div class="opts">';
   o.forEach(function(v){h+='<button class="opt" data-v="'+v+'">'+ar(v)+'</button>';});
-  h+='</div><div id="ffb"></div><button class="backb" id="fbk4">⟶ السابق</button></div>'+navBar('');
+  h+='</div><div id="fnxwrap"></div><button class="backb" id="fbk4">⟶ السابق</button></div></div></div>'+navBar('');
   document.getElementById('app').innerHTML=h;bindNav();
   document.getElementById('fbk4').onclick=function(){clearInterval(FTIMER);ac();showFnd(id);};
   var t0f=Date.now(),B=tim().sec,locked2=false;
@@ -1027,11 +1036,17 @@ function fndRun(id,list,i,miss){
       else if(v!==null&&parseInt(bs[j].getAttribute('data-v'),10)===v){bs[j].style.background='#e74c3c';bs[j].style.color='#fff';}
     }
     if(good){fnd(id).m[x[0]]=1;save();sGold();}else{sSave();miss.push(x);}
+    var note='';
+    if(f.typ==='d')note='<div class="xnote">💡 وهذه أخذناها في <b>هدّاف الضرب</b>:<br>'
+      +'<span class="xbig">'+ar(x[0])+' + '+ar(x[0])+' = '+ar(x[0]*2)+'</span> هي نفسها <span class="xbig">'+ar(x[0])+' × ٢ = '+ar(x[0]*2)+'</span><br>'
+      +'لأن العدد تكرّر <b>مرتين</b>، فاضربه في عدد مرات تكراره.</div>';
+    var qg=document.getElementById('qgrid');if(qg)qg.className='qgrid fbon';
+    document.getElementById('fnxwrap').innerHTML='<button class="btn main" id="fnext">التالي ⟵</button>';
+    document.getElementById('fnext').onclick=function(){ac();fndRun(id,list,i+1,miss);};
     document.getElementById('ffb').innerHTML='<div class="fb" style="background:'+(good?'#d4efdf':'#fadbd8')+'">'
      +'<h4 style="color:'+(good?'#0b6a38':'#8a2318')+'">'+(good?'✔ أحسنت — حفظتها':(v===null?'⌛ انتهى الوقت':'✘ ليست هي'))+'</h4>'
      +'<p style="color:'+(good?'#0b6a38':'#8a2318')+'">'+(f.typ==='c'?(ar(x[0])+' + '+ar(x[1])+' = '+ar(f.s)):(ar(x[0])+' + '+ar(x[0])+' = '+ar(x[0]*2)))+'</p>'
-     +'<button class="btn main" id="fnext">التالي ⟵</button></div>';
-    document.getElementById('fnext').onclick=function(){ac();fndRun(id,list,i+1,miss);};
+     +note+'</div>';
   }
   var bs2=document.querySelectorAll('.opt');
   for(var j2=0;j2<bs2.length;j2++)bs2[j2].onclick=function(){finish(parseInt(this.getAttribute('data-v'),10));};
@@ -1050,13 +1065,15 @@ function showTeach(id,si,fi){
    +'<div class="card dmwrap idfade"><div class="dmdots">'+dots+'</div>'
    +'<div>'+f.v+'</div>'
    +'<div class="dmtxt">'+f.t+'</div></div>'
+   +'<div class="btnrow">'
    +(last
      ? (lastSkill
-        ? '<button class="btn main" id="tgo">🏃 إلى التدريب (بلا وقت)</button>'
+        ? '<button class="btn main" id="tgo">🏃 إلى التدريب</button>'
         : '<button class="btn main" id="tnext">المهارة التالية ⟵</button>')
      : '<button class="btn main" id="tnext">التالي ⟵</button>')
-   +(fi>0?'<button class="btn sec" id="tprev">⟵ أعد الخطوة</button>':'')
-   +'<button class="btn sec" id="tagain">🔁 أعد الشرح من أوله</button>'
+   +(fi>0?'<button class="btn sec" id="tprev">⟵ أعد الخطوة</button>':'<button class="btn sec" id="tagain">🔁 من الأول</button>')
+   +'</div>'
+   +(fi>0?'<button class="btn sec" id="tagain" style="margin-bottom:8px">🔁 أعد الشرح من أوله</button>':'')
    +'<button class="backb" id="tbk">⟶ السابق</button></div>'+navBar('');
   document.getElementById('app').innerHTML=h;bindNav();
   if(document.getElementById('tnext'))document.getElementById('tnext').onclick=function(){
@@ -1085,13 +1102,18 @@ function startDrill(id,i,list,right){
     return;
   }
   var q=list[i],T=TEAM[q.sk],o=optsFor(q);
-  var h=topBar()+'<div class="screen active">'
-   +'<div class="card" style="text-align:center;padding:10px"><div style="font-size:.84rem;font-weight:800;color:#0c6397">🏃 تدريب بلا وقت — '+ar(i+1)+' من '+ar(list.length)+'</div>'
-   +'<div style="font-size:.8rem;color:#57606f;font-weight:700;margin-top:3px">'+T.e+' '+T.sk+'</div></div>'
+  var h=topBar(1)+'<div class="screen active"><div class="qgrid" id="qgrid">'
+   +'<div class="ga-score"><div class="card" style="text-align:center;padding:9px;margin:0">'
+   +'<div style="font-size:1.5rem">'+T.e+'</div>'
+   +'<div style="font-size:.8rem;font-weight:800;color:#0c6397">🏃 تدريب بلا وقت</div>'
+   +'<div style="font-size:.74rem;color:#57606f;font-weight:700;margin-top:2px">'+T.sk+'</div>'
+   +'<div style="font-size:.92rem;font-weight:800;color:#0b6a38;margin-top:4px">'+ar(i+1)+' من '+ar(list.length)+'</div></div></div>'
+   +'<div class="ga-side" id="dfb"></div>'
+   +'<div class="ga-main">'
    +'<div class="qbox"><div class="qtext"><span>'+ar(q.a)+' '+(q.op==='+'?'+':'−')+' '+ar(q.b)+' =</span> <span class="blank">؟</span></div></div>'
    +'<div class="opts" id="dopts">';
   o.forEach(function(v){h+='<button class="opt" data-v="'+v+'">'+ar(v)+'</button>';});
-  h+='</div><div id="dfb"></div><button class="backb" id="dbk2">⟶ السابق</button></div>'+navBar('');
+  h+='</div><div id="dnxwrap"></div><button class="backb" id="dbk2">⟶ السابق</button></div></div></div>'+navBar('');
   document.getElementById('app').innerHTML=h;bindNav();
   document.getElementById('dbk2').onclick=function(){ac();showTeach(id);};
   var bs=document.querySelectorAll('.opt'),done=false;
@@ -1100,11 +1122,12 @@ function startDrill(id,i,list,right){
     var v=parseInt(this.getAttribute('data-v'),10),good=(v===q.ans);
     this.style.background=good?'#2ecc71':'#e74c3c';this.style.color='#fff';
     if(good)sGold();else sSave();
+    var qg=document.getElementById('qgrid');if(qg)qg.className='qgrid fbon';
     document.getElementById('dfb').innerHTML='<div class="fb" style="background:'+(good?'#d4efdf':'#fadbd8')+'">'
      +'<h4 style="color:'+(good?'#0b6a38':'#8a2318')+'">'+(good?'✅ أحسنت':'❌ ليست هي')+'</h4>'
      +'<div class="dvb" style="max-width:100%;box-shadow:none;margin-top:6px"><div class="dvq">'+ar(q.a)+' '+(q.op==='+'?'+':'−')+' '+ar(q.b)+' = '+ar(q.ans)+'</div>'
-     +q.steps.map(function(x){return '<div class="stp">'+x+'</div>';}).join('')+'</div>'
-     +'<button class="btn main" id="dnext">التالي ⟵</button></div>';
+     +q.steps.map(function(x){return '<div class="stp">'+x+'</div>';}).join('')+'</div></div>';
+    document.getElementById('dnxwrap').innerHTML='<button class="btn main" id="dnext">التالي ⟵</button>';
     document.getElementById('dnext').onclick=function(){ac();startDrill(id,i+1,list,right+(good?1:0));};
   };
 }
