@@ -173,12 +173,12 @@ var TABLES=[2,3,4,5,6,7,8,9];
 var FINAL=[[9,9],[9,8],[9,7],[9,6],[9,5],[9,4],[9,3],[8,8],[8,7],[8,6],[8,4],[8,3],[7,6],[7,4]];
 var GOLD=2,WIN_PCT=95;
 var LEVELS={
- easy:{n:'مبتدئ',e:'🟢',ball:12,sec:7,max:5,d:'١٢ ثانية للكرة — هدف إذا أجبت قبل ٧ ثوانٍ<br>يصل إلى جدول ٥ فقط'},
- mid:{n:'متوسط',e:'🟡',ball:10,sec:5,max:7,d:'١٠ ثوانٍ للكرة — هدف إذا أجبت قبل ٥ ثوانٍ<br>يصل إلى جدول ٧ فقط'},
- pro:{n:'محترف',e:'🔴',ball:8,sec:4,max:9,d:'٨ ثوانٍ للكرة — هدف إذا أجبت قبل ٤ ثوانٍ<br>وحده يصل إلى النهائي والكأس كاملًا'}
+ easy:{n:'مبتدئ',e:'🟢',ball:12,sec:7,max:5,d:'١٢ ثانية للكرة — هدف إذا أجبت خلال ٧ ثوانٍ<br>يصل إلى جدول ٥ فقط'},
+ mid:{n:'متوسط',e:'🟡',ball:10,sec:5,max:7,d:'١٠ ثوانٍ للكرة — هدف إذا أجبت خلال ٥ ثوانٍ<br>يصل إلى جدول ٧ فقط'},
+ pro:{n:'محترف',e:'🔴',ball:8,sec:4,max:9,d:'٨ ثوانٍ للكرة — هدف إذا أجبت خلال ٤ ثوانٍ<br>وحده يصل إلى النهائي والكأس كاملًا'}
 };
 function lvl(){return LEVELS[player.level]||LEVELS.easy;}
-var CUPT={ball:10,sec:5};
+var CUPT={ball:8,sec:4};
 var CUPWIN=6;
 function tim(){return penMode?CUPT:lvl();}
 function needLevel(n){return n>=8?'المحترف':(n>=6?'المتوسط أو المحترف':'');}
@@ -680,7 +680,7 @@ function rulesCards(){
   });
   return '<div class="card"><h3>⚽ الكرة الواحدة — ثلاث نتائج</h3>'
    +'<div style="font-size:.88rem;line-height:2;font-weight:700;color:#2f3542">'
-   +'<div style="padding:8px;background:#d4efdf;border-radius:10px;margin-bottom:7px">⚽ <b>قول!</b> — إذا أجبت بسرعة قبل حدّ مستواك ← <b>هدف لك</b></div>'
+   +'<div style="padding:8px;background:#d4efdf;border-radius:10px;margin-bottom:7px">⚽ <b>قول!</b> — إذا أجبت خلال حدّ مستواك أو أسرع ← <b>هدف لك</b></div>'
    +'<div style="padding:8px;background:#fff3cd;border-radius:10px;margin-bottom:7px">🧤 <b>أنقذتَ مرماك</b> — إجابة صحيحة لكن متأخرة ← <b>لا لك ولا عليك</b></div>'
    +'<div style="padding:8px;background:#fadbd8;border-radius:10px">⚠️ <b>هجمة مرتدة</b> — خطأ أو انتهى الوقت ← <b>الخصم يسجّل</b></div>'
    +'</div></div>'
@@ -697,12 +697,12 @@ function rulesCards(){
    +'• <b>الدوري:</b> ١٨ كرة في كل مباراة (والنهائي '+ar(FINAL.length*2)+')، وتفوز إذا كانت أهدافك أكثر من أهداف الخصم.<br>'
    +'• لا ينتقل إلى المباراة التالية إلا من فاز.<br>'
    +'• <b>النجوم:</b> ⭐⭐⭐ إذا لم يسجّل عليك الخصم وسجّلت ١٢ فأكثر، ⭐⭐ إذا حقّقت واحدة منهما، ⭐ للفوز العادي.<br>'
-   +'• <b>الكأس:</b> عشر ركلات أمام كل حارس، وتهزمه بـ<b>٦ أهداف فأكثر</b>.<br>• في الكأس الزمن ثابت للجميع: <b>١٠ ثوانٍ للركلة، والهدف قبل ٥</b> مهما كان مستواك.<br>• الإجابة الصحيحة المتأخرة <b>لا تُحسب هدفًا ولا تُفقدك شيئًا</b>، والخطأ يعطي الحارس <b>هدفًا واحدًا</b>.<br>• ولا تفتح أمامك مرمى حارس حتى تهزم الذي قبله.</p></div>'
+   +'• <b>الكأس:</b> عشر ركلات أمام كل حارس، وتهزمه بـ<b>٦ أهداف فأكثر</b>.<br>• في الكأس الزمن ثابت للجميع: <b>٨ ثوانٍ للركلة، والهدف خلال ٤ ثوانٍ</b> مهما كان مستواك.<br>• الإجابة الصحيحة المتأخرة <b>لا تُحسب هدفًا ولا تُفقدك شيئًا</b>، والخطأ يعطي الحارس <b>هدفًا واحدًا</b>.<br>• ولا تفتح أمامك مرمى حارس حتى تهزم الذي قبله.</p></div>'
    +'<div class="card"><h3>🎚️ مستواك يحدّد سرعتك</h3>'
    +'<p style="font-size:.88rem;font-weight:700;line-height:2;color:#2f3542">'
-   +'🟢 مبتدئ: ١٢ ثانية للكرة، والهدف قبل ٧ — حتى جدول ٥.<br>'
-   +'🟡 متوسط: ١٠ ثوانٍ، والهدف قبل ٥ — حتى جدول ٧.<br>'
-   +'🔴 محترف: ٨ ثوانٍ، والهدف قبل ٤ — إلى النهائي والكأس كاملًا.</p></div>';
+   +'🟢 مبتدئ: ١٢ ثانية للكرة، والهدف خلال ٧ — حتى جدول ٥.<br>'
+   +'🟡 متوسط: ١٠ ثوانٍ، والهدف خلال ٥ — حتى جدول ٧.<br>'
+   +'🔴 محترف: ٨ ثوانٍ، والهدف خلال ٤ — إلى النهائي والكأس كاملًا.</p></div>';
 }
 
 /* جدول الدوري */
@@ -893,7 +893,7 @@ function showPens(){
    +'<div class="card" style="text-align:center;border:3px solid #9aa7b1"><div style="font-size:2.4rem">🥇</div>'
    +'<h3 style="font-size:1.2rem">بطولة الكأس — ركلات الترجيح</h3>'
    +'<p style="font-size:.84rem;color:#57606f;line-height:1.9">عشر ركلات أمام كل حارس. تغلّب على الحرّاس كلهم لترفع الكأس.<br>'
-   +'بلا مستويات — عشر ثوانٍ للركلة، والهدف قبل خمس.</p>'
+   +'بلا مستويات — ثماني ثوانٍ للركلة، والهدف خلال أربع.</p>'
    +'<p style="font-weight:700;color:#0a3d62;margin-top:8px">الحرّاس المهزومون: '+done+' / 9</p></div>';
   TABLES.forEach(function(n){
     var t=TEAM[n],c=cp(n),o=cupOpen(n);
@@ -989,7 +989,7 @@ function board(T){
   return '<div class="scoreboard">'
    +'<div class="sb"><span class="tm">'+T.e+' '+T.n+'</span><span class="nu" id="opN">'+op+'</span></div>'
    +'<div class="sb me"><span class="tm">👕 '+player.team+'</span><span class="nu" id="meN">'+me+'</span></div>'
-   +'<div class="sbfoot">'+(penMode?'ركلة':'الكرة')+' '+ar(idx+1)+' من '+ar(qs.length)+' — '+(penMode?'🥇 الكأس':lvl().e+' '+lvl().n)+' — الهدف قبل '+ar(tim().sec)+' ثوانٍ'+(penMode?'':' — الخطأ يعطي الخصم '+ar(team))+'</div></div>';
+   +'<div class="sbfoot">'+(penMode?'ركلة':'الكرة')+' '+ar(idx+1)+' من '+ar(qs.length)+' — '+(penMode?'🥇 الكأس':lvl().e+' '+lvl().n)+' — الهدف خلال '+ar(tim().sec)+' ثوانٍ'+(penMode?'':' — الخطأ يعطي الخصم '+ar(team))+'</div></div>';
 }
 function showQ(){
   BACK=function(){clearInterval(timer);if(penMode)showPens();else showLeague();};
@@ -1046,7 +1046,8 @@ function answer(v,el){
   var bl=document.getElementById('bl');if(bl)bl.textContent=ar(c._a);
   var qb=document.getElementById('qb'),fb=document.getElementById('fb');
   var head,line,bg,col,scored=false;
-  if(ok&&secs<tim().sec){
+  var shown=Math.round(secs*10)/10;
+  if(ok&&shown<=tim().sec){
     me++;player.goals=(player.goals||0)+1;scored=true;
     var was=st.level>=GOLD,gold=false;
     if(!usedHint){st.level=GOLD;if(!st.best||secs<st.best)st.best=secs;gold=!was&&st.level>=GOLD;if(gold)goldNow++;}
@@ -1059,10 +1060,10 @@ function answer(v,el){
     bg='#fff3cd';col='#856404';
     if(penMode){
       head='🧤 أنقذتَ مرماك من هدف — لم يسجّل الحارس';
-      line=ar(c.a)+' × '+ar(c.b)+' = '+ar(p)+' — تأخرت '+ar(secs.toFixed(1))+' ثانية<br>سدّد في أقل من '+ar(tim().sec)+' ثوانٍ ليصير هدفًا';
+      line=ar(c.a)+' × '+ar(c.b)+' = '+ar(p)+' — تأخرت '+ar(secs.toFixed(1))+' ثانية<br>سدّد خلال '+ar(tim().sec)+' ثوانٍ ليصير هدفًا';
     } else {
       head='🧤 أنقذتَ مرماك من هدف';
-      line=ar(c.a)+' × '+ar(c.b)+' = '+ar(p)+' — تأخرت '+ar(secs.toFixed(1))+' ثانية<br>أجِب في أقل من '+ar(tim().sec)+' ثوانٍ ليصير هدفًا';
+      line=ar(c.a)+' × '+ar(c.b)+' = '+ar(p)+' — تأخرت '+ar(secs.toFixed(1))+' ثانية<br>أجِب خلال '+ar(tim().sec)+' ثوانٍ ليصير هدفًا';
     }
   } else {
     var cost=penMode?1:team;
