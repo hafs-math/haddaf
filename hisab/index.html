@@ -76,6 +76,10 @@ body{background:linear-gradient(180deg,var(--ocean-dark) 0%,var(--ocean-mid) 50%
 @keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
 .dmwrap{text-align:center}
+.mny{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin:6px 0}
+.note{width:40px;height:26px;border-radius:5px;background:#1e9e5a;border:2px solid #0f6e3c;color:#fff;font-weight:800;font-size:.72rem;display:flex;align-items:center;justify-content:center}
+.coin{width:22px;height:22px;border-radius:50%;background:#f6b93b;border:2px solid #a8750a;color:#2b1b00;font-weight:800;font-size:.68rem;display:flex;align-items:center;justify-content:center}
+.note.hi,.coin.hi{animation:blink 1.1s infinite;box-shadow:0 0 0 3px rgba(231,76,60,.5)}
 .xnote{background:#fff;border:2px solid #f6b93b;border-radius:10px;padding:8px;margin:6px 0;font-size:.78rem;font-weight:700;color:#2f3542;line-height:1.8}
 .xbig{font-weight:800;color:#0a3d62;font-size:.92rem}
 .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
@@ -203,9 +207,9 @@ function aut(){return (player.author!==undefined&&player.author!==null)?player.a
 var TABLES=[1,2,3,4,5,6,7];
 var GOLD=18,WIN_PCT=95;
 var LEVELS={
- easy:{n:'مبتدئ',e:'🟢',ball:8,sec:4,max:7,R:20,d:'٨ ثوانٍ للكرة — هدف إذا أجبت خلال ٤ ثوانٍ<br>الأعداد ضمن ٢٠'},
+ easy:{n:'مبتدئ',e:'🟢',ball:8,sec:4,max:7,R:100,d:'٨ ثوانٍ للكرة — هدف إذا أجبت خلال ٤ ثوانٍ<br>الأعداد ضمن ١٠٠'},
  mid:{n:'متوسط',e:'🟡',ball:8,sec:4,max:7,R:50,d:'٨ ثوانٍ للكرة — هدف إذا أجبت خلال ٤ ثوانٍ<br>الأعداد ضمن ٥٠'},
- pro:{n:'محترف',e:'🔴',ball:8,sec:4,max:7,R:100,d:'٨ ثوانٍ للكرة — هدف إذا أجبت خلال ٤ ثوانٍ<br>الأعداد ضمن ١٠٠ بالحمل والاستلاف'}
+ pro:{n:'محترف',e:'🔴',ball:8,sec:4,max:7,R:200,d:'٨ ثوانٍ للكرة — هدف إذا أجبت خلال ٤ ثوانٍ<br>الأعداد ضمن ٢٠٠'}
 };
 function lvl(){return LEVELS[player.level]||LEVELS.easy;}
 function rng(){return lvl().R;}
@@ -255,13 +259,13 @@ function pcol(id){var v=id||player.pc||'w';for(var i=0;i<PCOLS.length;i++)if(PCO
 function patn(id){var v=id||player.pat||'p0';for(var i=0;i<PATS.length;i++)if(PATS[i].id===v)return PATS[i];return PATS[0];}
 var SHID=0;
 var TEAM={
-1:{n:'فريق العشرة',e:'🔟',c:'#079992',k:'حارس العشرة',tip:'أكمل العدد إلى ١٠ ثم أضف ما بقي',sk:'إكمال العشرة',ex:'٨ + ٥ ← ٨ + ٢ = ١٠ ثم ١٠ + ٣ = ١٣',rev:[]},
-2:{n:'فريق التوأم',e:'👯',c:'#8e44ad',k:'حارس التوأم',tip:'اعرف الضِعف، وجاره يزيد واحدًا',sk:'الضِعف وجاره',ex:'٧ + ٨ ← ٧ + ٧ = ١٤ ثم + ١ = ١٥',rev:[]},
-3:{n:'فريق البنّائين',e:'🧱',c:'#e67e22',k:'حارس البناء',tip:'اجمع العشرات أولًا ثم الآحاد',sk:'التفكيك بالمنازل',ex:'٣٦ + ٢٧ ← ٣٦ + ٢٠ = ٥٦ ثم + ٧ = ٦٣',rev:[]},
-4:{n:'فريق الرماة',e:'🎯',c:'#f6b93b',k:'حارس الرماية',tip:'قرّب إلى العشرة ثم عوّض الفرق',sk:'التقريب والتعويض',ex:'٤٨ + ٩ ← ٤٨ + ١٠ = ٥٨ ثم − ١ = ٥٧',rev:[]},
-5:{n:'فريق السلّم',e:'🪜',c:'#2980b9',k:'حارس السلّم',tip:'اصعد من الأصغر إلى الأكبر وعُدّ القفزات',sk:'العدّ صعودًا',ex:'٦٣ − ٥٨ ← من ٥٨ إلى ٦٠ = ٢ ومن ٦٠ إلى ٦٣ = ٣ ← ٥',rev:[]},
-6:{n:'فريق الميزان',e:'⚖️',c:'#c0397c',k:'حارس الميزان',tip:'زِد العددين معًا فيبقى الفرق كما هو',sk:'ثبات الفرق',ex:'٨٣ − ٤٧ ← ٨٦ − ٥٠ = ٣٦',rev:[]},
-7:{n:'منتخب الأبطال',e:'🏆',c:'#0a3d62',k:'الحارس الأسطوري',tip:'كل المهارات الستّ معًا',sk:'الختام — كل المهارات',ex:'مسائل من المهارات الستّ مخلوطة',rev:[]}
+1:{n:'فريق الفكة',e:'🪙',c:'#079992',k:'حارس الفكة',sk:'جمع الفكة',tip:'فكّك العدد: أوراق وفكة، ثم اجمع الفكة',ex:'٤٧ + ٦',rev:[]},
+2:{n:'فريق الأوراق',e:'💵',c:'#2980b9',k:'حارس الأوراق',sk:'جمع بلا عبور',tip:'اجمع الأوراق أولًا ثم الفكة',ex:'٤٢ + ٣٥',rev:[]},
+3:{n:'فريق العبور',e:'🔁',c:'#8e44ad',k:'حارس العبور',sk:'جمع مع العبور',tip:'الفكة إذا زادت عن عشرة صارت ورقة جديدة',ex:'٤٧ + ٣٦',rev:[]},
+4:{n:'فريق الدفع',e:'➖',c:'#e67e22',k:'حارس الدفع',sk:'طرح الفكة',tip:'ادفع حتى تصل إلى ورقة كاملة ثم أكمل',ex:'٨٣ − ٧',rev:[]},
+5:{n:'فريق الصرف',e:'💸',c:'#f6b93b',k:'حارس الصرف',sk:'طرح الأوراق',tip:'ادفع الأوراق فقط ولا تلمس الفكة',ex:'٨٣ − ٤٠',rev:[]},
+6:{n:'فريق المحاسبة',e:'🧾',c:'#c0397c',k:'حارس المحاسبة',sk:'الطرح الكامل',tip:'ادفع الأوراق أولًا ثم الفكة',ex:'٨٣ − ٤٧',rev:[]},
+7:{n:'منتخب الأبطال',e:'🏆',c:'#0a3d62',k:'الحارس الأسطوري',sk:'الختام — جمع وطرح',tip:'الطريقة نفسها: الأوراق أولًا ثم الفكة',ex:'كل المراحل مخلوطة',rev:[]}
 };
 var FND=[
  {id:'f10',n:'مكملات العشرة',e:'🔟',s:10,typ:'c',d:'كم يُكمل هذا العدد إلى عشرة؟'},
@@ -281,10 +285,10 @@ function fndOK(f){return fndCount(f)>=fndFacts(f).length;}
 function fndAllOK(){if(player.teacher)return true;for(var i=0;i<FND.length;i++)if(!fndOK(FND[i]))return false;return true;}
 function fndOpen(i){if(player.teacher)return true;if(i===0)return true;return fndOK(FND[i-1]);}
 var CAMP=[
- {id:1,sk:[1],n:'محطة العشرة',e:'🔟'},
- {id:2,sk:[2],n:'محطة التوأم',e:'👯'},
- {id:3,sk:[3,4],n:'محطة البناء والرماية',e:'🧱'},
- {id:4,sk:[5,6],n:'محطة الطرح',e:'🪜'}
+ {id:1,sk:[1,2],n:'محطة الجمع — أوراق وفكة',e:'💵'},
+ {id:2,sk:[3],n:'محطة العبور',e:'🔁'},
+ {id:3,sk:[4,5],n:'محطة الطرح — ادفع وادفع',e:'➖'},
+ {id:4,sk:[6],n:'محطة المحاسبة الكاملة',e:'🧾'}
 ];
 var CAMP_WIN=6, CAMP_PTS=3, CAMP_NEED=9;
 
@@ -401,50 +405,43 @@ function matchPct(n){return Math.round(Math.min(GOLD,cell(n).level)/GOLD*100);}
 function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1));}
 function pick(a){return a[rnd(0,a.length-1)];}
 function genQ(sk,R){
-  var a,b,ans,op='+',steps=[],g=0;
-  while(g++<80){
+  var a,b,ans,op='+',steps=[],g=0,t10,o1,o2,sum;
+  if(sk===7)sk=rnd(1,6);
+  var hi=Math.max(30,R);
+  while(g++<90){
     if(sk===1){
-      if(R<=20){a=rnd(6,9);b=rnd(11-a,9);}
-      else {var t=rnd(1,Math.floor(R/10)-1),u=rnd(6,9);a=t*10+u;b=rnd(11-u,9);}
-      ans=a+b;var u2=a%10,need=10-u2,rest=b-need,nx=a+need;
-      if(rest<1||ans>R)continue;
-      steps=[ar(a)+' + '+ar(need)+' = '+ar(nx),ar(nx)+' + '+ar(rest)+' = '+ar(ans)];
+      a=rnd(21,hi-9);b=rnd(3,9);o1=a%10;t10=a-o1;sum=o1+b;ans=a+b;
+      if(ans>hi||o1<2)continue;
+      steps=['فكّك: '+ar(a)+' = '+ar(t10)+' و '+ar(o1),'الفكة: '+ar(o1)+' + '+ar(b)+' = '+ar(sum),'الأوراق والفكة: '+ar(t10)+' + '+ar(sum)+' = '+ar(ans)];
     } else if(sk===2){
-      var m=(R<=20)?9:(R<=50)?24:49,x=rnd(R<=20?3:8,m),k=rnd(0,1);
-      a=x;b=x+k;ans=a+b;if(ans>R)continue;
-      steps=[ar(x)+' + '+ar(x)+' = '+ar(2*x)];
-      if(k)steps.push(ar(2*x)+' + ١ = '+ar(ans));
+      var ta=rnd(2,Math.floor(hi/20))*10,tb=rnd(1,Math.floor((hi-ta)/10)-1)*10;
+      o1=rnd(1,5);o2=rnd(1,9-o1);a=ta+o1;b=tb+o2;ans=a+b;
+      if(ans>hi||tb<10)continue;
+      steps=['الأوراق: '+ar(ta)+' + '+ar(tb)+' = '+ar(ta+tb),'الفكة: '+ar(o1)+' + '+ar(o2)+' = '+ar(o1+o2),'ادمج: '+ar(ta+tb)+' + '+ar(o1+o2)+' = '+ar(ans)];
     } else if(sk===3){
-      if(R<=20){a=rnd(11,16);b=rnd(2,9);}
-      else {a=rnd(21,Math.max(22,R-25));b=rnd(12,Math.min(39,R-a));}
-      ans=a+b;if(ans>R||b<2)continue;
-      var tb=Math.floor(b/10)*10,ub=b%10;
-      steps=tb?[ar(a)+' + '+ar(tb)+' = '+ar(a+tb),ar(a+tb)+' + '+ar(ub)+' = '+ar(ans)]:[ar(a)+' + '+ar(ub)+' = '+ar(ans)];
-      if(!tb&&!ub)continue;
+      var ta3=rnd(2,Math.floor(hi/20))*10,tb3=rnd(1,Math.floor((hi-ta3)/10)-2)*10;
+      o1=rnd(5,9);o2=rnd(11-o1,9);a=ta3+o1;b=tb3+o2;ans=a+b;
+      if(ans>hi||tb3<10||o1+o2<11)continue;
+      steps=['الأوراق: '+ar(ta3)+' + '+ar(tb3)+' = '+ar(ta3+tb3),'الفكة: '+ar(o1)+' + '+ar(o2)+' = '+ar(o1+o2)+' (ورقة وفكة)','ادمج: '+ar(ta3+tb3)+' + '+ar(o1+o2)+' = '+ar(ans)];
     } else if(sk===4){
-      b=pick(R<=20?[8,9]:(R<=50?[8,9,18,19]:[8,9,18,19,29]));
-      var rb=b+(10-b%10);
-      op=rnd(0,1)?'+':'−';
-      if(op==='+'){a=rnd(10,R-rb);if(a<10)continue;ans=a+b;
-        steps=[ar(a)+' + '+ar(rb)+' = '+ar(a+rb),ar(a+rb)+' − '+ar(rb-b)+' = '+ar(ans)];}
-      else {a=rnd(rb+3,R);ans=a-b;if(ans<2)continue;
-        steps=[ar(a)+' − '+ar(rb)+' = '+ar(a-rb),ar(a-rb)+' + '+ar(rb-b)+' = '+ar(ans)];}
+      op='−';a=rnd(23,hi);o1=a%10;b=rnd(o1+1,9);ans=a-b;
+      if(o1<1||o1>7||ans<10)continue;
+      t10=a-o1;
+      steps=['ادفع '+ar(o1)+' لتصل إلى الورقة: '+ar(a)+' − '+ar(o1)+' = '+ar(t10),'بقي عليك '+ar(b-o1)+': '+ar(t10)+' − '+ar(b-o1)+' = '+ar(ans)];
     } else if(sk===5){
-      op='−';var big=(R<=20)?rnd(12,20):rnd(31,R),gap=rnd(2,6);
-      a=big;b=big-gap;ans=gap;
-      if(b%10===0||b<5)continue;
-      var ten=Math.ceil(b/10)*10;if(ten>=a)continue;
-      steps=['من '+ar(b)+' إلى '+ar(ten)+' ← '+ar(ten-b),'ومن '+ar(ten)+' إلى '+ar(a)+' ← '+ar(a-ten),'المجموع '+ar(ans)];
+      op='−';a=rnd(25,hi);var tb5=rnd(1,Math.floor((a-10)/10))*10;b=tb5;ans=a-b;
+      if(ans<5)continue;
+      steps=['ادفع الأوراق فقط: '+ar(a)+' − '+ar(b)+' = '+ar(ans),'والفكة لم تتغيّر'];
     } else {
-      op='−';var u3=pick([7,8,9]),bt=(R<=20)?0:rnd(1,Math.max(1,Math.floor(R/10)-3));
-      b=bt*10+u3;a=rnd(b+3,R);ans=a-b;
-      if(ans<2||a>R)continue;
-      var sh=10-u3;
-      steps=[ar(a)+' + '+ar(sh)+' = '+ar(a+sh)+'  و  '+ar(b)+' + '+ar(sh)+' = '+ar(b+sh),ar(a+sh)+' − '+ar(b+sh)+' = '+ar(ans)];
+      op='−';a=rnd(31,hi);var tb6=rnd(1,Math.floor((a-12)/10))*10,ob6=rnd(1,9);
+      b=tb6+ob6;ans=a-b;
+      if(ans<4||b>=a)continue;
+      var mid=a-tb6;
+      steps=['ادفع الأوراق: '+ar(a)+' − '+ar(tb6)+' = '+ar(mid),'ثم الفكة: '+ar(mid)+' − '+ar(ob6)+' = '+ar(ans)];
     }
     break;
   }
-  if(ans===undefined||isNaN(ans)){a=7;b=5;op='+';ans=12;steps=[ar(7)+' + ٣ = ١٠','١٠ + ٢ = ١٢'];}
+  if(ans===undefined||isNaN(ans)||ans<1){a=47;b=6;op='+';ans=53;steps=['فكّك: ٤٧ = ٤٠ و ٧','الفكة: ٧ + ٦ = ١٣','٤٠ + ١٣ = ٥٣'];}
   return {sk:sk,a:a,b:b,op:op,ans:ans,steps:steps,rev:0,t:'d'};
 }
 function badFor(q){
@@ -800,7 +797,9 @@ function rulesCards(){
   });
   return '<div class="card" style="border:3px solid #f6b93b;background:#fffdf5"><h3>🏕️ المعسكر التدريبي أولًا</h3>'
    +'<p style="font-size:.9rem;font-weight:700;line-height:2;color:#2f3542">'
+   +'الطريقة واحدة في اللعبة كلها: <b>فكّك العدد أوراقًا وفكة، واعمل بالأوراق أولًا ثم الفكة</b>.<br>'
    +'البطولات كلها <b>مقفلة</b> حتى تُنهي المعسكر.<br>'
+   +'وفي المعسكر: ثلاث محطات حفظ، ثم أربع محطات تشرح الطريقة، وفي كل محطة أسألك «هل فهمت؟» فإن قلت لا أعدتُ بأسلوب آخر.<br>'
    +'فيه أربع محطات: في كل محطة يشرح لك المدرّب مهارة، ثم تتدرّب عليها بلا وقت، ثم تلعب <b>مباراة تجريبية</b> من عشر كرات.<br>'
    +'الفوز في المباراة التجريبية (<b>٦ أهداف فأكثر</b>) يعطيك <b>٣ نقاط</b>.<br>'
    +'ومن جمع <b>٩ نقاط من ١٢</b> فتحت له البطولات.</p></div>'
@@ -810,7 +809,7 @@ function rulesCards(){
    +'<div style="padding:8px;background:#fff3cd;border-radius:10px;margin-bottom:7px">🧤 <b>أنقذتَ مرماك</b> — إجابة صحيحة لكن متأخرة ← <b>لا لك ولا عليك</b></div>'
    +'<div style="padding:8px;background:#fadbd8;border-radius:10px">⚠️ <b>هجمة مرتدة</b> — خطأ أو انتهى الوقت ← <b>الخصم يسجّل</b></div>'
    +'</div></div>'
-   +'<div class="card"><h3>🧠 المهارات الستّ</h3>'
+   +'<div class="card"><h3>🧠 طريقة واحدة — سبع مراحل</h3>'
    +'<div style="font-size:.84rem;line-height:1.9;font-weight:700;color:#2f3542">'
    +TABLES.map(function(n){return '<div style="padding:7px 0;border-bottom:1px solid #eee">'+TEAM[n].e+' <b>'+TEAM[n].sk+'</b><br><span style="color:#57606f;font-weight:700">'+TEAM[n].ex+'</span></div>';}).join('')
    +'</div></div>'
@@ -829,16 +828,56 @@ function rulesCards(){
    +'<p style="font-size:.88rem;font-weight:700;line-height:2;color:#2f3542">'
    +'الزمن واحد للجميع: <b>٨ ثوانٍ للكرة، والهدف خلال ٤ ثوانٍ</b>، وما زاد على الأربع فهو تصدٍّ لا يسجّل ولا يُفقدك شيئًا، وانتهاء الوقت هدف في مرماك.<br>'
    +'والمستوى يحدّد <b>مدى الأعداد</b> فقط:<br>'
-   +'🟢 مبتدئ: الأعداد ضمن ٢٠.<br>'
-   +'🟡 متوسط: ضمن ٥٠.<br>'
-   +'🔴 محترف: ضمن ١٠٠ بالحمل والاستلاف.</p></div>';
+   +'🟢 مبتدئ: الأعداد ضمن ٥٠.<br>'
+   +'🟡 متوسط: ضمن ١٠٠.<br>'
+   +'🔴 محترف: ضمن ٢٠٠.</p></div>';
+}
+function showIntro(fromCamp){
+  BACK=showPick;
+  var h=topBar(1)+'<div class="screen active">'
+   +'<div class="card" style="text-align:center;border:3px solid #f6b93b"><div style="font-size:2.4rem">📖</div>'
+   +'<h3 style="font-size:1.2rem">كيف نبدأ؟ اقرأ هذه الصفحة أولًا</h3>'
+   +'<p style="font-size:.86rem;color:#57606f;font-weight:700">دقيقتان تكفيانك لتعرف كل شيء</p></div>'
+   +'<div class="card"><h3>🧠 ما الحساب الذهني؟</h3>'
+   +'<p style="font-size:.9rem;font-weight:700;color:#2f3542;line-height:2">أن تحسب في رأسك بلا ورقة ولا أصابع. وسرّه أنك لا تحسب كما تكتب: في الورقة تبدأ من اليمين (الآحاد)، وفي رأسك <b>تبدأ من اليسار — من الأكبر</b>.</p></div>'
+   +'<div class="card" style="border:3px solid #1e9e5a;background:#f3fbf6"><h3>💵 الطريقة كلها: أوراق وفكة</h3>'
+   +'<p style="font-size:.9rem;font-weight:700;color:#2f3542;line-height:2">تخيّل كل عدد <b>فلوسًا في جيبك</b>: أوراق من فئة عشرة، وقطع من فئة ريال.<br>'+money(4,7)+'<b>٤٧ = ٤ أوراق و ٧ قطع</b></p>'
+   +'<div style="background:#fff;border-radius:10px;padding:9px;margin-top:8px">'
+   +'<div style="font-weight:800;color:#0a3d62;margin-bottom:4px">في الجمع: اجمع الأوراق ثم الفكة</div>'
+   +'<div class="stp">٤٧ + ٣٦ ← الأوراق: ٤٠ + ٣٠ = ٧٠</div>'
+   +'<div class="stp">الفكة: ٧ + ٦ = ١٣</div>'
+   +'<div class="stp">ادمج: ٧٠ + ١٣ = ٨٣</div></div>'
+   +'<div style="background:#fff;border-radius:10px;padding:9px;margin-top:8px">'
+   +'<div style="font-weight:800;color:#0a3d62;margin-bottom:4px">في الطرح: لا تفكّك العدد الأول، ادفع الأوراق ثم الفكة</div>'
+   +'<div class="stp">٨٣ − ٤٧ ← ادفع الأوراق: ٨٣ − ٤٠ = ٤٣</div>'
+   +'<div class="stp">ثم الفكة: ٤٣ − ٧ = ٣٦</div></div>'
+   +'<p style="font-size:.84rem;font-weight:800;color:#0b6a38;margin-top:8px">طريقة واحدة لا غير — تصلح لكل الأعداد، صغيرها وكبيرها.</p></div>'
+   +'<div class="card"><h3>🗺️ خطتك في اللعبة</h3>'
+   +'<div style="font-size:.88rem;font-weight:700;color:#2f3542;line-height:1.9">'
+   +'<div style="padding:7px 0;border-bottom:1px solid #eee"><b>١) قسم الحفظ</b> — ثلاث محطات: مكملات العشرة، ومكملات العشرين، والأعداد المتشابهة. وهي وقود الطريقة، فمن حفظها طار.</div>'
+   +'<div style="padding:7px 0;border-bottom:1px solid #eee"><b>٢) محطات الطريقة</b> — أربع محطات: في كل واحدة شرح بالفلوس، ثم أسألك «هل فهمت؟» فإن قلت لا أعدتُ بأسلوب آخر، ثم تدريب بلا وقت، ثم مباراة تجريبية.</div>'
+   +'<div style="padding:7px 0;border-bottom:1px solid #eee"><b>٣) النقاط</b> — كل مباراة تجريبية تكسبها = ٣ نقاط، وتحتاج ٩ من ١٢.</div>'
+   +'<div style="padding:7px 0"><b>٤) البطولات</b> — تُفتح لك بعدها: الدوري سبع مباريات، ثم الكأس.</div>'
+   +'</div></div>'
+   +'<div class="card"><h3>⏱️ قاعدة الوقت</h3>'
+   +'<p style="font-size:.88rem;font-weight:700;color:#2f3542;line-height:2">لكل كرة <b>٨ ثوانٍ</b>.<br>'
+   +'⚽ أجبت صحيحًا خلال <b>٤ ثوانٍ</b> ← هدف لك.<br>'
+   +'🧤 صحيحًا بعد الأربع ← إنقاذ، لا لك ولا عليك.<br>'
+   +'⚠️ خطأ أو انتهى الوقت ← الخصم يسجّل.</p></div>'
+   +'<button class="btn main" id="igo">🏕️ فهمت — إلى المعسكر</button>'
+   +'<button class="backb" id="ibk">⟶ السابق</button></div>'+navBar('');
+  document.getElementById('app').innerHTML=h;bindNav();
+  document.getElementById('igo').onclick=function(){ac();sGoal();player.intro=1;save();showCamp();};
+  document.getElementById('ibk').onclick=function(){ac();showPick();};
 }
 function showCamp(){
+  if(!player.intro)return showIntro(1);
   BACK=showPick;
   var h=topBar()+'<div class="screen active">'
    +'<div class="card" style="text-align:center;border:3px solid #f6b93b"><div style="font-size:2.4rem">🏕️</div>'
    +'<h3 style="font-size:1.2rem">المعسكر التدريبي</h3>'
    +'<p style="font-size:.86rem;color:#57606f;font-weight:700;line-height:1.9">أولًا تحفظ الأساس: مكملات العشرة والعشرين والأعداد المتشابهة.<br>ثم محطات المهارات: شرح، فتدريب، فمباراة تجريبية.</p>'
+   +'<button class="btn sec" id="cintro" style="margin:8px 0 0">📖 كيف نبدأ؟ اقرأ الطريقة</button>'
    +'<div style="margin-top:8px;font-size:1.1rem;font-weight:800;color:'+(campDone()?'#0b6a38':'#b9770e')+'">الحفظ: '+ar(FND.filter(function(f){return fndOK(f);}).length)+' من '+ar(FND.length)+' — النقاط: '+ar(campPts())+' من '+ar(CAMP.length*CAMP_PTS)+(campDone()?'<br>✅ فُتحت البطولات':'')+'</div></div>';
   h+='<div class="card" style="padding:9px;text-align:center;background:#e8f4fb"><h3 style="margin:0">١) قسم الحفظ — الأساس</h3>'
    +'<p style="font-size:.8rem;color:#57606f;font-weight:700;margin:3px 0 0">احفظ هذه الحقائق أولًا، فلا حساب ذهني بدونها</p></div>';
@@ -860,12 +899,13 @@ function showCamp(){
   });
   h+='</div>'+navBar('');
   document.getElementById('app').innerHTML=h;bindNav();
+  if(document.getElementById('cintro'))document.getElementById('cintro').onclick=function(){ac();showIntro(1);};
   var rs=document.querySelectorAll('.mrow');
   for(var i=0;i<rs.length;i++)rs[i].onclick=function(){
     var fid=this.getAttribute('data-f');
     if(fid){if(!fndOpen(fIdx(fid))){sSave();return;}ac();showFnd(fid);return;}
     if(!fndAllOK()){sSave();return;}
-    ac();showTeach(parseInt(this.getAttribute('data-c'),10),0,0);
+    ac();showTeach(parseInt(this.getAttribute('data-c'),10),0,0,0,0);
   };
 }
 function cells(on,total,mv,gap){
@@ -902,7 +942,75 @@ function bars(a,b,mx,ca,cb){
    +'<div style="height:6px"></div>'
    +'<div class="dmlbl">'+ar(b)+'</div><div class="bar" style="width:'+w(b)+'%;background:'+(cb||'#e67e22')+'">'+ar(b)+'</div></div>';
 }
-function demoFrames(sk){
+function money(t,o,ht,ho){
+  var h='<div class="mny">';
+  for(var i=0;i<t;i++)h+='<div class="note'+(ht&&i>=t-ht?' hi':'')+'">١٠</div>';
+  for(var j=0;j<o;j++)h+='<div class="coin'+(ho&&j>=o-ho?' hi':'')+'">١</div>';
+  return h+'</div>';
+}
+function mlbl(x){return '<div class="dmlbl">'+x+'</div>';}
+function demoFrames(sk,v){
+  v=v||0;
+  if(sk===1)return (v===0)?[
+   {t:'معك <b>٤٧ ريالًا</b>: أربع أوراق من فئة عشرة، وسبع قطع.',x:money(4,7)},
+   {t:'وأعطاك أبوك <b>٦ قطع</b>.',x:money(4,7)+mlbl('+')+money(0,6)},
+   {t:'اجمع <b>الفكة</b> أولًا: ٧ + ٦ = <b>١٣</b>',x:money(0,13,0,6)+mlbl('٧ + ٦ = ١٣')},
+   {t:'ثم أضفها إلى الأوراق: <b>٤٠ + ١٣ = ٥٣</b>',x:'<div class="dmbig">٤٠ + ١٣ = ٥٣</div>'},
+   {t:'إذن <b>٤٧ + ٦ = ٥٣</b> ✔',x:'<div class="dmbig">٤٧ + ٦ = ٥٣</div>'}
+  ]:[
+   {t:'بأسلوب آخر: اكتب العدد قسمين.<br><b>٤٧ = ٤٠ + ٧</b>',x:'<div class="dmbig">٤٧ = ٤٠ + ٧</div>'},
+   {t:'اترك الأربعين جانبًا، واشتغل بالسبعة وحدها: <b>٧ + ٦ = ١٣</b>',x:'<div class="dmbig">٧ + ٦ = ١٣</div>'},
+   {t:'ثم أرجِع الأربعين: <b>٤٠ + ١٣ = ٥٣</b> ✔',x:'<div class="dmbig">٤٠ + ١٣ = ٥٣</div>'}
+  ];
+  if(sk===2)return (v===0)?[
+   {t:'<b>٤٢ + ٣٥</b> — معك ٤ أوراق وقطعتان، وأُعطيت ٣ أوراق و٥ قطع.',x:money(4,2)+mlbl('+')+money(3,5)},
+   {t:'اجمع <b>الأوراق</b> أولًا: ٤٠ + ٣٠ = <b>٧٠</b>',x:money(7,0,3)+mlbl('٧٠')},
+   {t:'ثم <b>الفكة</b>: ٢ + ٥ = <b>٧</b>',x:money(0,7,0,5)+mlbl('٧')},
+   {t:'ادمجهما: <b>٧٠ + ٧ = ٧٧</b> ✔',x:money(7,7)+'<div class="dmbig">٤٢ + ٣٥ = ٧٧</div>'}
+  ]:[
+   {t:'بأسلوب آخر: اجمع كل منزلة وحدها.<br>عشرات مع عشرات، وآحاد مع آحاد.',x:'<div class="dmbig">٤٠ + ٣٠ = ٧٠</div>'},
+   {t:'والآحاد: <b>٢ + ٥ = ٧</b>',x:'<div class="dmbig">٢ + ٥ = ٧</div>'},
+   {t:'ثم اجمع الناتجين: <b>٧٠ + ٧ = ٧٧</b> ✔',x:'<div class="dmbig">٧٧</div>'}
+  ];
+  if(sk===3)return (v===0)?[
+   {t:'<b>٤٧ + ٣٦</b> — وهنا الفكة ستزيد عن عشرة، فانتبه.',x:money(4,7)+mlbl('+')+money(3,6)},
+   {t:'الأوراق أولًا: ٤٠ + ٣٠ = <b>٧٠</b>',x:money(7,0,3)+mlbl('٧٠')},
+   {t:'والفكة: ٧ + ٦ = <b>١٣</b> — وهذه <b>ورقة كاملة وثلاث قطع</b>!',x:money(0,13,0,6)+mlbl('١٣ = ١٠ + ٣')},
+   {t:'فالورقة الجديدة تنضمّ إلى الأوراق: <b>٧٠ + ١٣ = ٨٣</b> ✔',x:money(8,3)+'<div class="dmbig">٤٧ + ٣٦ = ٨٣</div>'}
+  ]:[
+   {t:'بأسلوب آخر: اجمع العشرات ثم الآحاد ثم ادمج.<br><b>٧٠</b> و <b>١٣</b>',x:'<div class="dmbig">٧٠ و ١٣</div>'},
+   {t:'والثلاثة عشر فيها عشرة: <b>٧٠ + ١٠ = ٨٠</b>',x:'<div class="dmbig">٧٠ + ١٠ = ٨٠</div>'},
+   {t:'ثم الباقي: <b>٨٠ + ٣ = ٨٣</b> ✔',x:'<div class="dmbig">٨٣</div>'}
+  ];
+  if(sk===4)return (v===0)?[
+   {t:'<b>٨٣ − ٧</b> — معك ٨ أوراق و٣ قطع، وتريد أن تدفع ٧ قطع.',x:money(8,3)},
+   {t:'عندك ٣ قطع فقط… ادفعها أولًا لتصل إلى <b>٨٠</b>.',x:money(8,3,0,3)+mlbl('٨٣ − ٣ = ٨٠')},
+   {t:'بقي عليك <b>٤</b>، فاصرف ورقة وادفع منها: <b>٨٠ − ٤ = ٧٦</b> ✔',x:money(7,6)+'<div class="dmbig">٨٣ − ٧ = ٧٦</div>'}
+  ]:[
+   {t:'بأسلوب آخر: انزل إلى أقرب عشرة أولًا.<br><b>٨٣ − ٣ = ٨٠</b>',x:nline(70,90,[[80,83]])},
+   {t:'والسبعة طرحنا منها ٣، فبقي <b>٤</b>.',x:'<div class="dmbig">٧ − ٣ = ٤</div>'},
+   {t:'<b>٨٠ − ٤ = ٧٦</b> ✔',x:'<div class="dmbig">٧٦</div>'}
+  ];
+  if(sk===5)return (v===0)?[
+   {t:'<b>٨٣ − ٤٠</b> — تدفع أوراقًا فقط، والفكة لا تلمسها.',x:money(8,3)},
+   {t:'ادفع <b>٤ أوراق</b>.',x:money(8,3,4)+mlbl('٤٠')},
+   {t:'بقي <b>٤ أوراق و٣ قطع</b> = <b>٤٣</b> ✔',x:money(4,3)+'<div class="dmbig">٨٣ − ٤٠ = ٤٣</div>'}
+  ]:[
+   {t:'بأسلوب آخر: الآحاد لم تتغيّر، فاطرح العشرات فقط.<br><b>٨ − ٤ = ٤</b> أوراق',x:'<div class="dmbig">٨٠ − ٤٠ = ٤٠</div>'},
+   {t:'وأعِد الآحاد كما هي: <b>٤٠ + ٣ = ٤٣</b> ✔',x:'<div class="dmbig">٤٣</div>'}
+  ];
+  return (v===0)?[
+   {t:'<b>٨٣ − ٤٧</b> — القاعدة: <b>لا تفكّك العدد الأول أبدًا</b>.',x:money(8,3)+mlbl('معك ٨٣')},
+   {t:'ادفع <b>الأوراق</b> أولًا: ٨٣ − ٤٠ = <b>٤٣</b>',x:money(4,3)+mlbl('٨٣ − ٤٠ = ٤٣')},
+   {t:'ثم ادفع <b>الفكة</b>: ٤٣ − ٧ = <b>٣٦</b>',x:money(3,6)+mlbl('٤٣ − ٧ = ٣٦')},
+   {t:'إذن <b>٨٣ − ٤٧ = ٣٦</b> ✔',x:'<div class="dmbig">٨٣ − ٤٧ = ٣٦</div>'}
+  ]:[
+   {t:'بأسلوب آخر: اطرح على مرحلتين.<br>أولًا <b>٤٠</b>، ثم <b>٧</b>.',x:nline(30,90,[[43,83]])},
+   {t:'<b>٨٣ − ٤٠ = ٤٣</b>',x:'<div class="dmbig">٤٣</div>'},
+   {t:'<b>٤٣ − ٧ = ٣٦</b> ✔',x:'<div class="dmbig">٣٦</div>'}
+  ];
+}
+function OLDdemoFrames(sk){
   if(sk===1)return [
    {t:'عندنا ٨ كرات، ونريد أن نضيف إليها ٥.',v:cells(8,10)+'<div class="dmlbl">٨</div>'+cells(5,5)+'<div class="dmlbl">٥</div>'},
    {t:'كم ينقص الثمانية لتصير عشرة؟ ينقصها <b>٢</b> — انظر إلى الخانتين الفارغتين.',v:cells(8,10,0,1)+'<div class="dmlbl">٨ وينقصها ٢</div>'},
@@ -1052,37 +1160,45 @@ function fndRun(id,list,i,miss){
   for(var j2=0;j2<bs2.length;j2++)bs2[j2].onclick=function(){finish(parseInt(this.getAttribute('data-v'),10));};
 }
 function stAt(id){for(var i=0;i<CAMP.length;i++)if(CAMP[i].id===id)return CAMP[i];return CAMP[0];}
-function showTeach(id,si,fi){
-  var st=stAt(id);si=si||0;fi=fi||0;
-  var sk=st.sk[si],T=TEAM[sk],fr=demoFrames(sk),f=fr[fi],last=(fi>=fr.length-1),lastSkill=(si>=st.sk.length-1);
+function showTeach(id,si,fi,v,ask){
+  var st=stAt(id);si=si||0;fi=fi||0;v=v||0;
+  var sk=st.sk[si],T=TEAM[sk],fr=demoFrames(sk,v),f=fr[fi],last=(fi>=fr.length-1),lastSkill=(si>=st.sk.length-1);
   BACK=showCamp;
   var dots='';
   for(var d=0;d<fr.length;d++)dots+='<div class="dmdot'+(d<=fi?' on':'')+'"></div>';
   var h=topBar(1)+'<div class="screen active">'
    +'<div class="card" style="text-align:center;padding:10px"><div style="font-size:.82rem;font-weight:800;color:#0c6397">🎓 الشرح — '+st.n+(st.sk.length>1?(' ('+ar(si+1)+' من '+ar(st.sk.length)+')'):'')+'</div>'
-   +'<div style="font-size:1.05rem;font-weight:800;color:#0a3d62;margin-top:3px">'+T.e+' '+T.sk+'</div>'
-   +'<div style="font-size:.8rem;color:#57606f;font-weight:700;margin-top:2px">'+T.tip+'</div></div>'
+   +'<div style="font-size:1.05rem;font-weight:800;color:#0a3d62;margin-top:3px">'+T.e+' '+T.sk+' — '+T.ex+'</div>'
+   +'<div style="font-size:.8rem;color:#57606f;font-weight:700;margin-top:2px">'+T.tip+'</div>'
+   +(v?'<div style="font-size:.74rem;color:#b9770e;font-weight:800;margin-top:3px">🔁 شرح بأسلوب آخر</div>':'')+'</div>'
    +'<div class="card dmwrap idfade"><div class="dmdots">'+dots+'</div>'
-   +'<div>'+f.v+'</div>'
-   +'<div class="dmtxt">'+f.t+'</div></div>'
-   +'<div class="btnrow">'
-   +(last
-     ? (lastSkill
-        ? '<button class="btn main" id="tgo">🏃 إلى التدريب</button>'
-        : '<button class="btn main" id="tnext">المهارة التالية ⟵</button>')
-     : '<button class="btn main" id="tnext">التالي ⟵</button>')
-   +(fi>0?'<button class="btn sec" id="tprev">⟵ أعد الخطوة</button>':'<button class="btn sec" id="tagain">🔁 من الأول</button>')
-   +'</div>'
-   +(fi>0?'<button class="btn sec" id="tagain" style="margin-bottom:8px">🔁 أعد الشرح من أوله</button>':'')
-   +'<button class="backb" id="tbk">⟶ السابق</button></div>'+navBar('');
+   +'<div>'+f.x+'</div><div class="dmtxt">'+f.t+'</div></div>';
+  if(ask){
+    h+='<div class="card" style="border:3px solid #f6b93b;background:#fffdf5;text-align:center">'
+     +'<h3 style="margin:0 0 8px">🤔 هل فهمت الطريقة؟</h3>'
+     +'<div class="btnrow"><button class="btn main" id="yes">✅ نعم، فهمت</button>'
+     +'<button class="btn sec" id="no">🔁 أعد لي بأسلوب آخر</button></div></div>';
+  } else {
+    h+='<div class="btnrow">'
+     +'<button class="btn main" id="tnext">'+(last?'🤔 هل فهمت؟':'التالي ⟵')+'</button>'
+     +(fi>0?'<button class="btn sec" id="tprev">⟵ أعد الخطوة</button>':'<button class="btn sec" id="tagain">🔁 من الأول</button>')
+     +'</div>';
+  }
+  h+='<button class="backb" id="tbk">⟶ السابق</button></div>'+navBar('');
   document.getElementById('app').innerHTML=h;bindNav();
   if(document.getElementById('tnext'))document.getElementById('tnext').onclick=function(){
     ac();tone(760,0,.09,'sine',.16);
-    if(last)showTeach(id,si+1,0);else showTeach(id,si,fi+1);
+    if(last)showTeach(id,si,fi,v,1);else showTeach(id,si,fi+1,v,0);
   };
-  if(document.getElementById('tprev'))document.getElementById('tprev').onclick=function(){ac();showTeach(id,si,fi-1);};
-  document.getElementById('tagain').onclick=function(){ac();showTeach(id,0,0);};
-  if(document.getElementById('tgo'))document.getElementById('tgo').onclick=function(){ac();sGoal();startDrill(id,0,buildDrill(st),0);};
+  if(document.getElementById('tprev'))document.getElementById('tprev').onclick=function(){ac();showTeach(id,si,fi-1,v,0);};
+  if(document.getElementById('tagain'))document.getElementById('tagain').onclick=function(){ac();showTeach(id,si,0,v,0);};
+  if(document.getElementById('yes'))document.getElementById('yes').onclick=function(){
+    ac();sGoal();
+    if(lastSkill)startDrill(id,0,buildDrill(st),0);else showTeach(id,si+1,0,0,0);
+  };
+  if(document.getElementById('no'))document.getElementById('no').onclick=function(){
+    ac();showTeach(id,si,0,v?0:1,0);
+  };
   document.getElementById('tbk').onclick=function(){ac();showCamp();};
 }
 function startDrill(id,i,list,right){
