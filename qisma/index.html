@@ -43,9 +43,29 @@ body{background:linear-gradient(180deg,var(--ocean-dark) 0%,var(--ocean-mid) 50%
 .idl4{font-size:1rem;font-weight:600;line-height:2.1;opacity:.95}
 .idfade{animation:idIn .7s ease both}
 .netwrap{display:flex;justify-content:center;margin:2px 0 8px}
-.dvslot{display:flex;justify-content:flex-end;margin:0 0 8px}
+.top-bar.slim{padding-bottom:4px}
+.top-bar.slim .trow{margin-bottom:2px}
+.top-bar.slim .backb{padding:6px;font-size:.82rem;margin:2px 0 0}
+.qgrid{display:grid;gap:8px;grid-template-columns:1fr;grid-template-areas:'score' 'main'}
+.qgrid.fbon{grid-template-columns:1fr 47%;grid-template-areas:'score side' 'main main'}
+.ga-score{grid-area:score;min-width:0}
+.ga-side{grid-area:side;min-width:0;display:none}
+.qgrid.fbon .ga-side{display:block}
+.ga-main{grid-area:main;min-width:0}
+.ga-side .fb{padding:8px 6px;margin:0 0 6px;border-radius:12px}
+.ga-side .fb h4{font-size:.95rem;margin:2px 0}
+.ga-side .fb p{font-size:.76rem;line-height:1.6;margin:0}
+.ga-side .netwrap svg{width:100%;height:auto}
+@media(min-width:760px){
+ .app:has(.qgrid){max-width:1000px}
+ .qgrid,.qgrid.fbon{grid-template-columns:25% 1fr 27%;grid-template-areas:'score main side';gap:14px}
+ .qgrid .ga-side{display:block;visibility:hidden}
+ .qgrid.fbon .ga-side{visibility:visible}
+ .ga-side .fb p{font-size:.9rem}
+}
+.dvslot{display:flex;justify-content:flex-end;margin:0}
 .dvslot:empty{display:none}
-.dvb{background:#fff;border-radius:12px;padding:8px 6px;margin:0;width:100%;max-width:196px;box-shadow:0 4px 14px rgba(0,0,0,.18);animation:idIn .4s ease both}
+.dvb{background:#fff;border-radius:12px;padding:8px 6px;margin:0;width:100%;box-shadow:0 4px 14px rgba(0,0,0,.18);animation:idIn .4s ease both}
 @media(min-width:680px){.dvb{max-width:300px;padding:10px 8px}}
 .dvt{text-align:center;font-size:.76rem;color:#0a3d62;font-weight:700;margin-bottom:4px;line-height:1.5}
 .dvb2{text-align:center;font-size:.92rem;font-weight:800;color:#0b6a38;margin-top:4px}
@@ -421,13 +441,13 @@ function dots(a,b,c){var w=Math.min(b,10),s='',cl=15,p=4,W=w*cl+p*2,H=a*cl+p*2;f
 
 /* ===== الواجهة ===== */
 var BACK=null;
-function topBar(){
-  return '<header class="top-bar"><div class="trow">'
+function topBar(slim){
+  return '<header class="top-bar'+(slim?' slim':'')+'"><div class="trow">'
    +'<div style="width:44px">'+shirt(44,kit(),player.num,'')+'</div>'
    +'<div style="flex:1"><div class="tname">'+player.name+' — '+player.team+'</div>'
    +'<div class="tsmall">رقم '+player.num+' — قميص '+kit().n+' — '+lvl().e+' '+lvl().n+'</div></div>'
    +'<div class="credit" id="cred">'+sch()+'<br>'+aut()+(player.teacher?'<br><span style="color:#f6b93b">وضع المعلم مفعّل</span>':'')+'</div></div>'
-   +'<div class="stats"><div>⭐ '+allStars()+'/'+(TABLES.length*3)+'</div><div>🏆 '+wins()+'/'+TABLES.length+'</div><div>🧤 '+allGold()+'/45</div></div>'
+   +(slim?'':'<div class="stats"><div>⭐ '+allStars()+'/'+(TABLES.length*3)+'</div><div>🏆 '+wins()+'/'+TABLES.length+'</div><div>🧤 '+allGold()+'/45</div></div>')
    +(BACK?'<button class="backb" id="bkb">⟶ السابق</button>':'')+'</header>';
 }
 function navBar(active){
@@ -1034,14 +1054,16 @@ function showQ(){
   var c=qs[idx],T=TEAM[team];
   var f=faceOf(c);c._a=f.ans;
   var o=optsFor(f.ans,f.st);
-  var h=topBar()+'<div class="screen active">'+board(T)
+  var h=topBar(1)+'<div class="screen active"><div class="qgrid" id="qgrid">'
+   +'<div class="ga-score">'+board(T)+'</div>'
+   +'<div class="ga-side" id="qside"><div id="fb"></div><div class="dvslot" id="dvslot"></div></div>'
+   +'<div class="ga-main">'
    +'<div class="timer-wrap"><div class="timer-bar" id="tb"></div></div>'
-   +'<div class="dvslot" id="dvslot"></div>'
    +(c.rev?'<div style="text-align:center;margin-bottom:10px"><span class="pill" style="background:var(--gold);color:#2b1b00">⚡ كرة ثابتة — مراجعة جدول '+ar(c.rev)+'</span></div>':'')
    +'<div class="qbox" id="qb"><div class="qtext">'+f.h+'</div></div>'
    +'<div class="opts">';
   o.forEach(function(v){h+='<button class="opt" data-v="'+v+'">'+ar(v)+'</button>';});
-  h+='</div><div id="fb"></div><div id="coach"></div><div id="coachwrap"></div><div id="nx"></div></div>'+navBar('');
+  h+='</div><div id="coach"></div><div id="coachwrap"></div><div id="nx"></div></div></div></div>'+navBar('');
   document.getElementById('app').innerHTML=h;
   var bs=document.querySelectorAll('.opt');
   for(var i=0;i<bs.length;i++)bs[i].onclick=function(){answer(parseInt(this.getAttribute('data-v'),10),this);};
@@ -1109,6 +1131,7 @@ function answer(v,el){
   }
   var mn=document.getElementById('meN'),on=document.getElementById('opN');
   if(mn)mn.textContent=me; if(on)on.textContent=op;
+  var qg=document.getElementById('qgrid');if(qg)qg.className='qgrid fbon';
   var slot=document.getElementById('dvslot');
   if(slot)slot.innerHTML=ok?divBoard(c.a*c.b,c._p||c.a,c._e||c.b,c.t==='b'):'';
   fb.innerHTML='<div class="fb" style="background:'+bg+'">'+(scored?goalNet():'')+'<h4 style="color:'+col+'">'+head+'</h4><p style="color:'+col+'">'+line+'</p></div>';
