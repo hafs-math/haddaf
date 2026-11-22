@@ -284,6 +284,7 @@ function fndCount(f){var q=fnd(f.id),c=0,L=fndFacts(f);for(var i=0;i<L.length;i+
 function fndOK(f){return fndCount(f)>=fndFacts(f).length;}
 function fndAllOK(){if(player.teacher)return true;for(var i=0;i<FND.length;i++)if(!fndOK(FND[i]))return false;return true;}
 function fndOpen(i){if(player.teacher)return true;if(i===0)return true;return fndOK(FND[i-1]);}
+function campOpen(i){if(player.teacher)return true;if(!fndAllOK())return false;if(i===0)return true;return !!camp(CAMP[i-1].id).won;}
 var CAMP=[
  {id:1,sk:[1,2],n:'محطة الجمع — أوراق وقطع',e:'💵'},
  {id:2,sk:[3],n:'محطة العبور',e:'🔁'},
@@ -890,11 +891,11 @@ function showCamp(){
   });
   h+='<div class="card" style="padding:9px;text-align:center;background:'+(fndAllOK()?'#eafaf1':'#f1f2f6')+'"><h3 style="margin:0">'+(fndAllOK()?'٢) قسم المهارات':'🔒 ٢) قسم المهارات — أتمّ الحفظ أولًا')+'</h3>'
    +'<p style="font-size:.8rem;color:#57606f;font-weight:700;margin:3px 0 0">أربع محطات، كل فوز ٣ نقاط، وتحتاج ٩ من ١٢</p></div>';
-  CAMP.forEach(function(st){
-    var c=camp(st.id),names=st.sk.map(function(k){return TEAM[k].sk;}).join(' و'),o=fndAllOK();
+  CAMP.forEach(function(st,ci){
+    var c=camp(st.id),names=st.sk.map(function(k){return TEAM[k].sk;}).join(' و'),o=campOpen(ci);
     h+='<div class="mrow'+(o?'':' lock')+'" data-c="'+st.id+'" style="border-right-color:'+(c.won?'#2ecc71':(o?'#f6b93b':'#747d8c'))+'">'
      +'<div class="mleft"><div class="memo">'+(c.won?'✅':(o?st.e:'🔒'))+'</div><div class="minfo"><h4>'+st.n+'</h4>'
-     +'<p>'+names+'<br>'+(!o?'🔒 أتمّ قسم الحفظ أولًا':(c.won?('نجحت — ٣ نقاط'+(c.best?(' — أفضل نتيجة '+ar(c.best.me)+' أهداف'):'')):'عشر كرات — تحتاج ٦ أهداف'))+'</p></div></div>'
+     +'<p>'+names+'<br>'+(!o?(!fndAllOK()?'🔒 أتمّ قسم الحفظ أولًا':'🔒 تُفتح بعد نجاحك في المحطة السابقة'):(c.won?('نجحت — ٣ نقاط'+(c.best?(' — أفضل نتيجة '+ar(c.best.me)+' أهداف'):'')):'عشر كرات — تحتاج ٦ أهداف'))+'</p></div></div>'
      +'<div style="text-align:left"><span class="pill" style="background:'+(c.won?'#2ecc71':'#f6b93b')+';color:#2b1b00">'+(c.won?'٣':'٠')+' نقاط</span></div></div>';
   });
   h+='</div>'+navBar('');
@@ -904,8 +905,10 @@ function showCamp(){
   for(var i=0;i<rs.length;i++)rs[i].onclick=function(){
     var fid=this.getAttribute('data-f');
     if(fid){if(!fndOpen(fIdx(fid))){sSave();return;}ac();showFnd(fid);return;}
-    if(!fndAllOK()){sSave();return;}
-    ac();showTeach(parseInt(this.getAttribute('data-c'),10),0,0,0,0);
+    var cid=parseInt(this.getAttribute('data-c'),10),ci=0;
+    for(var z=0;z<CAMP.length;z++)if(CAMP[z].id===cid)ci=z;
+    if(!campOpen(ci)){sSave();return;}
+    ac();showTeach(cid,0,0,0,0);
   };
 }
 function cells(on,total,mv,gap){
@@ -1712,11 +1715,15 @@ function campResult(){
    +(campDone()?'<p style="font-size:.95rem;font-weight:800;color:#0b6a38">✅ بلغت '+ar(CAMP_NEED)+' نقاط — فُتحت لك البطولات</p>'
      :'<p style="font-size:.86rem;font-weight:700;color:#57606f">تحتاج '+ar(CAMP_NEED)+' نقاط لتفتح البطولات</p>')
    +'</div>'
+   +(won&&campMode<CAMP.length?'<button class="btn gold" id="cnextst">المحطة التالية ⟵</button>':'')
    +'<button class="btn main" id="cagain">🔁 أعد هذه المحطة</button>'
    +(campDone()?'<button class="btn gold" id="cgo">🏆 إلى البطولات</button>':'')
    +'<button class="btn sec" id="cback">🏕️ محطات المعسكر</button>'
    +'<button class="backb" id="cbk">⟶ السابق</button></div>'+navBar('');
   document.getElementById('app').innerHTML=h;bindNav();
+  if(document.getElementById('cnextst'))document.getElementById('cnextst').onclick=function(){
+    ac();var nx=campMode+1;campMode=0;showTeach(nx,0,0,0,0);
+  };
   document.getElementById('cagain').onclick=function(){ac();var id=campMode;campMode=0;startDrill(id,0,buildDrill(stAt(id)),0);};
   document.getElementById('cback').onclick=function(){ac();campMode=0;showCamp();};
   document.getElementById('cbk').onclick=function(){ac();campMode=0;showCamp();};
