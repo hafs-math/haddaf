@@ -77,7 +77,7 @@ body{background:linear-gradient(180deg,var(--ocean-dark) 0%,var(--ocean-mid) 50%
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
 .dmwrap{text-align:center}
 .dmtxt{font-size:.95rem;font-weight:800;color:#0a3d62;line-height:1.9;margin:8px 0}
-.dmbig{font-size:1.5rem;font-weight:800;color:#0a3d62;margin:6px 0;direction:ltr}
+.dmbig{font-size:1.5rem;font-weight:800;color:#0a3d62;margin:6px 0}
 .dmlbl{font-size:.74rem;font-weight:800;color:#57606f;margin-bottom:2px}
 .dmdots{display:flex;justify-content:center;gap:6px;margin:8px 0}
 .dmdot{width:9px;height:9px;border-radius:50%;background:#cfd8e3}
@@ -199,13 +199,13 @@ function aut(){return (player.author!==undefined&&player.author!==null)?player.a
 var TABLES=[1,2,3,4,5,6,7];
 var GOLD=18,WIN_PCT=95;
 var LEVELS={
- easy:{n:'مبتدئ',e:'🟢',ball:14,sec:8,max:7,R:20,d:'١٤ ثانية للكرة — هدف إذا أجبت خلال ٨ ثوانٍ<br>الأعداد ضمن ٢٠'},
- mid:{n:'متوسط',e:'🟡',ball:12,sec:7,max:7,R:50,d:'١٢ ثانية للكرة — هدف إذا أجبت خلال ٧ ثوانٍ<br>الأعداد ضمن ٥٠'},
- pro:{n:'محترف',e:'🔴',ball:10,sec:6,max:7,R:100,d:'١٠ ثوانٍ للكرة — هدف إذا أجبت خلال ٦ ثوانٍ<br>الأعداد ضمن ١٠٠ بالحمل والاستلاف'}
+ easy:{n:'مبتدئ',e:'🟢',ball:8,sec:4,max:7,R:20,d:'٨ ثوانٍ للكرة — هدف إذا أجبت خلال ٤ ثوانٍ<br>الأعداد ضمن ٢٠'},
+ mid:{n:'متوسط',e:'🟡',ball:8,sec:4,max:7,R:50,d:'٨ ثوانٍ للكرة — هدف إذا أجبت خلال ٤ ثوانٍ<br>الأعداد ضمن ٥٠'},
+ pro:{n:'محترف',e:'🔴',ball:8,sec:4,max:7,R:100,d:'٨ ثوانٍ للكرة — هدف إذا أجبت خلال ٤ ثوانٍ<br>الأعداد ضمن ١٠٠ بالحمل والاستلاف'}
 };
 function lvl(){return LEVELS[player.level]||LEVELS.easy;}
 function rng(){return lvl().R;}
-var CUPT={ball:12,sec:7};
+var CUPT={ball:8,sec:4};
 var CUPWIN=6;
 function tim(){return penMode?CUPT:lvl();}
 function needLevel(n){return '';}
@@ -794,14 +794,16 @@ function rulesCards(){
    +'• لا ينتقل إلى المباراة التالية إلا من فاز.<br>'
    +'• <b>النجوم:</b> ⭐⭐⭐ إذا لم يسجّل عليك الخصم وسجّلت ١٢ فأكثر، ⭐⭐ إذا حقّقت واحدة منهما، ⭐ للفوز العادي.<br>'
    +'• <b>الكأس:</b> عشر ركلات أمام كل حارس، وتهزمه بـ<b>٦ أهداف فأكثر</b>.<br>'
-   +'• في الكأس الزمن ثابت للجميع: <b>١٢ ثانية للركلة، والهدف خلال ٧ ثوانٍ</b>.<br>'
+   +'• الزمن واحد في كل البطولات: <b>٨ ثوانٍ للكرة، والهدف خلال ٤ ثوانٍ</b>.<br>'
    +'• الإجابة الصحيحة المتأخرة <b>لا تُحسب هدفًا ولا تُفقدك شيئًا</b>، والخطأ يعطي الحارس <b>هدفًا واحدًا</b>.<br>'
    +'• ولا تفتح أمامك مرمى حارس حتى تهزم الذي قبله.</p></div>'
-   +'<div class="card"><h3>🎚️ مستواك يحدّد سرعتك ومدى الأعداد</h3>'
+   +'<div class="card"><h3>🎚️ الزمن واحد، والمستوى يحدّد مدى الأعداد</h3>'
    +'<p style="font-size:.88rem;font-weight:700;line-height:2;color:#2f3542">'
-   +'🟢 مبتدئ: ١٤ ثانية للكرة، والهدف خلال ٨ — الأعداد ضمن ٢٠.<br>'
-   +'🟡 متوسط: ١٢ ثانية، والهدف خلال ٧ — الأعداد ضمن ٥٠.<br>'
-   +'🔴 محترف: ١٠ ثوانٍ، والهدف خلال ٦ — الأعداد ضمن ١٠٠ بالحمل والاستلاف.</p></div>';
+   +'الزمن واحد للجميع: <b>٨ ثوانٍ للكرة، والهدف خلال ٤ ثوانٍ</b>، وما زاد على الأربع فهو تصدٍّ لا يسجّل ولا يُفقدك شيئًا، وانتهاء الوقت هدف في مرماك.<br>'
+   +'والمستوى يحدّد <b>مدى الأعداد</b> فقط:<br>'
+   +'🟢 مبتدئ: الأعداد ضمن ٢٠.<br>'
+   +'🟡 متوسط: ضمن ٥٠.<br>'
+   +'🔴 محترف: ضمن ١٠٠ بالحمل والاستلاف.</p></div>';
 }
 function showCamp(){
   BACK=showPick;
@@ -839,13 +841,13 @@ function nline(from,to,jumps){
   for(var v=from;v<=to;v++){
     var big=(v%5===0);
     h+='<line x1="'+x(v)+'" y1="'+(big?44:48)+'" x2="'+x(v)+'" y2="56" stroke="#0a3d62" stroke-width="'+(big?2:1)+'"/>';
-    if(big)h+='<text x="'+x(v)+'" y="70" text-anchor="middle" font-size="10" fill="#0a3d62" font-weight="700">'+v+'</text>';
+    if(big)h+='<text x="'+x(v)+'" y="70" text-anchor="middle" font-size="11" fill="#0a3d62" font-weight="700">'+ar(v)+'</text>';
   }
   (jumps||[]).forEach(function(j){
     var x1=x(j[0]),x2=x(j[1]),mid=(x1+x2)/2;
     h+='<path d="M'+x1+' 48 Q'+mid+' 14 '+x2+' 48" fill="none" stroke="#2ecc71" stroke-width="3"/>'
      +'<circle cx="'+x2+'" cy="48" r="4" fill="#2ecc71"/>'
-     +'<text x="'+mid+'" y="18" text-anchor="middle" font-size="12" fill="#0b6a38" font-weight="800">+'+(j[1]-j[0])+'</text>';
+     +'<text x="'+mid+'" y="18" text-anchor="middle" font-size="13" fill="#0b6a38" font-weight="800">+'+ar(j[1]-j[0])+'</text>';
   });
   return h+'</svg>';
 }
@@ -861,38 +863,38 @@ function demoFrames(sk){
    {t:'عندنا ٨ كرات، ونريد أن نضيف إليها ٥.',v:cells(8,10)+'<div class="dmlbl">٨</div>'+cells(5,5)+'<div class="dmlbl">٥</div>'},
    {t:'كم ينقص الثمانية لتصير عشرة؟ ينقصها <b>٢</b> — انظر إلى الخانتين الفارغتين.',v:cells(8,10,0,1)+'<div class="dmlbl">٨ وينقصها ٢</div>'},
    {t:'خذ <b>٢</b> من الخمسة وضعها في الفارغ.',v:cells(8,10,2)+'<div class="dmlbl">صارت ١٠</div>'+cells(3,5)+'<div class="dmlbl">وبقي ٣</div>'},
-   {t:'والعشرة سهلة: <b>١٠ + ٣ = ١٣</b>',v:'<div class="dmbig">10 + 3 = 13</div>'+cells(10,10)+cells(3,5)},
-   {t:'إذن <b>٨ + ٥ = ١٣</b> ✔',v:'<div class="dmbig">8 + 5 = 13</div>'}
+   {t:'والعشرة سهلة: <b>١٠ + ٣ = ١٣</b>',v:'<div class="dmbig">١٠ + ٣ = ١٣</div>'+cells(10,10)+cells(3,5)},
+   {t:'إذن <b>٨ + ٥ = ١٣</b> ✔',v:'<div class="dmbig">٨ + ٥ = ١٣</div>'}
   ];
   if(sk===2)return [
    {t:'المطلوب: <b>٧ + ٨</b>',v:cells(7,7)+'<div class="dmlbl">٧</div>'+cells(8,8)+'<div class="dmlbl">٨</div>'},
    {t:'لاحظ أن <b>٨ = ٧ + ١</b>، فالعددان توأمان وزيادة واحد.',v:cells(7,7)+'<div class="dmlbl">٧</div>'+cells(7,7,1)+'<div class="dmlbl">٧ + ١</div>'},
-   {t:'والضِعف محفوظ: <b>٧ + ٧ = ١٤</b>',v:'<div class="dmbig">7 + 7 = 14</div>'},
-   {t:'ثم أضف الواحد الزائد: <b>١٤ + ١ = ١٥</b> ✔',v:'<div class="dmbig">14 + 1 = 15</div>'}
+   {t:'والضِعف محفوظ: <b>٧ + ٧ = ١٤</b>',v:'<div class="dmbig">٧ + ٧ = ١٤</div>'},
+   {t:'ثم أضف الواحد الزائد: <b>١٤ + ١ = ١٥</b> ✔',v:'<div class="dmbig">١٤ + ١ = ١٥</div>'}
   ];
   if(sk===3)return [
-   {t:'المطلوب: <b>٣٦ + ٢٧</b>',v:'<div class="dmbig">36 + 27</div>'},
-   {t:'فكّك <b>٢٧</b> إلى <b>٢٠</b> و <b>٧</b>.',v:'<div class="dmbig">27 = 20 + 7</div>'},
+   {t:'المطلوب: <b>٣٦ + ٢٧</b>',v:'<div class="dmbig">٣٦ + ٢٧</div>'},
+   {t:'فكّك <b>٢٧</b> إلى <b>٢٠</b> و <b>٧</b>.',v:'<div class="dmbig">٢٧ = ٢٠ + ٧</div>'},
    {t:'أضف العشرات أولًا: <b>٣٦ + ٢٠ = ٥٦</b>',v:nline(30,70,[[36,56]])},
    {t:'ثم الآحاد: <b>٥٦ + ٧ = ٦٣</b> ✔',v:nline(30,70,[[36,56],[56,63]])}
   ];
   if(sk===4)return [
-   {t:'المطلوب: <b>٤٨ + ٩</b>',v:'<div class="dmbig">48 + 9</div>'},
+   {t:'المطلوب: <b>٤٨ + ٩</b>',v:'<div class="dmbig">٤٨ + ٩</div>'},
    {t:'والتسعة قريبة من العشرة… فلنأخذ <b>١٠</b> لأنها أسهل.',v:cells(9,10,0,1)+'<div class="dmlbl">٩ وينقصها ١ لتصير ١٠</div>'},
    {t:'<b>٤٨ + ١٠ = ٥٨</b>',v:nline(40,65,[[48,58]])},
-   {t:'لكننا زدنا واحدًا زيادة، فنرجعه: <b>٥٨ − ١ = ٥٧</b> ✔',v:'<div class="dmbig">58 − 1 = 57</div>'}
+   {t:'لكننا زدنا واحدًا زيادة، فنرجعه: <b>٥٨ − ١ = ٥٧</b> ✔',v:'<div class="dmbig">٥٨ − ١ = ٥٧</div>'}
   ];
   if(sk===5)return [
    {t:'المطلوب: <b>٦٣ − ٥٨</b> — والعددان متقاربان، فلا تطرح، بل اصعد.',v:nline(55,65,[])},
    {t:'اصعد من <b>٥٨</b> إلى <b>٦٠</b>: قفزة مقدارها <b>٢</b>.',v:nline(55,65,[[58,60]])},
    {t:'ثم من <b>٦٠</b> إلى <b>٦٣</b>: قفزة مقدارها <b>٣</b>.',v:nline(55,65,[[58,60],[60,63]])},
-   {t:'اجمع القفزتين: <b>٢ + ٣ = ٥</b> ✔',v:'<div class="dmbig">63 − 58 = 5</div>'}
+   {t:'اجمع القفزتين: <b>٢ + ٣ = ٥</b> ✔',v:'<div class="dmbig">٦٣ − ٥٨ = ٥</div>'}
   ];
   return [
    {t:'المطلوب: <b>٨٣ − ٤٧</b> — والفرق بينهما هو ما نريد.',v:bars(83,47,100)},
    {t:'لو زدنا العددين معًا بالمقدار نفسه، بقي الفرق كما هو.',v:bars(83,47,100)+'<div class="dmlbl">الفرق لا يتغيّر</div>'},
    {t:'زِد <b>٣</b> على كلّ منهما: <b>٨٦</b> و <b>٥٠</b>.',v:bars(86,50,100,'','#2ecc71')},
-   {t:'والطرح من الخمسين سهل: <b>٨٦ − ٥٠ = ٣٦</b> ✔',v:'<div class="dmbig">86 − 50 = 36</div>'}
+   {t:'والطرح من الخمسين سهل: <b>٨٦ − ٥٠ = ٣٦</b> ✔',v:'<div class="dmbig">٨٦ − ٥٠ = ٣٦</div>'}
   ];
 }
 function stAt(id){for(var i=0;i<CAMP.length;i++)if(CAMP[i].id===id)return CAMP[i];return CAMP[0];}
