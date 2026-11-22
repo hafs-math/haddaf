@@ -259,6 +259,23 @@ var TEAM={
 6:{n:'فريق الميزان',e:'⚖️',c:'#c0397c',k:'حارس الميزان',tip:'زِد العددين معًا فيبقى الفرق كما هو',sk:'ثبات الفرق',ex:'٨٣ − ٤٧ ← ٨٦ − ٥٠ = ٣٦',rev:[]},
 7:{n:'منتخب الأبطال',e:'🏆',c:'#0a3d62',k:'الحارس الأسطوري',tip:'كل المهارات الستّ معًا',sk:'الختام — كل المهارات',ex:'مسائل من المهارات الستّ مخلوطة',rev:[]}
 };
+var FND=[
+ {id:'f10',n:'مكملات العشرة',e:'🔟',s:10,typ:'c',d:'كم يُكمل هذا العدد إلى عشرة؟'},
+ {id:'f20',n:'مكملات العشرين',e:'🧮',s:20,typ:'c',d:'كم يُكمل هذا العدد إلى عشرين؟'},
+ {id:'dbl',n:'الأعداد المتشابهة',e:'👯',s:0,typ:'d',d:'العدد مع نفسه: ٢+٢، ٣+٣ … ١٠+١٠'}
+];
+function fndFacts(f){
+  var o=[],i;
+  if(f.id==='f10'){for(i=1;i<=9;i++)o.push([i,10-i]);}
+  else if(f.id==='f20'){for(i=11;i<=19;i++)o.push([i,20-i]);}
+  else {for(i=2;i<=10;i++)o.push([i,i]);}
+  return o;
+}
+function fnd(id){if(!fnds[id])fnds[id]={done:0,m:{}};return fnds[id];}
+function fndCount(f){var q=fnd(f.id),c=0,L=fndFacts(f);for(var i=0;i<L.length;i++)if(q.m[L[i][0]])c++;return c;}
+function fndOK(f){return fndCount(f)>=fndFacts(f).length;}
+function fndAllOK(){if(player.teacher)return true;for(var i=0;i<FND.length;i++)if(!fndOK(FND[i]))return false;return true;}
+function fndOpen(i){if(player.teacher)return true;if(i===0)return true;return fndOK(FND[i-1]);}
 var CAMP=[
  {id:1,sk:[1],n:'محطة العشرة',e:'🔟'},
  {id:2,sk:[2],n:'محطة التوأم',e:'👯'},
@@ -268,13 +285,13 @@ var CAMP=[
 var CAMP_WIN=6, CAMP_PTS=3, CAMP_NEED=9;
 
 var player={name:'',team:'',num:10,kit:'blue',pat:'p0',pc:'w',teacher:false,level:'easy'};
-var cards={},prog={},cup={},cmp={},muted=false;
+var cards={},prog={},cup={},cmp={},fnds={},muted=false;
 var campMode=0;
 
 function cell(sk){var k='s'+sk;if(!cards[k])cards[k]={level:0,best:0};return cards[k];}
 function camp(id){if(!cmp[id])cmp[id]={won:0,best:null,taught:0};return cmp[id];}
 function campPts(){var t=0;for(var i=0;i<CAMP.length;i++)if(camp(CAMP[i].id).won)t+=CAMP_PTS;return t;}
-function campDone(){return player.teacher||campPts()>=CAMP_NEED;}
+function campDone(){return player.teacher||(fndAllOK()&&campPts()>=CAMP_NEED);}
 function pr(n){if(!prog[n])prog[n]={won:0,stars:0,best:null};return prog[n];}
 function cp(n){if(!cup[n])cup[n]={won:0,best:null};return cup[n];}
 function cupOpen(n){if(player.teacher)return true;if(!campDone())return false;if(n===1)return true;return !!cp(TABLES[TABLES.indexOf(n)-1]).won;}
@@ -287,9 +304,10 @@ var STORE_OK=true;
 function rawState(){
   var cs=TABLES.map(function(n){return Math.min(GOLD,cell(n).level);}).join('.');
   var cmps=CAMP.map(function(x){var q=camp(x.id);return (q.won?1:0)+','+((q.best&&q.best.me)||0);}).join(';');
+  var fs=FND.map(function(f){var L=fndFacts(f),t='';for(var i=0;i<L.length;i++)t+=(fnd(f.id).m[L[i][0]]?'1':'0');return t;}).join(';');
   var ps=TABLES.map(function(n){var q=pr(n);return (q.won?1:0)+','+(q.stars||0)+','+((q.best&&q.best.me)||0)+','+((q.best&&q.best.op)||0);}).join(';');
   var ks=TABLES.map(function(n){var q=cp(n);return (q.won?1:0)+','+((q.best&&q.best.me)||0)+','+((q.best&&q.best.op)||0);}).join(';');
-  return [player.name||'',player.team||'',player.num||10,player.kit||'blue',player.level||'easy',player.goals||0,cs,ps,ks,(player.pat||'p0')+'.'+(player.pc||'w'),cmps].join('~');
+  return [player.name||'',player.team||'',player.num||10,player.kit||'blue',player.level||'easy',player.goals||0,cs,ps,ks,(player.pat||'p0')+'.'+(player.pc||'w'),cmps,fs].join('~');
 }
 function b64e(str){
   try{return btoa(unescape(encodeURIComponent(str))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}catch(e){return '';}
@@ -327,6 +345,12 @@ function decState(code){
       if(!CAMP[i])return;var v=x.split(',');
       cmp[CAMP[i].id]={won:+v[0]||0,best:(+v[1]?{me:+v[1],op:0}:null),taught:0};
     });
+    fnds={};
+    (a[11]||'').split(';').forEach(function(x,i){
+      if(!FND[i])return;var L=fndFacts(FND[i]),o={done:0,m:{}};
+      for(var z=0;z<L.length;z++)if(x.charAt(z)==='1')o.m[L[z][0]]=1;
+      o.done=(x.indexOf('0')<0)?1:0;fnds[FND[i].id]=o;
+    });
     prog={};
     (a[7]||'').split(';').forEach(function(x,i){
       if(!TABLES[i])return;var v=x.split(',');
@@ -342,7 +366,7 @@ function decState(code){
 }
 function save(){
   var code=encState();
-  try{localStorage.setItem('haddafH',JSON.stringify({p:player,c:cards,g:prog,k:cup,cm:cmp,m:muted}));STORE_OK=true;}catch(e){STORE_OK=false;}
+  try{localStorage.setItem('haddafH',JSON.stringify({p:player,c:cards,g:prog,k:cup,cm:cmp,fn:fnds,m:muted}));STORE_OK=true;}catch(e){STORE_OK=false;}
   try{sessionStorage.setItem('haddafHc',code);}catch(e){}
   try{if(window.history&&history.replaceState)history.replaceState(null,'','#s='+code);}catch(e){}
 }
@@ -353,7 +377,7 @@ function load(){
     if(r){var d=JSON.parse(r);
       if(d&&d.p){player=d.p;if(!player.name)player.name='';if(!player.team)player.team='';
         if(!player.num)player.num=10;if(!player.kit)player.kit='blue';if(!player.level)player.level='easy';
-        cards=d.c||{};prog=d.g||{};cup=d.k||{};cmp=d.cm||{};muted=!!d.m;ok=!!player.name;}}
+        cards=d.c||{};prog=d.g||{};cup=d.k||{};cmp=d.cm||{};fnds=d.fn||{};muted=!!d.m;ok=!!player.name;}}
   }catch(e){STORE_OK=false;}
   if(!ok){try{var h=location.hash||'';if(h.indexOf('s=')>=0&&decState(h))ok=!!player.name;}catch(e){}}
   if(!ok){try{var sc=sessionStorage.getItem('haddafHc');if(sc&&decState(sc))ok=!!player.name;}catch(e){}}
@@ -810,19 +834,35 @@ function showCamp(){
   var h=topBar()+'<div class="screen active">'
    +'<div class="card" style="text-align:center;border:3px solid #f6b93b"><div style="font-size:2.4rem">🏕️</div>'
    +'<h3 style="font-size:1.2rem">المعسكر التدريبي</h3>'
-   +'<p style="font-size:.86rem;color:#57606f;font-weight:700;line-height:1.9">في كل محطة: شرح المهارة، ثم تدريب بلا وقت، ثم مباراة تجريبية من عشر كرات.<br>الفوز بستة أهداف فأكثر = ٣ نقاط.</p>'
-   +'<div style="margin-top:8px;font-size:1.1rem;font-weight:800;color:'+(campDone()?'#0b6a38':'#b9770e')+'">نقاطك: '+ar(campPts())+' من '+ar(CAMP.length*CAMP_PTS)+(campDone()?' ✅ فُتحت البطولات':' — تحتاج '+ar(CAMP_NEED))+'</div></div>';
+   +'<p style="font-size:.86rem;color:#57606f;font-weight:700;line-height:1.9">أولًا تحفظ الأساس: مكملات العشرة والعشرين والأعداد المتشابهة.<br>ثم محطات المهارات: شرح، فتدريب، فمباراة تجريبية.</p>'
+   +'<div style="margin-top:8px;font-size:1.1rem;font-weight:800;color:'+(campDone()?'#0b6a38':'#b9770e')+'">الحفظ: '+ar(FND.filter(function(f){return fndOK(f);}).length)+' من '+ar(FND.length)+' — النقاط: '+ar(campPts())+' من '+ar(CAMP.length*CAMP_PTS)+(campDone()?'<br>✅ فُتحت البطولات':'')+'</div></div>';
+  h+='<div class="card" style="padding:9px;text-align:center;background:#e8f4fb"><h3 style="margin:0">١) قسم الحفظ — الأساس</h3>'
+   +'<p style="font-size:.8rem;color:#57606f;font-weight:700;margin:3px 0 0">احفظ هذه الحقائق أولًا، فلا حساب ذهني بدونها</p></div>';
+  FND.forEach(function(f,fi){
+    var o=fndOpen(fi),c=fndCount(f),N=fndFacts(f).length,ok=fndOK(f);
+    h+='<div class="mrow'+(o?'':' lock')+'" data-f="'+f.id+'" style="border-right-color:'+(ok?'#2ecc71':(o?'#0c6397':'#747d8c'))+'">'
+     +'<div class="mleft"><div class="memo">'+(ok?'✅':(o?f.e:'🔒'))+'</div><div class="minfo"><h4>'+f.n+'</h4>'
+     +'<p>'+(o?(f.d+'<br>أتقنت '+ar(c)+' من '+ar(N)):'تُفتح بعد إتقان ما قبلها')+'</p></div></div>'
+     +'<div style="text-align:left"><span class="pill" style="background:'+(ok?'#2ecc71':'#0c6397')+';color:'+(ok?'#2b1b00':'#fff')+'">'+ar(c)+'/'+ar(N)+'</span></div></div>';
+  });
+  h+='<div class="card" style="padding:9px;text-align:center;background:'+(fndAllOK()?'#eafaf1':'#f1f2f6')+'"><h3 style="margin:0">'+(fndAllOK()?'٢) قسم المهارات':'🔒 ٢) قسم المهارات — أتمّ الحفظ أولًا')+'</h3>'
+   +'<p style="font-size:.8rem;color:#57606f;font-weight:700;margin:3px 0 0">أربع محطات، كل فوز ٣ نقاط، وتحتاج ٩ من ١٢</p></div>';
   CAMP.forEach(function(st){
-    var c=camp(st.id),names=st.sk.map(function(k){return TEAM[k].sk;}).join(' و');
-    h+='<div class="mrow" data-c="'+st.id+'" style="border-right-color:'+(c.won?'#2ecc71':'#f6b93b')+'">'
-     +'<div class="mleft"><div class="memo">'+(c.won?'✅':st.e)+'</div><div class="minfo"><h4>'+st.n+'</h4>'
-     +'<p>'+names+'<br>'+(c.won?('نجحت — ٣ نقاط'+(c.best?(' — أفضل نتيجة '+ar(c.best.me)+' أهداف'):'')):'عشر كرات — تحتاج ٦ أهداف')+'</p></div></div>'
+    var c=camp(st.id),names=st.sk.map(function(k){return TEAM[k].sk;}).join(' و'),o=fndAllOK();
+    h+='<div class="mrow'+(o?'':' lock')+'" data-c="'+st.id+'" style="border-right-color:'+(c.won?'#2ecc71':(o?'#f6b93b':'#747d8c'))+'">'
+     +'<div class="mleft"><div class="memo">'+(c.won?'✅':(o?st.e:'🔒'))+'</div><div class="minfo"><h4>'+st.n+'</h4>'
+     +'<p>'+names+'<br>'+(!o?'🔒 أتمّ قسم الحفظ أولًا':(c.won?('نجحت — ٣ نقاط'+(c.best?(' — أفضل نتيجة '+ar(c.best.me)+' أهداف'):'')):'عشر كرات — تحتاج ٦ أهداف'))+'</p></div></div>'
      +'<div style="text-align:left"><span class="pill" style="background:'+(c.won?'#2ecc71':'#f6b93b')+';color:#2b1b00">'+(c.won?'٣':'٠')+' نقاط</span></div></div>';
   });
   h+='</div>'+navBar('');
   document.getElementById('app').innerHTML=h;bindNav();
   var rs=document.querySelectorAll('.mrow');
-  for(var i=0;i<rs.length;i++)rs[i].onclick=function(){ac();showTeach(parseInt(this.getAttribute('data-c'),10),0,0);};
+  for(var i=0;i<rs.length;i++)rs[i].onclick=function(){
+    var fid=this.getAttribute('data-f');
+    if(fid){if(!fndOpen(fIdx(fid))){sSave();return;}ac();showFnd(fid);return;}
+    if(!fndAllOK()){sSave();return;}
+    ac();showTeach(parseInt(this.getAttribute('data-c'),10),0,0);
+  };
 }
 function cells(on,total,mv,gap){
   var h='<div class="tfr">';
@@ -896,6 +936,105 @@ function demoFrames(sk){
    {t:'زِد <b>٣</b> على كلّ منهما: <b>٨٦</b> و <b>٥٠</b>.',v:bars(86,50,100,'','#2ecc71')},
    {t:'والطرح من الخمسين سهل: <b>٨٦ − ٥٠ = ٣٦</b> ✔',v:'<div class="dmbig">٨٦ − ٥٠ = ٣٦</div>'}
   ];
+}
+function fAt(id){for(var i=0;i<FND.length;i++)if(FND[i].id===id)return FND[i];return FND[0];}
+function fIdx(id){for(var i=0;i<FND.length;i++)if(FND[i].id===id)return i;return 0;}
+function fndCard(f,x){
+  var sign=(f.typ==='c')?(ar(x[0])+' + <span style="color:#e74c3c">؟</span> = '+ar(f.s)):(ar(x[0])+' + '+ar(x[0])+' = <span style="color:#e74c3c">؟</span>');
+  return sign;
+}
+function showFnd(id){
+  var f=fAt(id),L=fndFacts(f),q=fnd(id);BACK=showCamp;
+  var g='';
+  for(var i=0;i<L.length;i++){
+    var done=!!q.m[L[i][0]];
+    g+='<div style="background:'+(done?'#d4efdf':'#eef7fb')+';border:2px solid '+(done?'#2ecc71':'#cfe3f0')+';border-radius:10px;padding:8px 4px;text-align:center;font-weight:800;font-size:.98rem;color:#0a3d62">'
+     +(done?'<span style="color:#0b6a38">✔ </span>':'')
+     +(f.typ==='c'?(ar(L[i][0])+' + '+ar(L[i][1])+' = '+ar(f.s)):(ar(L[i][0])+' + '+ar(L[i][0])+' = '+ar(L[i][0]*2)))
+     +'</div>';
+  }
+  var h=topBar(1)+'<div class="screen active">'
+   +'<div class="card" style="text-align:center"><div style="font-size:2.2rem">'+f.e+'</div>'
+   +'<h3>'+f.n+'</h3><p style="font-size:.86rem;color:#57606f;font-weight:700">'+f.d+'</p>'
+   +'<div style="margin-top:6px;font-size:1rem;font-weight:800;color:'+(fndOK(f)?'#0b6a38':'#b9770e')+'">أتقنت '+ar(fndCount(f))+' من '+ar(L.length)+(fndOK(f)?' ✅':'')+'</div></div>'
+   +'<div class="card"><h3>👀 احفظها أولًا</h3>'
+   +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">'+g+'</div></div>'
+   +'<button class="btn main" id="fgo">⚡ ابدأ التدريب — '+ar(tim().sec)+' ثوانٍ لكل بطاقة</button>'
+   +'<button class="backb" id="fbk">⟶ السابق</button></div>'+navBar('');
+  document.getElementById('app').innerHTML=h;bindNav();
+  document.getElementById('fgo').onclick=function(){ac();fndRun(id,shuffle(fndFacts(f).slice()),0,[]);};
+  document.getElementById('fbk').onclick=function(){ac();showCamp();};
+}
+var FTIMER=null;
+function fndRun(id,list,i,miss){
+  var f=fAt(id);BACK=function(){clearInterval(FTIMER);showFnd(id);};
+  if(i>=list.length){
+    clearInterval(FTIMER);
+    if(miss.length){
+      var hm=topBar(1)+'<div class="screen active"><div class="card" style="text-align:center">'
+       +'<div style="font-size:2.4rem">💪</div><h3>بقيت عليك '+ar(miss.length)+' بطاقة</h3>'
+       +'<p style="font-size:.9rem;font-weight:700;color:#57606f">أعدها حتى تتقنها كلها</p>'
+       +'<div style="margin-top:8px;font-size:1.05rem;font-weight:800;color:#b9770e">أتقنت '+ar(fndCount(f))+' من '+ar(fndFacts(f).length)+'</div>'
+       +'<button class="btn main" id="fre">🔁 أعد البطاقات الباقية</button>'
+       +'<button class="btn sec" id="fall">👀 ارجع واحفظها</button>'
+       +'<button class="backb" id="fbk2">⟶ السابق</button></div></div>'+navBar('');
+      document.getElementById('app').innerHTML=hm;bindNav();
+      document.getElementById('fre').onclick=function(){ac();fndRun(id,shuffle(miss.slice()),0,[]);};
+      document.getElementById('fall').onclick=function(){ac();showFnd(id);};
+      document.getElementById('fbk2').onclick=function(){ac();showFnd(id);};
+      return;
+    }
+    fnd(id).done=1;save();burst();sGold();
+    var nx=fIdx(id)+1;
+    var hd=topBar(1)+'<div class="screen active"><div class="card" style="text-align:center">'
+     +'<div style="font-size:3rem">🏅</div><h3>أتقنت '+f.n+' كاملة</h3>'
+     +'<p style="font-size:.95rem;font-weight:800;color:#0b6a38">'+ar(fndFacts(f).length)+' من '+ar(fndFacts(f).length)+' ✔</p>'
+     +(nx<FND.length?'<p style="font-size:.86rem;color:#57606f;font-weight:700">فُتحت لك: '+FND[nx].e+' '+FND[nx].n+'</p>':'<p style="font-size:.9rem;font-weight:800;color:#0b6a38">أتممت قسم الحفظ — انتقل إلى محطات المهارات</p>')
+     +'<button class="btn main" id="fnx">'+(nx<FND.length?'التالية ⟵':'🏕️ إلى محطات المهارات')+'</button>'
+     +'<button class="backb" id="fbk3">⟶ السابق</button></div></div>'+navBar('');
+    document.getElementById('app').innerHTML=hd;bindNav();
+    document.getElementById('fnx').onclick=function(){ac();if(nx<FND.length)showFnd(FND[nx].id);else showCamp();};
+    document.getElementById('fbk3').onclick=function(){ac();showCamp();};
+    return;
+  }
+  var x=list[i],ansv=(f.typ==='c')?x[1]:x[0]*2;
+  var o=shuffle([ansv].concat(badFor({ans:ansv,a:x[0],b:x[1],op:'+'})));
+  var h=topBar(1)+'<div class="screen active">'
+   +'<div class="card" style="text-align:center;padding:9px"><div style="font-size:.82rem;font-weight:800;color:#0c6397">'+f.e+' '+f.n+' — بطاقة '+ar(i+1)+' من '+ar(list.length)+'</div>'
+   +'<div style="font-size:.76rem;color:#57606f;font-weight:700;margin-top:2px">أتقنت '+ar(fndCount(f))+' من '+ar(fndFacts(f).length)+'</div></div>'
+   +'<div class="timer-wrap"><div class="timer-bar" id="ftb"></div></div>'
+   +'<div class="qbox"><div class="qtext">'+fndCard(f,x)+'</div></div>'
+   +'<div class="opts">';
+  o.forEach(function(v){h+='<button class="opt" data-v="'+v+'">'+ar(v)+'</button>';});
+  h+='</div><div id="ffb"></div><button class="backb" id="fbk4">⟶ السابق</button></div>'+navBar('');
+  document.getElementById('app').innerHTML=h;bindNav();
+  document.getElementById('fbk4').onclick=function(){clearInterval(FTIMER);ac();showFnd(id);};
+  var t0f=Date.now(),B=tim().sec,locked2=false;
+  clearInterval(FTIMER);
+  FTIMER=setInterval(function(){
+    var bar=document.getElementById('ftb');if(!bar){clearInterval(FTIMER);return;}
+    var left=Math.max(0,B-(Date.now()-t0f)/1000);
+    bar.style.width=((left/B)*100)+'%';
+    if(left<=0){clearInterval(FTIMER);finish(null);}
+  },70);
+  function finish(v){
+    if(locked2)return;locked2=true;clearInterval(FTIMER);
+    var good=(v===ansv);
+    var bs=document.querySelectorAll('.opt');
+    for(var j=0;j<bs.length;j++){
+      bs[j].disabled=true;
+      if(parseInt(bs[j].getAttribute('data-v'),10)===ansv){bs[j].style.background='#2ecc71';bs[j].style.color='#fff';}
+      else if(v!==null&&parseInt(bs[j].getAttribute('data-v'),10)===v){bs[j].style.background='#e74c3c';bs[j].style.color='#fff';}
+    }
+    if(good){fnd(id).m[x[0]]=1;save();sGold();}else{sSave();miss.push(x);}
+    document.getElementById('ffb').innerHTML='<div class="fb" style="background:'+(good?'#d4efdf':'#fadbd8')+'">'
+     +'<h4 style="color:'+(good?'#0b6a38':'#8a2318')+'">'+(good?'✔ أحسنت — حفظتها':(v===null?'⌛ انتهى الوقت':'✘ ليست هي'))+'</h4>'
+     +'<p style="color:'+(good?'#0b6a38':'#8a2318')+'">'+(f.typ==='c'?(ar(x[0])+' + '+ar(x[1])+' = '+ar(f.s)):(ar(x[0])+' + '+ar(x[0])+' = '+ar(x[0]*2)))+'</p>'
+     +'<button class="btn main" id="fnext">التالي ⟵</button></div>';
+    document.getElementById('fnext').onclick=function(){ac();fndRun(id,list,i+1,miss);};
+  }
+  var bs2=document.querySelectorAll('.opt');
+  for(var j2=0;j2<bs2.length;j2++)bs2[j2].onclick=function(){finish(parseInt(this.getAttribute('data-v'),10));};
 }
 function stAt(id){for(var i=0;i<CAMP.length;i++)if(CAMP[i].id===id)return CAMP[i];return CAMP[0];}
 function showTeach(id,si,fi){
@@ -1102,7 +1241,7 @@ function showSettings(){
 function doReset(){
   var sc=player.school,au=player.author;
   clearStores();
-  cards={};prog={};cup={};cmp={};
+  cards={};prog={};cup={};cmp={};fnds={};
   player={name:'',team:'',num:10,kit:'blue',pat:'p0',pc:'w',teacher:false,level:'easy'};
   player.school=sc;player.author=au;
   save();
