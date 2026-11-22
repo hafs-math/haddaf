@@ -68,6 +68,22 @@ body{background:linear-gradient(180deg,var(--ocean-dark) 0%,var(--ocean-mid) 50%
 .dvslot:empty{display:none}
 .dvb{background:#fff;border-radius:12px;padding:8px 6px;margin:0;width:100%;box-shadow:0 4px 14px rgba(0,0,0,.18);animation:idIn .4s ease both}
 @media(min-width:680px){.dvb{max-width:300px;padding:10px 8px}}
+.tfr{display:inline-grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:6px;background:#eef7fb;border:2px solid #cfe3f0;border-radius:10px}
+.cel{width:22px;height:22px;border-radius:50%;background:#fff;border:2px dashed #b9cfdf}
+.cel.on{background:#1E6FD9;border:2px solid #124A94}
+.cel.mv{background:#2ecc71;border:2px solid #1e8449;animation:pop .5s ease}
+.cel.gap{border-color:#e74c3c;animation:blink 1s infinite}
+@keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.dmwrap{text-align:center}
+.dmtxt{font-size:.95rem;font-weight:800;color:#0a3d62;line-height:1.9;margin:8px 0}
+.dmbig{font-size:1.5rem;font-weight:800;color:#0a3d62;margin:6px 0;direction:ltr}
+.dmlbl{font-size:.74rem;font-weight:800;color:#57606f;margin-bottom:2px}
+.dmdots{display:flex;justify-content:center;gap:6px;margin:8px 0}
+.dmdot{width:9px;height:9px;border-radius:50%;background:#cfd8e3}
+.dmdot.on{background:#f6b93b}
+.nline{width:100%;max-width:300px}
+.bar{height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.82rem}
 .dvq{text-align:center;font-size:1.02rem;font-weight:800;color:#0a3d62;margin:2px 0 6px}
 .stp{background:#eef7fb;border-radius:8px;padding:5px 6px;margin-bottom:4px;font-size:.78rem;font-weight:700;color:#0c6397;text-align:center}
 .stpok{color:#0b6a38}
@@ -804,26 +820,111 @@ function showCamp(){
   h+='</div>'+navBar('');
   document.getElementById('app').innerHTML=h;bindNav();
   var rs=document.querySelectorAll('.mrow');
-  for(var i=0;i<rs.length;i++)rs[i].onclick=function(){ac();showTeach(parseInt(this.getAttribute('data-c'),10));};
+  for(var i=0;i<rs.length;i++)rs[i].onclick=function(){ac();showTeach(parseInt(this.getAttribute('data-c'),10),0,0);};
+}
+function cells(on,total,mv,gap){
+  var h='<div class="tfr">';
+  for(var i=0;i<total;i++){
+    var c='cel';
+    if(i<on)c+=' on';
+    if(mv&&i>=on&&i<on+mv)c+=' mv';
+    if(gap&&i>=on+(mv||0))c+=' gap';
+    h+='<div class="'+c+'"></div>';
+  }
+  return h+'</div>';
+}
+function nline(from,to,jumps){
+  var W=300,H=74,pad=18,span=to-from,x=function(v){return pad+(v-from)/span*(W-pad*2);};
+  var h='<svg viewBox="0 0 '+W+' '+H+'" class="nline"><line x1="'+pad+'" y1="52" x2="'+(W-pad)+'" y2="52" stroke="#0a3d62" stroke-width="2.5"/>';
+  for(var v=from;v<=to;v++){
+    var big=(v%5===0);
+    h+='<line x1="'+x(v)+'" y1="'+(big?44:48)+'" x2="'+x(v)+'" y2="56" stroke="#0a3d62" stroke-width="'+(big?2:1)+'"/>';
+    if(big)h+='<text x="'+x(v)+'" y="70" text-anchor="middle" font-size="10" fill="#0a3d62" font-weight="700">'+v+'</text>';
+  }
+  (jumps||[]).forEach(function(j){
+    var x1=x(j[0]),x2=x(j[1]),mid=(x1+x2)/2;
+    h+='<path d="M'+x1+' 48 Q'+mid+' 14 '+x2+' 48" fill="none" stroke="#2ecc71" stroke-width="3"/>'
+     +'<circle cx="'+x2+'" cy="48" r="4" fill="#2ecc71"/>'
+     +'<text x="'+mid+'" y="18" text-anchor="middle" font-size="12" fill="#0b6a38" font-weight="800">+'+(j[1]-j[0])+'</text>';
+  });
+  return h+'</svg>';
+}
+function bars(a,b,mx,ca,cb){
+  var w=function(v){return Math.max(12,Math.round(v/mx*100));};
+  return '<div style="max-width:300px;margin:0 auto">'
+   +'<div class="dmlbl">'+ar(a)+'</div><div class="bar" style="width:'+w(a)+'%;background:#1E6FD9">'+ar(a)+'</div>'
+   +'<div style="height:6px"></div>'
+   +'<div class="dmlbl">'+ar(b)+'</div><div class="bar" style="width:'+w(b)+'%;background:'+(cb||'#e67e22')+'">'+ar(b)+'</div></div>';
+}
+function demoFrames(sk){
+  if(sk===1)return [
+   {t:'عندنا ٨ كرات، ونريد أن نضيف إليها ٥.',v:cells(8,10)+'<div class="dmlbl">٨</div>'+cells(5,5)+'<div class="dmlbl">٥</div>'},
+   {t:'كم ينقص الثمانية لتصير عشرة؟ ينقصها <b>٢</b> — انظر إلى الخانتين الفارغتين.',v:cells(8,10,0,1)+'<div class="dmlbl">٨ وينقصها ٢</div>'},
+   {t:'خذ <b>٢</b> من الخمسة وضعها في الفارغ.',v:cells(8,10,2)+'<div class="dmlbl">صارت ١٠</div>'+cells(3,5)+'<div class="dmlbl">وبقي ٣</div>'},
+   {t:'والعشرة سهلة: <b>١٠ + ٣ = ١٣</b>',v:'<div class="dmbig">10 + 3 = 13</div>'+cells(10,10)+cells(3,5)},
+   {t:'إذن <b>٨ + ٥ = ١٣</b> ✔',v:'<div class="dmbig">8 + 5 = 13</div>'}
+  ];
+  if(sk===2)return [
+   {t:'المطلوب: <b>٧ + ٨</b>',v:cells(7,7)+'<div class="dmlbl">٧</div>'+cells(8,8)+'<div class="dmlbl">٨</div>'},
+   {t:'لاحظ أن <b>٨ = ٧ + ١</b>، فالعددان توأمان وزيادة واحد.',v:cells(7,7)+'<div class="dmlbl">٧</div>'+cells(7,7,1)+'<div class="dmlbl">٧ + ١</div>'},
+   {t:'والضِعف محفوظ: <b>٧ + ٧ = ١٤</b>',v:'<div class="dmbig">7 + 7 = 14</div>'},
+   {t:'ثم أضف الواحد الزائد: <b>١٤ + ١ = ١٥</b> ✔',v:'<div class="dmbig">14 + 1 = 15</div>'}
+  ];
+  if(sk===3)return [
+   {t:'المطلوب: <b>٣٦ + ٢٧</b>',v:'<div class="dmbig">36 + 27</div>'},
+   {t:'فكّك <b>٢٧</b> إلى <b>٢٠</b> و <b>٧</b>.',v:'<div class="dmbig">27 = 20 + 7</div>'},
+   {t:'أضف العشرات أولًا: <b>٣٦ + ٢٠ = ٥٦</b>',v:nline(30,70,[[36,56]])},
+   {t:'ثم الآحاد: <b>٥٦ + ٧ = ٦٣</b> ✔',v:nline(30,70,[[36,56],[56,63]])}
+  ];
+  if(sk===4)return [
+   {t:'المطلوب: <b>٤٨ + ٩</b>',v:'<div class="dmbig">48 + 9</div>'},
+   {t:'والتسعة قريبة من العشرة… فلنأخذ <b>١٠</b> لأنها أسهل.',v:cells(9,10,0,1)+'<div class="dmlbl">٩ وينقصها ١ لتصير ١٠</div>'},
+   {t:'<b>٤٨ + ١٠ = ٥٨</b>',v:nline(40,65,[[48,58]])},
+   {t:'لكننا زدنا واحدًا زيادة، فنرجعه: <b>٥٨ − ١ = ٥٧</b> ✔',v:'<div class="dmbig">58 − 1 = 57</div>'}
+  ];
+  if(sk===5)return [
+   {t:'المطلوب: <b>٦٣ − ٥٨</b> — والعددان متقاربان، فلا تطرح، بل اصعد.',v:nline(55,65,[])},
+   {t:'اصعد من <b>٥٨</b> إلى <b>٦٠</b>: قفزة مقدارها <b>٢</b>.',v:nline(55,65,[[58,60]])},
+   {t:'ثم من <b>٦٠</b> إلى <b>٦٣</b>: قفزة مقدارها <b>٣</b>.',v:nline(55,65,[[58,60],[60,63]])},
+   {t:'اجمع القفزتين: <b>٢ + ٣ = ٥</b> ✔',v:'<div class="dmbig">63 − 58 = 5</div>'}
+  ];
+  return [
+   {t:'المطلوب: <b>٨٣ − ٤٧</b> — والفرق بينهما هو ما نريد.',v:bars(83,47,100)},
+   {t:'لو زدنا العددين معًا بالمقدار نفسه، بقي الفرق كما هو.',v:bars(83,47,100)+'<div class="dmlbl">الفرق لا يتغيّر</div>'},
+   {t:'زِد <b>٣</b> على كلّ منهما: <b>٨٦</b> و <b>٥٠</b>.',v:bars(86,50,100,'','#2ecc71')},
+   {t:'والطرح من الخمسين سهل: <b>٨٦ − ٥٠ = ٣٦</b> ✔',v:'<div class="dmbig">86 − 50 = 36</div>'}
+  ];
 }
 function stAt(id){for(var i=0;i<CAMP.length;i++)if(CAMP[i].id===id)return CAMP[i];return CAMP[0];}
-function showTeach(id){
-  var st=stAt(id);BACK=showCamp;
-  var h=topBar()+'<div class="screen active">'
-   +'<div class="card" style="text-align:center"><div style="font-size:2.2rem">'+st.e+'</div><h3>'+st.n+'</h3></div>';
-  st.sk.forEach(function(k){
-    var T=TEAM[k],q=genQ(k,rng());
-    h+='<div class="card"><h3>'+T.e+' '+T.sk+'</h3>'
-     +'<p style="font-size:.92rem;font-weight:800;color:#0a3d62;line-height:1.9">'+T.tip+'</p>'
-     +'<div class="dvb" style="max-width:100%;box-shadow:none;border:2px solid #e6eef5;margin-top:8px">'
-     +'<div class="dvq">'+ar(q.a)+' '+(q.op==='+'?'+':'−')+' '+ar(q.b)+' = '+ar(q.ans)+'</div>'
-     +q.steps.map(function(x){return '<div class="stp">'+x+'</div>';}).join('')
-     +'</div></div>';
-  });
-  h+='<button class="btn main" id="tgo">🏃 ابدأ التدريب (بلا وقت)</button>'
+function showTeach(id,si,fi){
+  var st=stAt(id);si=si||0;fi=fi||0;
+  var sk=st.sk[si],T=TEAM[sk],fr=demoFrames(sk),f=fr[fi],last=(fi>=fr.length-1),lastSkill=(si>=st.sk.length-1);
+  BACK=showCamp;
+  var dots='';
+  for(var d=0;d<fr.length;d++)dots+='<div class="dmdot'+(d<=fi?' on':'')+'"></div>';
+  var h=topBar(1)+'<div class="screen active">'
+   +'<div class="card" style="text-align:center;padding:10px"><div style="font-size:.82rem;font-weight:800;color:#0c6397">🎓 الشرح — '+st.n+(st.sk.length>1?(' ('+ar(si+1)+' من '+ar(st.sk.length)+')'):'')+'</div>'
+   +'<div style="font-size:1.05rem;font-weight:800;color:#0a3d62;margin-top:3px">'+T.e+' '+T.sk+'</div>'
+   +'<div style="font-size:.8rem;color:#57606f;font-weight:700;margin-top:2px">'+T.tip+'</div></div>'
+   +'<div class="card dmwrap idfade"><div class="dmdots">'+dots+'</div>'
+   +'<div>'+f.v+'</div>'
+   +'<div class="dmtxt">'+f.t+'</div></div>'
+   +(last
+     ? (lastSkill
+        ? '<button class="btn main" id="tgo">🏃 إلى التدريب (بلا وقت)</button>'
+        : '<button class="btn main" id="tnext">المهارة التالية ⟵</button>')
+     : '<button class="btn main" id="tnext">التالي ⟵</button>')
+   +(fi>0?'<button class="btn sec" id="tprev">⟵ أعد الخطوة</button>':'')
+   +'<button class="btn sec" id="tagain">🔁 أعد الشرح من أوله</button>'
    +'<button class="backb" id="tbk">⟶ السابق</button></div>'+navBar('');
   document.getElementById('app').innerHTML=h;bindNav();
-  document.getElementById('tgo').onclick=function(){ac();startDrill(id,0,buildDrill(st),0);};
+  if(document.getElementById('tnext'))document.getElementById('tnext').onclick=function(){
+    ac();tone(760,0,.09,'sine',.16);
+    if(last)showTeach(id,si+1,0);else showTeach(id,si,fi+1);
+  };
+  if(document.getElementById('tprev'))document.getElementById('tprev').onclick=function(){ac();showTeach(id,si,fi-1);};
+  document.getElementById('tagain').onclick=function(){ac();showTeach(id,0,0);};
+  if(document.getElementById('tgo'))document.getElementById('tgo').onclick=function(){ac();sGoal();startDrill(id,0,buildDrill(st),0);};
   document.getElementById('tbk').onclick=function(){ac();showCamp();};
 }
 function startDrill(id,i,list,right){
@@ -1336,7 +1437,7 @@ function campResult(){
    +'<button class="btn sec" id="cback">🏕️ محطات المعسكر</button>'
    +'<button class="backb" id="cbk">⟶ السابق</button></div>'+navBar('');
   document.getElementById('app').innerHTML=h;bindNav();
-  document.getElementById('cagain').onclick=function(){ac();showTeach(campMode);};
+  document.getElementById('cagain').onclick=function(){ac();var id=campMode;campMode=0;startDrill(id,0,buildDrill(stAt(id)),0);};
   document.getElementById('cback').onclick=function(){ac();campMode=0;showCamp();};
   document.getElementById('cbk').onclick=function(){ac();campMode=0;showCamp();};
   if(campDone()&&document.getElementById('cgo'))document.getElementById('cgo').onclick=function(){ac();campMode=0;showPick();};
