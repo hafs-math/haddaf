@@ -187,6 +187,7 @@ var LEVELS={
 };
 function lvl(){return LEVELS[player.level]||LEVELS.easy;}
 var CUPT={ball:10,sec:5};
+var CUPWIN=6;
 function tim(){return penMode?CUPT:lvl();}
 function needLevel(n){return n>=8?'المحترف':(n>=6?'المتوسط أو المحترف':'');}
 var KITS=[
@@ -711,7 +712,7 @@ function rulesCards(){
    +'• <b>الدوري:</b> ١٨ كرة في كل مباراة (والنهائي '+ar(FINAL.length*2)+')، وتفوز إذا كانت أهدافك أكثر من أهداف الخصم.<br>'
    +'• لا ينتقل إلى المباراة التالية إلا من فاز.<br>'
    +'• <b>النجوم:</b> ⭐⭐⭐ إذا لم يسجّل عليك الخصم وسجّلت ١٢ فأكثر، ⭐⭐ إذا حقّقت واحدة منهما، ⭐ للفوز العادي.<br>'
-   +'• <b>الكأس:</b> عشر ركلات أمام كل حارس، وتهزمه بـ<b>٦ أهداف فأكثر</b>. المتأخرة يمسكها الحارس.</p></div>'
+   +'• <b>الكأس:</b> عشر ركلات أمام كل حارس، وتهزمه بـ<b>٦ أهداف فأكثر</b>.<br>• في الكأس الزمن ثابت للجميع: <b>١٠ ثوانٍ للركلة، والهدف قبل ٥</b> مهما كان مستواك.<br>• الإجابة الصحيحة المتأخرة <b>لا تُحسب هدفًا ولا تُفقدك شيئًا</b>، والخطأ يعطي الحارس <b>هدفًا واحدًا</b>.<br>• ولا تفتح أمامك مرمى حارس حتى تهزم الذي قبله.</p></div>'
    +'<div class="card"><h3>🎚️ مستواك يحدّد سرعتك</h3>'
    +'<p style="font-size:.88rem;font-weight:700;line-height:2;color:#2f3542">'
    +'🟢 مبتدئ: ١٢ ثانية للكرة، والهدف قبل ٧ — حتى جدول ٥.<br>'
@@ -767,7 +768,7 @@ function showPick(){
    +'<div style="text-align:left"><span class="pill" style="background:#f6b93b;color:#2b1b00">'+wins()+'/9</span></div></div>'
    +'<div class="mrow" id="p2" style="border-right-color:#9aa7b1"><div class="mleft"><div class="memo">🥇</div>'
    +'<div class="minfo"><h4>بطولة الكأس</h4><p>ركلات ترجيح أمام حرّاس الفرق.<br>عشر ركلات لكل حارس — تهزمه بستة أهداف فأكثر.<br>ولا تنتقل لحارس حتى تهزم الذي قبله.</p></div></div>'
-   +'<div style="text-align:left"><span class="pill" style="background:#9aa7b1;color:#fff">'+cupWins()+'/9</span></div></div>'
+   +'<div style="text-align:left"><span class="pill" style="background:#9aa7b1;color:#fff">'+cupWins()+'/'+TABLES.length+'</span></div></div>'
    +'<div class="mrow" id="p3" style="border-right-color:#079992"><div class="mleft"><div class="memo">🏅</div>'
    +'<div class="minfo"><h4>بطاقة اللاعب</h4><p>فنيلتك وإنجازاتك وشهاداتك.</p></div></div></div>'
    +'<div class="mrow" id="p4" style="border-right-color:#0c6397"><div class="mleft"><div class="memo">📋</div>'
@@ -1148,7 +1149,7 @@ function answer(v,el){
 
 function showResult(){
   clearInterval(timer);BACK=function(){if(penMode)showPens();else showLeague();};
-  var T=TEAM[team],won=(me>op);
+  var T=TEAM[team],won=penMode?(me>=CUPWIN):(me>op);
   if(!penMode&&won){
     var p=pr(team),s=((op===0&&me>=12)?3:((op===0||me>=12)?2:1));
     if(!p.best||me>p.best.me)p.best={me:me,op:op};
@@ -1164,7 +1165,7 @@ function showResult(){
   }
   var h=topBar()+'<div class="screen active"><div class="card" style="text-align:center">'
    +'<div style="font-size:3rem">'+(penMode?(won?'🥇':'🧤'):(won?'🏆':'😟'))+'</div>'
-   +'<h3 style="font-size:1.25rem">'+(penMode?(won?'🥇 هزمت '+T.k:'الحارس صمد أمامك'):(won?'فوز!':(me===op?'تعادل — تحتاج هدفًا واحدًا على الأقل':'خسارة')))+'</h3>'
+   +'<h3 style="font-size:1.25rem">'+(penMode?(won?'🥇 هزمت '+T.k:'الحارس صمد أمامك — تحتاج '+ar(CUPWIN)+' أهداف'):(won?'فوز!':(me===op?'تعادل — تحتاج هدفًا واحدًا على الأقل':'خسارة')))+'</h3>'
    +'<div class="scoreboard" style="position:static;margin-top:12px">'
    +'<div class="sb"><span class="tm">'+T.e+' '+T.n+'</span><span class="nu">'+op+'</span></div>'
    +'<div class="sb me"><span class="tm">👕 '+player.team+'</span><span class="nu">'+me+'</span></div></div>';
