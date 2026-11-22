@@ -1115,9 +1115,8 @@ function answer(v,el){
     sGoal();
     bg='#fff3cd';col='#856404';
     if(penMode){
-      op++;
-      head='🧤 أمسكها الحارس';
-      line=ar(p)+' ÷ '+ar(c.a)+' = '+ar(c.b)+' — تأخرت '+ar(secs.toFixed(1))+' ثانية<br>سدّد في أقل من '+ar(tim().sec)+' ثوانٍ ليدخل';
+      head='🧤 أنقذتَ مرماك من هدف — لم يسجّل الحارس';
+      line=ar(p)+' ÷ '+ar(c.a)+' = '+ar(c.b)+' — تأخرت '+ar(secs.toFixed(1))+' ثانية<br>سدّد في أقل من '+ar(tim().sec)+' ثوانٍ ليصير هدفًا';
     } else {
       head='🧤 أنقذتَ مرماك من هدف';
       line=ar(p)+' ÷ '+ar(c.a)+' = '+ar(c.b)+' — تأخرت '+ar(secs.toFixed(1))+' ثانية<br>أجِب في أقل من '+ar(tim().sec)+' ثوانٍ ليصير هدفًا';
