@@ -43,10 +43,13 @@ body{background:linear-gradient(180deg,var(--ocean-dark) 0%,var(--ocean-mid) 50%
 .idl4{font-size:1rem;font-weight:600;line-height:2.1;opacity:.95}
 .idfade{animation:idIn .7s ease both}
 .netwrap{display:flex;justify-content:center;margin:2px 0 8px}
-.dvb{background:#fff;border-radius:12px;padding:10px 8px;margin-top:8px;animation:idIn .45s ease both}
-.dvt{text-align:center;font-size:.92rem;color:#0a3d62;font-weight:700;margin-bottom:6px}
-.dvb2{text-align:center;font-size:1rem;font-weight:800;color:#0b6a38;margin-top:6px}
-.dvb3{text-align:center;font-size:.86rem;color:#57606f;margin-top:2px}
+.dvslot{display:flex;justify-content:flex-end;margin:0 0 8px}
+.dvslot:empty{display:none}
+.dvb{background:#fff;border-radius:12px;padding:8px 6px;margin:0;width:100%;max-width:196px;box-shadow:0 4px 14px rgba(0,0,0,.18);animation:idIn .4s ease both}
+@media(min-width:680px){.dvb{max-width:300px;padding:10px 8px}}
+.dvt{text-align:center;font-size:.76rem;color:#0a3d62;font-weight:700;margin-bottom:4px;line-height:1.5}
+.dvb2{text-align:center;font-size:.92rem;font-weight:800;color:#0b6a38;margin-top:4px}
+.dvb3{text-align:center;font-size:.78rem;color:#57606f;margin-top:1px}
 .ballfly{animation:ballfly .75s cubic-bezier(.22,.68,.35,1) forwards}
 @keyframes ballfly{0%{transform:translate(168px,128px) scale(.55);opacity:0}15%{opacity:1}100%{transform:translate(48px,42px) scale(1)}}
 .netsh{transform-origin:50% 50%;animation:netsh .55s .62s ease-out}
@@ -424,7 +427,7 @@ function topBar(){
    +'<div style="flex:1"><div class="tname">'+player.name+' — '+player.team+'</div>'
    +'<div class="tsmall">رقم '+player.num+' — قميص '+kit().n+' — '+lvl().e+' '+lvl().n+'</div></div>'
    +'<div class="credit" id="cred">'+sch()+'<br>'+aut()+(player.teacher?'<br><span style="color:#f6b93b">وضع المعلم مفعّل</span>':'')+'</div></div>'
-   +'<div class="stats"><div>⭐ '+allStars()+'/'+(TABLES.length*3)+'</div><div>🏆 '+wins()+'/'+TABLES.length+'</div><div>🧤 '+allGold()+'/90</div></div>'
+   +'<div class="stats"><div>⭐ '+allStars()+'/'+(TABLES.length*3)+'</div><div>🏆 '+wins()+'/'+TABLES.length+'</div><div>🧤 '+allGold()+'/45</div></div>'
    +(BACK?'<button class="backb" id="bkb">⟶ السابق</button>':'')+'</header>';
 }
 function navBar(active){
@@ -867,7 +870,7 @@ function showReport(){
      +'<td style="padding:7px">'+(pr(n).won?'✅':'—')+'</td><td style="padding:7px">'+(cp(n).won?'✅':'—')+'</td></tr>';
   });
   h+='</table><p style="font-size:.84rem;font-weight:700;color:#0a3d62;margin-top:12px;line-height:1.9">'
-   +'🏆 مباريات الدوري: '+wins()+' من '+TABLES.length+'<br>🥇 حرّاس الكأس: '+cupWins()+' من '+TABLES.length+'<br>⭐ النجوم: '+allStars()+' من '+(TABLES.length*3)+'<br>🧤 التسديدات المضمونة: '+allGold()+' من 90<br>⚽ الأهداف: '+(player.goals||0)+'</p></div>'
+   +'🏆 مباريات الدوري: '+wins()+' من '+TABLES.length+'<br>🥇 حرّاس الكأس: '+cupWins()+' من '+TABLES.length+'<br>⭐ النجوم: '+allStars()+' من '+(TABLES.length*3)+'<br>🧤 التسديدات المضمونة: '+allGold()+' من 45<br>⚽ الأهداف: '+(player.goals||0)+'</p></div>'
    +'<button class="btn gold" id="pr">🖨️ طباعة / حفظ PDF</button>'
    +'<button class="btn sec" id="bk2">⟶ السابق</button></div>'+navBar('set');
   document.getElementById('app').innerHTML=h;bindNav();
@@ -940,7 +943,7 @@ function showCupChampion(){
 /* بطاقة اللاعب */
 function showCard(){
   BACK=showPick;
-  var L='بطاقة لاعب — هدّاف القسمة\n'+sch()+'\n'+aut()+'\n\nاللاعب: '+player.name+'\nالفريق: '+player.team+'\nرقم القميص: '+player.num+'\nالمباريات المكسوبة: '+wins()+' من '+TABLES.length+'\nالنجوم: '+allStars()+' من 27\nالتسديدات المضمونة: '+allGold()+' من 90\n';
+  var L='بطاقة لاعب — هدّاف القسمة\n'+sch()+'\n'+aut()+'\n\nاللاعب: '+player.name+'\nالفريق: '+player.team+'\nرقم القميص: '+player.num+'\nالمباريات المكسوبة: '+wins()+' من '+TABLES.length+'\nالنجوم: '+allStars()+' من '+(TABLES.length*3)+'\nالتسديدات المضمونة: '+allGold()+' من 45\n';
   TABLES.forEach(function(n){var p=pr(n);if(p.won)L+='- '+TEAM[n].n+': '+(p.best?p.best.op+'-'+p.best.me:'')+' ('+p.stars+' نجوم)\n';});
   L+='\nالتاريخ: '+new Date().toLocaleDateString('ar-EG');
   var h=topBar()+'<div class="screen active">'
@@ -1033,6 +1036,7 @@ function showQ(){
   var o=optsFor(f.ans,f.st);
   var h=topBar()+'<div class="screen active">'+board(T)
    +'<div class="timer-wrap"><div class="timer-bar" id="tb"></div></div>'
+   +'<div class="dvslot" id="dvslot"></div>'
    +(c.rev?'<div style="text-align:center;margin-bottom:10px"><span class="pill" style="background:var(--gold);color:#2b1b00">⚡ كرة ثابتة — مراجعة جدول '+ar(c.rev)+'</span></div>':'')
    +'<div class="qbox" id="qb"><div class="qtext">'+f.h+'</div></div>'
    +'<div class="opts">';
@@ -1105,8 +1109,9 @@ function answer(v,el){
   }
   var mn=document.getElementById('meN'),on=document.getElementById('opN');
   if(mn)mn.textContent=me; if(on)on.textContent=op;
-  var dv=ok?divBoard(c.a*c.b,c._p||c.a,c._e||c.b,c.t==='b'):'';
-  fb.innerHTML='<div class="fb" style="background:'+bg+'">'+(scored?goalNet():'')+'<h4 style="color:'+col+'">'+head+'</h4><p style="color:'+col+'">'+line+'</p>'+dv+'</div>';
+  var slot=document.getElementById('dvslot');
+  if(slot)slot.innerHTML=ok?divBoard(c.a*c.b,c._p||c.a,c._e||c.b,c.t==='b'):'';
+  fb.innerHTML='<div class="fb" style="background:'+bg+'">'+(scored?goalNet():'')+'<h4 style="color:'+col+'">'+head+'</h4><p style="color:'+col+'">'+line+'</p></div>';
   if(mustCoach){
     document.getElementById('coachwrap').innerHTML='<button class="coachbtn must" id="hint">🛟 لازم تسأل المدرّب قبل الكرة التالية</button>';
     document.getElementById('hint').onclick=function(){
@@ -1169,7 +1174,7 @@ function showChampion(){
   var txt='🏆 بطل بطولة هدّاف القسمة 🏆\n\n'
    +'الفريق البطل: '+player.team+'\n'
    +'اللاعب: '+player.name+' — قميص رقم '+player.num+'\n'
-   +'المباريات: '+TABLES.length+' من '+TABLES.length+'\nالأهداف: '+g+'\nالنجوم: '+allStars()+' من 27\nالتسديدات المضمونة: '+allGold()+' من 90\n\n'
+   +'المباريات: '+TABLES.length+' من '+TABLES.length+'\nالأهداف: '+g+'\nالنجوم: '+allStars()+' من '+(TABLES.length*3)+'\nالتسديدات المضمونة: '+allGold()+' من 45\n\n'
    +'نشكر فريق '+player.team+' واللاعب '+player.name+' على الفوز ببطولة هدّاف القسمة.\n'
    +'لقد كان قويًا سريعًا، تخطّى تسعة حُرّاس، وأتقن القسمة على ٢ إلى ٩.\n\n'
    +sch()+'\n'+aut()+'\nالتاريخ: '+new Date().toLocaleDateString('ar-EG');
@@ -1186,7 +1191,7 @@ function showChampion(){
    +'<div>⚽<br>'+g+'<br><span style="font-size:.72rem;color:#57606f">هدف</span></div>'
    +'<div>🏆<br>'+TABLES.length+'/'+TABLES.length+'<br><span style="font-size:.72rem;color:#57606f">مباراة</span></div>'
    +'<div>⭐<br>'+allStars()+'/'+(TABLES.length*3)+'<br><span style="font-size:.72rem;color:#57606f">نجمة</span></div>'
-   +'<div>🧤<br>'+allGold()+'/90<br><span style="font-size:.72rem;color:#57606f">مضمونة</span></div></div></div>'
+   +'<div>🧤<br>'+allGold()+'/45<br><span style="font-size:.72rem;color:#57606f">مضمونة</span></div></div></div>'
 
    +'<div class="card" style="border-right:6px solid var(--gold)">'
    +'<h3>🎖️ كلمة البطولة</h3>'
