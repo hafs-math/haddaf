@@ -81,7 +81,9 @@
   .seq{display:flex;gap:8px;justify-content:center;align-items:center}
   .sq{min-width:58px;padding:10px 6px;font-size:30px;font-weight:900;background:#fff;
     border:3px solid #0002;border-radius:14px;text-align:center}
-  .sq.q{background:#fff3cd;border-style:dashed;border-color:#2f6fed;color:#2f6fed}
+  .sq.q{background:#fff3cd;border-style:dashed;border-color:#2f6fed;color:#2f6fed;animation:blink 1.4s infinite}
+  .sq.q:empty:before{content:"\00a0"}
+  @keyframes blink{0%,100%{background:#fff3cd}50%{background:#ffe79a}}
   .stage-btn small{display:block;font-size:12px;font-weight:700;color:#5d7a6e;margin-top:2px}
   .stage-btn .tick{margin-right:auto;font-size:20px;text-align:center;line-height:1.1}
   .stage-btn .tick b{display:block;font-size:10px;color:#4a7a60;letter-spacing:1px}
@@ -708,10 +710,18 @@
       shuffle(range(11,20)).forEach(function(n){
         qs.push({type:"count10",n:n,emoji:pick(EMOJI),answer:n,choices:makeChoices(n,11,20)}); });
     } else if(st === 4 || st === 5){
-      var lo = (st === 4) ? 2 : 12, hi = (st === 4) ? 9 : 19;
       var clo = (st === 4) ? 1 : 11, chi = (st === 4) ? 10 : 20;
-      shuffle(range(lo,hi)).forEach(function(n){
-        qs.push({type:"missing", n:n, answer:n, choices:makeChoices(n,clo,chi)});
+      var starts = range(clo, chi-2);
+      var picked = [];
+      [0,1,2].forEach(function(pos){
+        shuffle(starts.slice()).slice(0,3).forEach(function(s0){
+          picked.push({ start:s0, pos:pos });
+        });
+      });
+      shuffle(picked).forEach(function(p){
+        var trio = [p.start, p.start+1, p.start+2];
+        var ans = trio[p.pos];
+        qs.push({ type:"missing", trio:trio, pos:p.pos, answer:ans, choices:makeChoices(ans,clo,chi) });
       });
     } else {
       var pairs = [];
@@ -783,10 +793,10 @@
         + '<div class="group"><span class="cap">و</span>'+items(q.n-10,q.emoji,.35)+'</div>';
     } else if(q.type === "missing"){
       $("qtext").textContent = "ما العدد المفقود؟";
-      obj.innerHTML = '<div class="seq" dir="ltr">'
-        + '<span class="sq">' + num(q.n-1) + '</span>'
-        + '<span class="sq q">؟</span>'
-        + '<span class="sq">' + num(q.n+1) + '</span></div>';
+      var cells = q.trio.map(function(v,i){
+        return (i === q.pos) ? '<span class="sq q"></span>' : '<span class="sq">' + num(v) + '</span>';
+      }).join("");
+      obj.innerHTML = '<div class="seq" dir="rtl">' + cells + '</div>';
     } else {
       $("qtext").textContent = "كم المجموع؟";
       obj.innerHTML = '<div class="group">'+items(q.a,q.emoji)+(q.a===0?'<span class="cap">لا شيء</span>':'')+'</div>'
@@ -805,7 +815,7 @@
     });
 
     $("netmsg").textContent = (q.type==="add") ? "اجمع المجموعتين ثم اختر!"
-      : (q.type==="missing" ? "ما العدد الذي بين العددين؟" : "عُدّ الأشياء ثم اختر العدد!");
+      : (q.type==="missing" ? "عُدّ من اليمين إلى اليسار واملأ الفراغ" : "عُدّ الأشياء ثم اختر العدد!");
     locked = false; startTimer();
   }
   function lockChoices(){ Array.prototype.forEach.call($("choices").children, function(b){ b.disabled = true; }); }
